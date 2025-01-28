@@ -8,6 +8,11 @@ app.get("/", (x, res) => {
 	res.sendFile(path.join(__dirname, "index.html"));
 });
 
+app.get("/constants.js", (req, res) => {
+	res.set("Content-Type", "application/javascript");
+	res.sendFile(path.join(__dirname, "constants.js"));
+});
+
 app.get("/app.js", (req, res) => {
 	res.set("Content-Type", "application/javascript");
 	res.sendFile(path.join(__dirname, "app.js"));
