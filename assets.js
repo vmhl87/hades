@@ -396,8 +396,27 @@ function drawModule(T){
 			line(11*cos(PI/3*i), 11*sin(PI/3*i),
 				27/2*cos(PI/3*i), 27/2*sin(PI/3*i));
 		}
-		for(let i=0; i<3; ++i)
-			line(0, 0, 4*sin(PI*2*i/3), 4*cos(PI*2*i/3));
+	}
+
+	if(T == TP){
+		stroke(50, 150, 50); noFill();
+		ellipse(0, -8, 25, 8);
+		arc(0, 0, 25, 8, -PI*0.05, PI*1.05);
+		arc(0, 8, 25, 8, -PI*0.05, PI*1.05);
+	}
+
+	if(T == BARRIER){
+		fill(50, 150, 50); noStroke();
+		beginShape();
+		vertex(0, -7);
+		vertex(-5.5, 2);
+		vertex(-4.5, 6.5);
+		vertex(0, 4);
+		vertex(4.5, 6.5);
+		vertex(5.5, 2);
+		endShape(CLOSE);
+		noFill(); stroke(50, 150, 50);
+		circle(0, 0, 25);
 	}
 
 	// DRONE

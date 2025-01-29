@@ -7,7 +7,7 @@ let ui = {
 	}
 };
 
-let modules = [MASS, IMPULSE, FORT, SOL, REPAIR];
+let modules = [MASS, IMPULSE, FORT, BARRIER, REPAIR];
 
 function setup(){
 	createCanvas(windowWidth, windowHeight);
