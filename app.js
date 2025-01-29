@@ -7,7 +7,7 @@ let ui = {
 	}
 };
 
-let modules = [LASER, PASSIVE, SOL, DELTA, DECOY];
+let modules = [MASS, IMPULSE, FORT, SOL, REPAIR];
 
 function setup(){
 	createCanvas(windowWidth, windowHeight);

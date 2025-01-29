@@ -8,4 +8,4 @@ const ALPHA = ++ct, IMPULSE = ++ct, PASSIVE = ++ct, OMEGA = ++ct, MIRROR = ++ct,
 
 const EMP = ++ct, SOL = ++ct, FORT = ++ct, TP = ++ct, AMP = ++ct, DESTINY = ++ct, BARRIER = ++ct, VENG = ++ct, DELTA = ++ct;
 
-const DECOY = ++ct, REPAIR = ++ct, ROCKET = ++ct, TURRET = ++ct, CHAIN = ++ct;
+const DECOY = ++ct, REPAIR = ++ct, ROCKET = ++ct, TURRET = ++ct;

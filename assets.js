@@ -203,20 +203,106 @@ function drawShip(T, R, G, B){
 function drawModule(T){
 	if(T == null) return;
 
+	function _batt(x, y, r, l){
+		stroke(200, 50, 50); noFill();
+		rect(-2+x, -10, 4, 4);
+		rect(-1+x, -6, 2, 4);
+		if(l){
+			beginShape();
+			vertex(-2+x, -2);
+			vertex(2+x+y, -2);
+			vertex(2+x+y, 4);
+			vertex(3+x+y, 5);
+			vertex(3+x+y, 9);
+			vertex(2+x+y, 10);
+			vertex(-2+x, 10);
+			endShape();
+		}
+		if(r){
+			beginShape();
+			vertex(2+x, 10);
+			vertex(-2+x-y, 10);
+			vertex(-3+x-y, 9);
+			vertex(-3+x-y, 5);
+			vertex(-2+x-y, 4);
+			vertex(-2+x-y, -2);
+			vertex(2+x, -2);
+			endShape();
+		}
+	}
+
 	push(); strokeWeight(2);
 
+	// WEAPON
+
 	if(T == LASER){
-		stroke(255, 50, 50);
+		stroke(200, 50, 50);
 		line(0, -10, 0, 10);
 		line(-10, -10, 10, -10);
-		line(-7, -3, 0, -9);
-		line(7, -3, 0, -9);
+		line(8.7, -5, 0, -9);
+		line(-8.7, -5, 0, -9);
+		line(5, -1.3, 0, -9);
+		line(-5, -1.3, 0, -9);
 	}
+
+	if(T == BATTERY){
+		_batt(-4, 0, 1, 1);
+		_batt(4, 0, 1, 1);
+	}
+
+	if(T == MASS){
+		_batt(-6, 0, 1, 0);
+		_batt(0, 1, 1, 1);
+		_batt(6, 0, 0, 1);
+	}
+
+	if(T == LASER2){
+		stroke(200, 50, 50);
+		line(3, -10, 3, 10);
+		line(-3, -10, -3, 10);
+		line(-13, -10, 13, -10);
+		line(11.7, -5, 3, -9);
+		line(-11.7, -5, -3, -9);
+		line(8, -1.3, 3, -9);
+		line(-8, -1.3, -3, -9);
+	}
+
+	if(T == DART){
+		stroke(200, 50, 50);
+		beginShape();
+		vertex(-2, 10);
+		vertex(-2, -6);
+		vertex(0, -10);
+		vertex(2, -6);
+		vertex(2, 10);
+		endShape();
+		strokeWeight(1.5);
+		line(-5, 8, -5, 2);
+		line(5, 8, 5, 2);
+	}
+
+	// SHIELD
 
 	if(T == ALPHA){
 		stroke(50, 150, 150); noFill();
 		arc(0, 0, 20, 20, -PI*0.3, PI*0.3);
 		arc(0, 0, 20, 20, PI-PI*0.3, PI+PI*0.3);
+	}
+
+	if(T == IMPULSE){
+		stroke(50, 150, 150); noFill();
+		arc(0, 0, 25, 25, -PI*0.35, PI*0.15);
+		arc(0, 0, 25, 25, PI-PI*0.15, PI+PI*0.35);
+		fill(50, 150, 150);
+		beginShape();
+		vertex(0, -11);
+		vertex(6, 4);
+		vertex(0, 6);
+		vertex(-6, 4);
+		endShape(CLOSE);
+		line(-4, 9, -4, 12);
+		line(0, 10, 0, 14);
+		line(4, 9, 4, 12);
 	}
 
 	if(T == PASSIVE){
@@ -227,6 +313,13 @@ function drawModule(T){
 		line(12.5*cos(PI*0.3), 12.5*sin(PI*0.3), 11.5, 10.5);
 		line(-12.5*cos(PI*0.3), -12.5*sin(PI*0.3), -6, -6);
 		line(-12.5*cos(PI*0.3), -12.5*sin(PI*0.3), -11.5, -10.5);
+		fill(50, 150, 150);
+		beginShape();
+		vertex(3, 0);
+		vertex(0, 4);
+		vertex(-3, 0);
+		vertex(0, -4);
+		endShape(CLOSE);
 	}
 
 	if(T == OMEGA){
@@ -242,20 +335,115 @@ function drawModule(T){
 		endShape(CLOSE);
 	}
 
+	if(T == MIRROR){
+		stroke(50, 150, 150); noFill();
+		arc(0, 0, 25, 25, -PI*0.3, PI*0.3);
+		arc(0, 0, 25, 25, PI-PI*0.3, PI+PI*0.3);
+		beginShape();
+		vertex(-2, -4);
+		vertex(2, -4);
+		vertex(2, 3);
+		vertex(0, 4);
+		vertex(-2, 3);
+		endShape(CLOSE);
+		beginShape();
+		vertex(-6, -3);
+		vertex(-7, 0);
+		vertex(-6, 3);
+		endShape();
+		beginShape();
+		vertex(6, -3);
+		vertex(7, 0);
+		vertex(6, 3);
+		endShape();
+	}
+
+	if(T == ALLY){
+		stroke(50, 150, 150); noFill();
+		arc(0, 0, 25, 25, -PI*0.3, PI*0.3);
+		arc(0, 0, 25, 25, PI-PI*0.3, PI+PI*0.3);
+		arc(0, 0, 21, 21, -PI*0.1, PI*0.1);
+		arc(0, 0, 21, 21, PI-PI*0.1, PI+PI*0.1);
+		strokeWeight(1);
+		circle(0, 0, 15);
+	}
+
+	// MODULE
+
 	if(T == SOL){
 		fill(50, 150, 50); noStroke();
 		beginShape();
-		vertex(-0, -9);
-		vertex(-7, 8);
-		vertex(-1, 4);
+		vertex(-0.5, -10);
+		vertex(-7.5, 4);
+		vertex(-7, 10);
+		vertex(-0.5, 6);
 		endShape(CLOSE);
 		stroke(50, 150, 50); noFill();
 		beginShape();
-		vertex(0, -9);
-		vertex(-7, 8);
-		vertex(0, 4);
-		vertex(6, 8);
+		vertex(0, -10);
+		vertex(-7.5, 4);
+		vertex(-7, 10);
+		vertex(0, 6);
+		vertex(7, 10);
+		vertex(7.5, 4);
 		endShape(CLOSE);
+	}
+
+	if(T == FORT){
+		stroke(50, 150, 50); noFill();
+		for(let i=0.5; i<7; ++i){
+			arc(0, 0, 27, 27, PI/3*i-PI/20, PI/3*i+PI/20);
+			line(11*cos(PI/3*i), 11*sin(PI/3*i),
+				27/2*cos(PI/3*i), 27/2*sin(PI/3*i));
+		}
+		for(let i=0; i<3; ++i)
+			line(0, 0, 4*sin(PI*2*i/3), 4*cos(PI*2*i/3));
+	}
+
+	// DRONE
+	
+	if(T == DECOY){
+		stroke(150, 100, 50); noFill();
+		beginShape();
+		vertex(-12, 3);
+		vertex(-4, -3);
+		vertex(0, -4);
+		vertex(4, -3);
+		vertex(12, 3);
+		endShape();
+		beginShape();
+		vertex(-7, -1);
+		vertex(-3, 2);
+		vertex(0, 3);
+		vertex(3, 2);
+		vertex(7, -1);
+		endShape();
+		strokeWeight(1.5);
+		arc(0, -2, 25, 25, PI*0.3, PI*0.7);
+		arc(0, 2, 25, 25, PI*1.3, PI*1.7);
+		line(0, 2-12.5, 0, -8.5);
+		line(0, 12.5-2, 0, 8.5);
+	}
+
+	if(T == REPAIR){
+		stroke(150, 100, 50); fill(150, 100, 50);
+		beginShape();
+		vertex(-5, -9);
+		vertex(0, 4);
+		vertex(-3, 2);
+		vertex(-5, 9);
+		vertex(-7, 2);
+		vertex(-10, 4);
+		endShape(CLOSE);
+		noFill(); strokeWeight(3);
+		beginShape();
+		vertex(9.5, -10);
+		vertex(10, -6);
+		vertex(7, -4.5);
+		vertex(4, -6);
+		vertex(4.5, -10);
+		endShape();
+		line(7, -4.5, 7, 9);
 	}
 
 	pop();
