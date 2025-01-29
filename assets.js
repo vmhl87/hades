@@ -369,6 +369,22 @@ function drawModule(T){
 	}
 
 	// MODULE
+	
+	if(T == EMP){
+		fill(50, 150, 50); stroke(50, 150, 50);
+		beginShape();
+		vertex(0.5, -3);
+		vertex(2, -1);
+		vertex(0, 0);
+		vertex(-0.5, 3);
+		vertex(-2, 1);
+		vertex(0, 0);
+		endShape(CLOSE);
+		noFill();
+		circle(0, 0, 25);
+		strokeWeight(1.5);
+		circle(0, 0, 20);
+	}
 
 	if(T == SOL){
 		fill(50, 150, 50); noStroke();
@@ -405,6 +421,40 @@ function drawModule(T){
 		arc(0, 8, 25, 8, -PI*0.05, PI*1.05);
 	}
 
+	if(T == AMP){
+		stroke(50, 150, 50); noFill();
+
+		for(let i=0; i<8; ++i)
+			arc(0, 0, 25, 25, -PI/16 + PI*i/4, PI/16 + PI*i/4);
+
+		circle(0, 0, 8);
+		line(0, -7, 0, 7);
+		line(-7, 0, 7, 0);
+	}
+
+	if(T == DESTINY){
+		stroke(50, 150, 50); fill(50, 150, 50);
+		beginShape();
+		vertex(0, -5);
+		vertex(-5, 0);
+		vertex(0, 5);
+		vertex(5, 0);
+		endShape(CLOSE);
+		noFill();
+		line(5, 5, 10, 10);
+		line(-5, 5, -10, 10);
+		line(5, -5, 10, -10);
+		line(-5, -5, -10, -10);
+		line(-2, 8, -2.75, 9);
+		line(2, 8, 2.75, 9);
+		line(-2, -8, -2.75, -9);
+		line(2, -8, 2.75, -9);
+		line(-8, 2, -9, 2.75);
+		line(8, 2, 9, 2.75);
+		line(-8, -2, -9, -2.75);
+		line(8, -2, 9, -2.75);
+	}
+
 	if(T == BARRIER){
 		fill(50, 150, 50); noStroke();
 		beginShape();
@@ -417,6 +467,52 @@ function drawModule(T){
 		endShape(CLOSE);
 		noFill(); stroke(50, 150, 50);
 		circle(0, 0, 25);
+	}
+
+	if(T == VENG){
+		stroke(50, 150, 50); noFill();
+		beginShape();
+		vertex(0, -5);
+		vertex(-5, 0);
+		vertex(0, 5);
+		vertex(5, 0);
+		endShape(CLOSE);
+		line(5, 5, 10, 10);
+		line(-5, 5, -10, 10);
+		line(5, -5, 10, -10);
+		line(-5, -5, -10, -10);
+		line(-2, 8, -2.75, 9);
+		line(2, 8, 2.75, 9);
+		line(-2, -8, -2.75, -9);
+		line(2, -8, 2.75, -9);
+		line(-8, 2, -9, 2.75);
+		line(8, 2, 9, 2.75);
+		line(-8, -2, -9, -2.75);
+		line(8, -2, 9, -2.75);
+	}
+
+	if(T == DELTA){
+		stroke(50, 150, 50); fill(50, 150, 50);
+		beginShape();
+		vertex(10, -10);
+		vertex(10, -8);
+		vertex(8, -6);
+		vertex(6, -8);
+		vertex(8, -10);
+		endShape(CLOSE);
+		beginShape();
+		vertex(4, -6);
+		vertex(-4, 2);
+		vertex(-11, 5);
+		vertex(-9, 9);
+		vertex(-5, 11);
+		vertex(-2, 4);
+		vertex(6, -4);
+		endShape();
+		line(-1.5, -7, -3, -12);
+		line(1.5, 7, 3, 12);
+		line(-7, -1.5, -12, -3);
+		line(7, 1.5, 12, 3);
 	}
 
 	// DRONE
@@ -447,10 +543,10 @@ function drawModule(T){
 	if(T == REPAIR){
 		stroke(150, 100, 50); fill(150, 100, 50);
 		beginShape();
-		vertex(-5, -9);
+		vertex(-5, -7);
 		vertex(0, 4);
 		vertex(-3, 2);
-		vertex(-5, 9);
+		vertex(-5, 7);
 		vertex(-7, 2);
 		vertex(-10, 4);
 		endShape(CLOSE);
@@ -463,6 +559,45 @@ function drawModule(T){
 		vertex(4.5, -10);
 		endShape();
 		line(7, -4.5, 7, 9);
+	}
+
+	if(T == ROCKET){
+		stroke(150, 100, 50); fill(150, 100, 50);
+		beginShape();
+		vertex(-5, -7);
+		vertex(0, 4);
+		vertex(-3, 2);
+		vertex(-5, 7);
+		vertex(-7, 2);
+		vertex(-10, 4);
+		endShape(CLOSE);
+		beginShape();
+		vertex(6.5, -8);
+		vertex(6.5, -9);
+		vertex(7, -10);
+		vertex(7.5, -9);
+		vertex(7.5, -8);
+		endShape(CLOSE);
+		beginShape();
+		vertex(5, 11);
+		vertex(6.5, 7);
+		vertex(6.5, -5);
+		vertex(7.5, -5);
+		vertex(7.5, 7);
+		vertex(9, 11);
+		vertex(7, 10);
+		endShape(CLOSE);
+	}
+
+	if(T == TURRET){
+		stroke(150, 100, 50); fill(150, 100, 50);
+		circle(0, -4, 2);
+		circle(4*sin(PI*2/3), -4*cos(PI*2/3), 2);
+		circle(4*sin(PI*4/3), -4*cos(PI*4/3), 2);
+		noFill();
+		arc(0, 0, 22, 22, -PI/2-PI/4, -PI/2+PI/4);
+		arc(0, 0, 22, 22, -PI/2+PI*2/3-PI/4, -PI/2+PI*2/3+PI/4);
+		arc(0, 0, 22, 22, -PI/2+PI*4/3-PI/4, -PI/2+PI*4/3+PI/4);
 	}
 
 	pop();
