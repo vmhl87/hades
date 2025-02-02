@@ -20,7 +20,7 @@ function draw(){
 
 		fill(200); noStroke();
 		push(); translate(width/2, height/2-100);
-		scale(5); drawShip(BS1);
+		scale(5); drawShip(BS, 0);
 		pop();
 
 		fill(255, 0, 0, 50);

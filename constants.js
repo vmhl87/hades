@@ -1,6 +1,6 @@
 let ct = 0;
 
-const BS1 = ++ct, BS2 = ++ct, SENTINEL = ++ct, GUARD = ++ct, INT = ++ct, COL = ++ct;
+const BS = ++ct, SENTINEL = ++ct, GUARD = ++ct, INT = ++ct, COL = ++ct;
 
 const LASER = ++ct, BATTERY = ++ct, MASS = ++ct, LASER2 = ++ct, DART = ++ct;
 
