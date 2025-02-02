@@ -18,6 +18,11 @@ app.get("/app.js", (req, res) => {
 	res.sendFile(path.join(__dirname, "app.js"));
 });
 
+app.get("/util.js", (req, res) => {
+	res.set("Content-Type", "application/javascript");
+	res.sendFile(path.join(__dirname, "util.js"));
+});
+
 app.get("/assets.js", (req, res) => {
 	res.set("Content-Type", "application/javascript");
 	res.sendFile(path.join(__dirname, "assets.js"));
@@ -26,6 +31,10 @@ app.get("/assets.js", (req, res) => {
 app.get("/style.css", (req, res) => {
 	res.set("Content-Type", "text/css");
 	res.sendFile(path.join(__dirname, "style.css"));
+});
+
+app.get('/Ubuntu-Regular.ttf', (x, res) => {
+  res.sendFile(__dirname + '/Ubuntu-Regular.ttf')
 });
 
 io.on("connect", (socket) => {
