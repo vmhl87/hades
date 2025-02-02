@@ -1,10 +1,9 @@
-const socket = io();
-
 let font = null;
 
 let modules = [null, null, null, null, null];
 
-let ongoing = 0, searching = 0, staging = 1, chooseModule = -1;
+let searching = 0, staging = 1, chooseModule = -1,
+	open = 0;
 
 function preload(){
 	font = loadFont('Ubuntu-Regular.ttf');
@@ -21,12 +20,12 @@ function setup(){
 }
 
 function draw(){
-	if(staging){
-		background(0, 10, 25);
+	background(0, 10, 25);
 
+	if(staging){
 		fill(200); noStroke();
 		push(); translate(width/2, height/2-100);
-		scale(5); drawShip(BS, 0);
+		scale(5); drawShip(BS, 0, 1);
 		pop();
 
 		fill(255, 50, 50, searching ? 60 :
@@ -118,7 +117,7 @@ function draw(){
 					drawModule(EMP+i);
 					pop();
 					fill(0, 100);
-					if(modules[5-chooseModule] == EMP+i) rect(width/2-95+i*50, height/2+155, 40, 40);
+					if(modules[5-chooseModule] == EMP+i) rect(width/2-120+i*50, height/2+105, 40, 40);
 				}
 
 				for(let i=0; i<4; ++i){
@@ -147,6 +146,7 @@ function draw(){
 		}
 
 	}else{
+		// do stuff
 	}
 }
 
@@ -178,20 +178,28 @@ function mouseReleased(){
 			if(mouseIn(width/2, height/2+150, 60, 30)){
 				if(!searching){
 					searching = 1;
-					// start();
+					setTimeout(() => {
+						if(searching){
+							start();
+							open = 1;
+						}
+					}, 3000);
 				}
 			}
 
 			if(mouseIn(width/2, height/2+200, 60, 15)){
 				if(searching){
 					searching = 0;
-					// cancel();
+					if(open) cancel();
 				}
 			}
 
 			if(mouseIn(width/2, height/2+230, 60, 15)){
 				if(searching){
-					// solo();
+					searching = 0;
+					if(open) cancel();
+					solo();
+					staging = 0;
 				}
 			}
 

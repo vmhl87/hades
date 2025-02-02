@@ -1,4 +1,4 @@
-function drawShip(T, O = 0){
+function drawShip(T, O, M){
 	function _symm(a){
 		beginShape();
 		for(let i=0; i<a.length; ++i)
@@ -11,6 +11,22 @@ function drawShip(T, O = 0){
 	push(); noStroke();
 
 	if(T == BS){
+		if(M){
+			fill(60, 180, 180);
+			_symm([
+				[-20, 0],
+				[-20, 2],
+				[-26-(sin(frameCount/20)/2+0.5), 5.25+0.2*(sin(frameCount/20)/2+0.5)],
+				[-15, 7]
+			]);
+			fill(100, 255, 255);
+			_symm([
+				[-19, 0],
+				[-20, 3],
+				[-24-0.6*(sin(frameCount/20)/2+0.5), 5+0.12*(sin(frameCount/20)/2+0.5)],
+				[-15, 6]
+			]);
+		}
 		if(O == 0) fill(60, 90, 90);
 		if(O == 1) fill(110, 30, 30);
 		_symm([
@@ -95,6 +111,18 @@ function drawShip(T, O = 0){
 	}
 
 	if(T == SENTINEL){
+		if(M){
+			fill(60, 180, 180);
+			_symm([
+				[-18-(sin(frameCount/20)/2+0.5), 0],
+				[-8, 2]
+			]);
+			fill(100, 255, 255);
+			_symm([
+				[-15-0.5*(sin(frameCount/20)/2+0.5), 0],
+				[-8, 1.5]
+			]);
+		}
 		fill(80, 50, 50);
 		_symm([
 			[-10, 0],
@@ -148,9 +176,38 @@ function drawShip(T, O = 0){
 		circle(4.5, 0, 4.5);
 		fill(80, 50, 50);
 		circle(4.5, 0, 3);
+		if(M){
+			fill(60, 180, 180);
+			_symm([
+				[-8-(sin(frameCount/20)/2+0.5), 0],
+				[-3, 2],
+				[-2, 2],
+				[-1, 1],
+				[-0.5, 0]
+			]);
+			fill(100, 255, 255);
+			_symm([
+				[-5-0.7*(sin(frameCount/20)/2+0.5), 0],
+				[-3, 1],
+				[-2, 1],
+				[-1.5, 0]
+			]);
+		}
 	}
 
 	if(T == INT){
+		if(M){
+			fill(60, 180, 180);
+			_symm([
+				[-20-2*(sin(frameCount/20)/2+0.5), 0],
+				[-8, 3]
+			]);
+			fill(100, 255, 255);
+			_symm([
+				[-16-(sin(frameCount/20)/2+0.5), 0],
+				[-8, 2]
+			]);
+		}
 		fill(150, 80, 80);
 		_symm([
 			[6, 0],
@@ -184,6 +241,22 @@ function drawShip(T, O = 0){
 	}
 
 	if(T == COL){
+		if(M){
+			fill(60, 180, 180);
+			_symm([
+				[-20, 0],
+				[-20, 2],
+				[-26-(sin(frameCount/20)/2+0.5), 4.25+0.2*(sin(frameCount/20)/2+0.5)],
+				[-15, 6]
+			]);
+			fill(100, 255, 255);
+			_symm([
+				[-19, 0],
+				[-20, 3],
+				[-24-0.6*(sin(frameCount/20)/2+0.5), 4+0.12*(sin(frameCount/20)/2+0.5)],
+				[-15, 5]
+			]);
+		}
 		fill(80, 50, 50);
 		_symm([
 			[8, 6],
@@ -252,19 +325,54 @@ function drawShip(T, O = 0){
 		if(O == 0) fill(60, 100, 100);
 		if(O == 1) fill(120, 40, 40);
 		circle(1.25, 0, 2.5);
+		if(M){
+			fill(60, 180, 180);
+			_symm([
+				[-10-(sin(frameCount/20)/2+0.5), 0],
+				[-5, 2],
+				[-4, 2],
+				[-3, 1],
+				[-2.5, 0]
+			]);
+			fill(100, 255, 255);
+			_symm([
+				[-7-0.7*(sin(frameCount/20)/2+0.5), 0],
+				[-5, 1],
+				[-4, 1],
+				[-3.5, 0]
+			]);
+		}
 	}
 
 	if(T == REPAIR){
 		if(O == 0) fill(100, 150, 150);
 		if(O == 1) fill(170, 70, 70);
 		ellipse(1.25, 0, 12, 10);
-		arc(3, 0, 18, 18, PI*0.7, PI*1.3);
+		arc(3, 0, 18, 18, PI*0.7, PI*0.9);
+		arc(3, 0, 18, 18, PI*1.1, PI*1.3);
 		if(O == 0) fill(80, 120, 120);
 		if(O == 1) fill(140, 50, 50);
 		circle(1, 0, 4);
 		if(O == 0) fill(60, 100, 100);
 		if(O == 1) fill(120, 40, 40);
 		circle(1, 0, 2.5);
+		if(M){
+			fill(60, 180, 180);
+			_symm([
+				[-14-(sin(frameCount/20)/2+0.5), 0],
+				[-9, 2],
+				[-8, 2],
+				[-7, 1],
+				[-6.5, 0]
+			]);
+			fill(100, 255, 255);
+			_symm([
+				[-11-0.7*(sin(frameCount/20)/2+0.5), 0],
+				[-9, 1],
+				[-8, 1],
+				[-7.5, 0]
+			]);
+		}
 	}
 
 	if(T == TURRET){
@@ -292,6 +400,23 @@ function drawShip(T, O = 0){
 	}
 
 	if(T == ROCKET){
+		if(M){
+			fill(60, 180, 180);
+			_symm([
+				[-17-(sin(frameCount/20)/2+0.5), 0],
+				[-12, 2],
+				[-11, 2],
+				[-10, 1],
+				[-9.5, 0]
+			]);
+			fill(100, 255, 255);
+			_symm([
+				[-14-0.7*(sin(frameCount/20)/2+0.5), 0],
+				[-12, 1],
+				[-11, 1],
+				[-10.5, 0]
+			]);
+		}
 		if(O == 0) fill(70, 110, 110);
 		if(O == 1) fill(120, 40, 40);
 		_symm([
@@ -322,6 +447,23 @@ function drawShip(T, O = 0){
 	}
 
 	if(T == DARTP){
+		if(M){
+			fill(60, 180, 180);
+			_symm([
+				[-12-(sin(frameCount/20)/2+0.5), 0],
+				[-7, 1.5],
+				[-6, 1.5],
+				[-5, 0.6],
+				[-4.5, 0]
+			]);
+			fill(100, 255, 255);
+			_symm([
+				[-9-0.7*(sin(frameCount/20)/2+0.5), 0],
+				[-7, 0.6],
+				[-6, 0.6],
+				[-5.5, 0]
+			]);
+		}
 		if(O == 0) fill(70, 110, 110);
 		if(O == 1) fill(120, 40, 40);
 		_symm([
@@ -339,6 +481,23 @@ function drawShip(T, O = 0){
 	}
 
 	if(T == DELTAP){
+		if(M){
+			fill(60, 180, 180);
+			_symm([
+				[-16-(sin(frameCount/20)/2+0.5), 0],
+				[-10, 2.5],
+				[-9, 2.5],
+				[-8, 1.5],
+				[-6.5, 0]
+			]);
+			fill(100, 255, 255);
+			_symm([
+				[-13-0.5*(sin(frameCount/20)/2+0.5), 0],
+				[-10, 1.2],
+				[-9, 1.2],
+				[-7.5, 0]
+			]);
+		}
 		if(O == 0) fill(70, 110, 110);
 		if(O == 1) fill(120, 40, 40);
 		_symm([
@@ -359,6 +518,23 @@ function drawShip(T, O = 0){
 	}
 
 	if(T == ROCKETP){
+		if(M){
+			fill(60, 180, 180);
+			_symm([
+				[-16-(sin(frameCount/20)/2+0.5), 0],
+				[-9, 1.8],
+				[-8, 1.8],
+				[-7, 0.9],
+				[-6.5, 0]
+			]);
+			fill(100, 255, 255);
+			_symm([
+				[-12-0.7*(sin(frameCount/20)/2+0.5), 0],
+				[-9, 0.9],
+				[-8, 0.9],
+				[-7.5, 0]
+			]);
+		}
 		if(O == 0) fill(70, 110, 110);
 		if(O == 1) fill(120, 40, 40);
 		_symm([
@@ -461,6 +637,33 @@ function drawModule(T){
 		strokeWeight(1.5);
 		line(-5, 8, -5, 2);
 		line(5, 8, 5, 2);
+	}
+
+	// CERB
+	
+	if(T == GUARD){
+		_batt(0, 0, 1, 1);
+	}
+
+	if(T == SENTINEL){
+		_batt(-4, 0, 1, 1);
+		_batt(4, 0, 1, 1);
+	}
+
+	if(T == INT){
+		_batt(-6, 0, 1, 0);
+		_batt(0, 1, 1, 1);
+		_batt(6, 0, 0, 1);
+	}
+
+	if(T == COL){
+		stroke(200, 50, 50);
+		line(0, -10, 0, 10);
+		line(-10, -10, 10, -10);
+		line(8.7, -5, 0, -9);
+		line(-8.7, -5, 0, -9);
+		line(5, -1.3, 0, -9);
+		line(-5, -1.3, 0, -9);
 	}
 
 	// SHIELD
