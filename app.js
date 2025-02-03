@@ -3,7 +3,7 @@ let font = null;
 let modules = [null, null, null, null, null];
 
 let searching = 0, staging = 1, chooseModule = -1,
-	open = 0;
+	open = 0, connected = 0;
 
 function preload(){
 	font = loadFont('Ubuntu-Regular.ttf');
@@ -17,7 +17,63 @@ function setup(){
 	if(localStorage.getItem("modules")){
 		modules = JSON.parse(localStorage.getItem("modules"));
 	}
+
+	for(let element of document.getElementsByClassName("p5Canvas"))
+		element.addEventListener("contextmenu", e => e.preventDefault())
 }
+
+let ships = [], rocks = [];
+
+socket.on("reset", () => {
+	searching = 0;
+	staging = 1;
+	open = 0;
+	connected = 0;
+});
+
+socket.on("start", data => {
+	chooseModule = -1;
+	searching = 0;
+	staging = 0;
+	open = 0;
+	connected = 1;
+
+	ships = [];
+	for(let s of data.ships)
+		ships.push(new Ship(s));
+	rocks = data.rocks;
+});
+
+socket.on("state", data => {
+	let uids = new Set();
+	for(let d of data) uids.add(d.uid);
+
+	ships = ships.filter(x => uids.has(x.uid));
+
+	uids = new Set();
+	for(let s of ships){
+		for(let d of data){
+			if(s.uid == d.uid){
+				s.decode(d);
+			}
+		}
+		uids.add(s.uid);
+	}
+
+	for(let d of data) if(!uids.has(d.uid)){
+		ships.push(new Ship(d));
+	}
+});
+
+socket.on("end", () => {
+	chooseModule = -1;
+	searching = 0;
+	staging = 1;
+	open = 0;
+	connected = 0;
+});
+
+let camera = {x: 0, y: 0, z: 1};
 
 function draw(){
 	background(0, 10, 25);
@@ -145,8 +201,53 @@ function draw(){
 			}
 		}
 
+	}else if(connected){
+		for(let s of ships){
+			let target;
+			if(s.move.length) target = atan2(s.move[0][1]-s.pos[1], s.move[0][0]-s.pos[0]);
+			else target = PI*1.7;
+
+			let diff = target - s.rot;
+			if(diff > PI) diff -= PI*2;
+			if(diff < -PI) diff += PI*2;
+
+			s.rot += diff * 0.1;
+			if(s.rot > PI*2) s.rot -= PI*2;
+			if(s.rot < -PI*2) s.rot += PI*2;
+
+			s.vpos[0] = lerp(s.vpos[0], s.pos[0], 0.05);
+			s.vpos[1] = lerp(s.vpos[1], s.pos[1], 0.05);
+		}
+
+		for(let r of rocks){
+			push();
+			translate(width/2-camera.x, height/2-camera.y); scale(camera.z);
+			noStroke(); fill(150, 100, 200);
+			rect(r[0]-1, r[1]-1, 2, 2);
+			pop();
+		}
+
+		for(let s of ships){
+			push();
+			translate(width/2-camera.x, height/2-camera.y); scale(camera.z);
+			stroke(100, 200, 200, 30); strokeWeight(4);
+			if(s.move.length) line(s.pos[0], s.pos[1], s.move[0][0], s.move[0][1]);
+			for(let i=0; i<s.move.length-1; ++i)
+				line(s.move[i][0], s.move[i][1], s.move[i+1][0], s.move[i+1][1]);
+			pop();
+		}
+
+		for(let s of ships){
+			push(); translate(s.vpos[0], s.vpos[1]);
+			translate(width/2-camera.x, height/2-camera.y); scale(camera.z);
+			rotate(s.rot);
+			drawShip(s.type, s.team != socket.id, s.move.length ? 1 : 0);
+			pop();
+		}
+
 	}else{
-		// do stuff
+		fill(200); textSize(25); noStroke();
+		text("CONNECTING", width/2, height/2);
 	}
 }
 

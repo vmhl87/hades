@@ -22,6 +22,8 @@ const DECOY = ++ct, REPAIR = ++ct, ROCKET = ++ct, TURRET = ++ct;
 
 const DARTP = ++ct, ROCKETP = ++ct, DELTAP = ++ct;
 
+const CERB = ++ct;
+
 // -- file xfer --
 
 app.get("/", (x, res) => {
@@ -59,22 +61,26 @@ app.get('/Ubuntu-Regular.ttf', (x, res) => {
 
 // -- game management --
 
-const Game = require("./game.js");
+const Module = require("./game.js");
+
+const Ship = Module.Ship, Game = Module.Game;
 
 let games = [], queue = [];
 
 function tick(game){
 	if(game){
+		game.update();
 		game.kill();
-		++game.time;
 
 	}else{
 		for(let g of games){
 			tick(g);
+
 			if(g.alive(BS) == 0){
+				g.end();
+
 				let p = [];
-				for(let x of g.players)
-					p.push(x.id);
+				for(let x of g.players) p.push(x.id);
 				console.log("ending game:", p);
 			}
 		}
@@ -94,19 +100,31 @@ io.on("connect", (socket) => {
 
 	console.log("connect " + socket.id);
 
+	socket.emit("reset");
+
 	socket.on("disconnect", e => {
 		console.log("disconnect " + socket.id);
+		for(let g of games){
+			for(let s of g.ships){
+				if(s.type == BS && s.team == socket.id){
+					console.log(" => killing ships");
+					s.hp = 0;
+				}
+			}
+		}
 	});
 
 	socket.on("enqueue", modules => {
 		console.log("enqueued player", socket.id, "with", modules);
 		queue.push({s: socket, modules: modules});
-		console.log(" =>", queue);
+		let m = [];
+		for(let q of queue) m.push(q.s.id);
+		console.log(" =>", m);
 		if(queue.length == 2){
-			console.log("starting new game:", queue);
+			console.log("starting new game:", m);
 			const g = new Game([queue[0].s, queue[1].s]);
-			g.addShip(BS, 7000, queue[0].s.id, queue[0].modules, [-100, 0]);
-			g.addShip(BS, 7000, queue[1].s.id, queue[1].modules, [100, 0]);
+			g.addShip(BS, 7000, queue[0].s.id, queue[0].modules, [-100, 0], []);
+			g.addShip(BS, 7000, queue[1].s.id, queue[1].modules, [100, 0], []);
 			g.start();
 			games.push(g);
 			queue = [];
@@ -115,14 +133,17 @@ io.on("connect", (socket) => {
 
 	socket.on("dequeue", () => {
 		console.log("dequeued player", socket.id);
-		queue = queue.filter(x => x.id != socket.id);
-		console.log(" =>", queue);
+		queue = queue.filter(x => x.s.id != socket.id);
+		let m = [];
+		for(let q of queue) m.push(q.s.id);
+		console.log(" =>", m);
 	});
 
 	socket.on("solo", modules => {
 		console.log("solo match started by", socket.id, "with", modules);
 		const g = new Game([socket]);
-		g.addShip(BS, 7000, socket.id, modules, [0, 0]);
+		g.addShip(BS, 7000, socket.id, modules, [0, 0], []);
+		g.addShip(INT, 5000, CERB, [INT], [-100, 100], [[200, 200], [100, -100], [-100, -200]]);
 		g.start();
 		games.push(g);
 	});

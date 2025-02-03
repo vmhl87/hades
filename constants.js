@@ -11,3 +11,13 @@ const EMP = ++ct, SOL = ++ct, FORT = ++ct, TP = ++ct, AMP = ++ct, DESTINY = ++ct
 const DECOY = ++ct, REPAIR = ++ct, ROCKET = ++ct, TURRET = ++ct;
 
 const DARTP = ++ct, ROCKETP = ++ct, DELTAP = ++ct;
+
+const CERB = ++ct;
+
+let SPEED = new Array(ct);
+
+SPEED[BS] = 20;
+SPEED[SENTINEL] = 10;
+SPEED[GUARD] = 11;
+SPEED[INT] = 26;
+SPEED[COL] = 12;
