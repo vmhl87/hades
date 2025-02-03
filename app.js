@@ -231,7 +231,7 @@ function draw(){
 			push();
 			translate(width/2-camera.x, height/2-camera.y); scale(camera.z);
 			stroke(100, 200, 200, 30); strokeWeight(4);
-			if(s.move.length) line(s.pos[0], s.pos[1], s.move[0][0], s.move[0][1]);
+			if(s.move.length) line(s.vpos[0], s.vpos[1], s.move[0][0], s.move[0][1]);
 			for(let i=0; i<s.move.length-1; ++i)
 				line(s.move[i][0], s.move[i][1], s.move[i+1][0], s.move[i+1][1]);
 			pop();
