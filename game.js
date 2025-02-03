@@ -21,6 +21,11 @@ SPEED[SENTINEL] = 10;
 SPEED[GUARD] = 11;
 SPEED[INT] = 26;
 SPEED[COL] = 12;
+SPEED[DECOY] = 20;
+SPEED[REPAIR] = 20;
+SPEED[ROCKET] = 20;
+SPEED[DARTP] = 25;
+SPEED[ROCKETP] = 40;
 
 let UID = 0;
 
@@ -64,8 +69,10 @@ class Ship{
 	update(){
 		const now = Date.now();
 
-		while(this.move.length && this.move[0][2] < now)
+		while(this.move.length && this.move[0][2] < now){
+			this.pos = this.move[0].slice(0, 2);
 			this.move = this.move.slice(1);
+		}
 
 		if(this.move.length){
 			let move = this.move[0],
@@ -85,6 +92,7 @@ class Game{
 		this.players = players;
 		this.ships = [];
 		this.rocks = [];
+		this.uid = ++UID;
 	}
 
 	addShip(type, hp, team, modules, pos, move){
@@ -107,7 +115,7 @@ class Game{
 		for(let s of this.ships) q.push(s.encode());
 
 		for(let p of this.players){
-			p.emit("start", {ships: q, rocks: this.rocks});
+			p.emit("start", {ships: q, rocks: this.rocks, uid: this.uid});
 		}
 	}
 

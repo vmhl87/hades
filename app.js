@@ -22,13 +22,14 @@ function setup(){
 		element.addEventListener("contextmenu", e => e.preventDefault())
 }
 
-let ships = [], rocks = [];
+let ships = [], rocks = [], gameID = null;
 
 socket.on("reset", () => {
 	searching = 0;
 	staging = 1;
 	open = 0;
 	connected = 0;
+	gameID = null;
 });
 
 socket.on("start", data => {
@@ -38,9 +39,12 @@ socket.on("start", data => {
 	open = 0;
 	connected = 1;
 
+	gameID = data.uid;
+
 	ships = [];
 	for(let s of data.ships)
 		ships.push(new Ship(s));
+
 	rocks = data.rocks;
 });
 
@@ -71,6 +75,7 @@ socket.on("end", () => {
 	staging = 1;
 	open = 0;
 	connected = 0;
+	gameID = null;
 });
 
 let camera = {x: 0, y: 0, z: 1};
@@ -231,7 +236,7 @@ function draw(){
 			push();
 			translate(width/2-camera.x, height/2-camera.y); scale(camera.z);
 			stroke(100, 200, 200, 30); strokeWeight(4);
-			if(s.move.length) line(s.vpos[0], s.vpos[1], s.move[0][0], s.move[0][1]);
+			if(s.move.length) line(s.pos[0], s.pos[1], s.move[0][0], s.move[0][1]);
 			for(let i=0; i<s.move.length-1; ++i)
 				line(s.move[i][0], s.move[i][1], s.move[i+1][0], s.move[i+1][1]);
 			pop();
@@ -351,6 +356,9 @@ function mouseReleased(){
 			}
 		}
 
-	}else{
+	}else if(connected){
+		let ID = null;
+		for(let s of ships) if(s.type == BS && s.team == socket.id) ID = s.uid;
+		if(ID) socket.emit("move", {gameID: gameID, shipID: ID, pos: [mouseX-width/2, mouseY-height/2]});
 	}
 }

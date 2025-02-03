@@ -147,4 +147,16 @@ io.on("connect", (socket) => {
 		g.start();
 		games.push(g);
 	});
+
+	socket.on("move", data => {
+		for(let g of games){
+			if(g.uid == data.gameID){
+				for(let s of g.ships){
+					if(s.uid == data.shipID){
+						s.moveTo(data.pos);
+					}
+				}
+			}
+		}
+	});
 });
