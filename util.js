@@ -24,8 +24,9 @@ class Ship{
 		this.modules = dat.modules;
 		this.pos = dat.pos;
 		this.move = dat.move;
+		this.wait = dat.wait;
 		this.vpos = [...this.pos];
-		this.rot = PI*1.7;
+		this.rot = PI;
 		this.uid = dat.uid;
 		this.lock = dat.lock;
 
@@ -38,13 +39,15 @@ class Ship{
 		this.modules = dat.modules;
 		this.pos = dat.pos;
 		this.move = dat.move;
+		this.wait = dat.wait;
 		this.lock = dat.lock;
 	}
 
 	travel(){
 		let target;
 		if(this.move.length) target = atan2(this.move[0][1]-this.pos[1], this.move[0][0]-this.pos[0]);
-		else target = PI*1.7;
+		else if(this.wait) target = atan2(this.wait[1]-this.pos[1], this.wait[0]-this.pos[0]);
+		else target = PI*1.85;
 
 		let diff = target - this.rot;
 		if(diff > PI) diff -= PI*2;
@@ -92,7 +95,7 @@ function _lerp(a, b, c){
 	return [lerp(a[0], b[0], c), lerp(a[1], b[1], c)];
 }
 
-let select = null, moved;
+let select = null, moved, shipID = null, selectMove = null;
 
 function selected(){
 	let opt = [];
@@ -104,7 +107,7 @@ function selected(){
 
 	for(let i=0; i<ships.length; ++i){
 		const d = _dist(screenPos(ships[i].pos), [mouseX, mouseY]);
-		if(d < 50) opt.push([d-30, ["ship", i]]);
+		if(d < 50) opt.push([d-20, ["ship", ships[i].uid]]);
 	}
 
 	opt.sort((a, b) => a[0] - b[0]);

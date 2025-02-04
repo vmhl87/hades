@@ -179,7 +179,33 @@ io.on("connect", (socket) => {
 			if(g.uid == data.gameID){
 				for(let s of g.ships){
 					if(s.uid == data.shipID){
-						s.moveTo(data.pos);
+						if(s.wait) s.cancelMove();
+						if(s.move.length)s.moveTo(data.pos);
+						else s.waitMoveTo(data.pos);
+					}
+				}
+			}
+		}
+	});
+
+	socket.on("confirmMove", data => {
+		for(let g of games){
+			if(g.uid == data.gameID){
+				for(let s of g.ships){
+					if(s.uid == data.shipID){
+						s.confirmMove();
+					}
+				}
+			}
+		}
+	});
+
+	socket.on("cancelMove", data => {
+		for(let g of games){
+			if(g.uid == data.gameID){
+				for(let s of g.ships){
+					if(s.uid == data.shipID){
+						s.cancelMove();
 					}
 				}
 			}
@@ -190,6 +216,18 @@ io.on("connect", (socket) => {
 		for(let g of games){
 			if(g.uid == data.gameID){
 				g.addShip(...data.arg);
+			}
+		}
+	});
+
+	socket.on("activateModule", data => {
+		for(let g of games){
+			if(g.uid == data.gameID){
+				for(let s of g.ships){
+					if(s.uid == data.shipID){
+						console.log("activate module", data.i);
+					}
+				}
 			}
 		}
 	});

@@ -65,13 +65,29 @@ class Ship{
 			this.modules.push({type: m, state: 1, aux: 0});
 		this.pos = pos;
 		this.move = move;
+		this.wait = null;
 		this.uid = ++UID;
 		this.lock = false;
 		this.vel = 0;
 	}
 
+	waitMoveTo(pos){
+		this.wait = [pos[0], pos[1], 20];
+	}
+
 	moveTo(pos){
 		this.move.push(pos);
+	}
+
+	confirmMove(){
+		if(this.wait){
+			this.move.push(this.wait.slice(0, 2));
+			this.wait = null;
+		}
+	}
+
+	cancelMove(){
+		this.wait = null;
 	}
 
 	encode(){
@@ -82,13 +98,17 @@ class Ship{
 			modules: this.modules,
 			pos: this.pos,
 			move: this.move,
+			wait: this.wait,
 			uid: this.uid,
 			lock: this.lock
 		};
 	}
 
 	travel(){
+		// this.hp = Math.max(this.team == -1 ? -50 : 50, this.hp-100);
 		const now = Date.now();
+
+		if(this.wait && --this.wait[2] == 0) this.confirmMove();
 
 		if(this.move.length){
 			if(!this.lock){
