@@ -61,8 +61,8 @@ class Ship{
 		this.hp = hp;
 		this.team = team;
 		this.modules = [];
-		for(let m of modules)
-			this.modules.push({type: m, state: 1});
+		for(let m of modules) if(m)
+			this.modules.push({type: m, state: 1, aux: 0});
 		this.pos = pos;
 		this.move = move;
 		this.uid = ++UID;

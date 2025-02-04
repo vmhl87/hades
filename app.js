@@ -105,40 +105,49 @@ function draw(){
 		scale(5); drawShip(BS, 0, 1);
 		pop();
 
-		fill(255, 50, 50, searching ? 60 :
-			(mouseIn(width/2-100, height/2+50, 20, 20) || chooseModule == 0 ? 80 : 60));
-		rect(width/2 - 120, height/2 - 20 + 50, 40, 40);
-		push(); translate(width/2-100, height/2 + 50);
-		drawModule(modules[0]);
-		pop();
+		if(ALLMODULE){
+			for(let i=0; i<5; ++i){
+				push(); translate(width/2-100+50*i, height/2+50);
+				drawModule2(modules[i], mouseIn(width/2-100+i*50, height/2+50, 20, 20) ? 1 : 0);
+				pop();
+			}
 
-		fill(0, 255, 255, searching ? 60 :
-			(mouseIn(width/2-50, height/2+50, 20, 20) || chooseModule == 1 ? 80 : 60));
-		rect(width/2 - 70, height/2 - 20 + 50, 40, 40);
-		push(); translate(width/2-50, height/2 + 50);
-		drawModule(modules[1]);
-		pop();
+		}else{
+			fill(255, 50, 50, searching ? 60 :
+				(mouseIn(width/2-100, height/2+50, 20, 20) || chooseModule == 0 ? 80 : 60));
+			rect(width/2 - 120, height/2 - 20 + 50, 40, 40);
+			push(); translate(width/2-100, height/2 + 50);
+			drawModule(modules[0]);
+			pop();
 
-		fill(100, 255, 100, searching ? 60 :
-			(mouseIn(width/2, height/2+50, 20, 20) || chooseModule == 2 ? 80 : 60));
-		rect(width/2 - 20, height/2 - 20 + 50, 40, 40);
-		push(); translate(width/2, height/2 + 50);
-		drawModule(modules[2]);
-		pop();
+			fill(0, 255, 255, searching ? 60 :
+				(mouseIn(width/2-50, height/2+50, 20, 20) || chooseModule == 1 ? 80 : 60));
+			rect(width/2 - 70, height/2 - 20 + 50, 40, 40);
+			push(); translate(width/2-50, height/2 + 50);
+			drawModule(modules[1]);
+			pop();
 
-		fill(100, 255, 100, searching ? 60 :
-			(mouseIn(width/2+50, height/2+50, 20, 20) || chooseModule == 3 ? 80 : 60));
-		rect(width/2 + 30, height/2 - 20 + 50, 40, 40);
-		push(); translate(width/2+50, height/2 + 50);
-		drawModule(modules[3]);
-		pop();
+			fill(100, 255, 100, searching ? 60 :
+				(mouseIn(width/2, height/2+50, 20, 20) || chooseModule == 2 ? 80 : 60));
+			rect(width/2 - 20, height/2 - 20 + 50, 40, 40);
+			push(); translate(width/2, height/2 + 50);
+			drawModule(modules[2]);
+			pop();
 
-		fill(255, 100, 0, searching ? 60 :
-			(mouseIn(width/2+100, height/2+50, 20, 20) || chooseModule == 4 ? 80 : 60));
-		rect(width/2 + 80, height/2 - 20 + 50, 40, 40);
-		push(); translate(width/2+100, height/2 + 50);
-		drawModule(modules[4]);
-		pop();
+			fill(100, 255, 100, searching ? 60 :
+				(mouseIn(width/2+50, height/2+50, 20, 20) || chooseModule == 3 ? 80 : 60));
+			rect(width/2 + 30, height/2 - 20 + 50, 40, 40);
+			push(); translate(width/2+50, height/2 + 50);
+			drawModule(modules[3]);
+			pop();
+
+			fill(255, 100, 0, searching ? 60 :
+				(mouseIn(width/2+100, height/2+50, 20, 20) || chooseModule == 4 ? 80 : 60));
+			rect(width/2 + 80, height/2 - 20 + 50, 40, 40);
+			push(); translate(width/2+100, height/2 + 50);
+			drawModule(modules[4]);
+			pop();
+		}
 
 		if(searching){
 			fill(0, 100);
@@ -220,6 +229,76 @@ function draw(){
 					pop();
 				}
 			}
+
+			if(chooseModule < -1){
+				for(let i=0; i<5; ++i){
+					fill(255, 50, 50, mouseIn(width/2-100+i*50, height/2+125, 20, 20) ? 80 : 60);
+					rect(width/2-120+i*50, height/2+105, 40, 40);
+					push(); translate(width/2-100+i*50, height/2+125);
+					drawModule(LASER+i);
+					pop();
+				}
+
+				for(let i=0; i<6; ++i){
+					fill(0, 255, 255, mouseIn(width/2-125+i*50, height/2+175, 20, 20) ? 80 : 60);
+					rect(width/2-145+i*50, height/2+155, 40, 40);
+					push(); translate(width/2-125+i*50, height/2+175);
+					drawModule(ALPHA+i);
+					pop();
+				}
+
+				for(let i=0; i<5; ++i){
+					fill(100, 255, 100,
+						modules[5-chooseModule] == EMP+i ? 60 :
+						(mouseIn(width/2-100+i*50, height/2+225, 20, 20) ? 80 : 60)
+					);
+					rect(width/2-120+i*50, height/2+205, 40, 40);
+					push(); translate(width/2-100+i*50, height/2+225);
+					drawModule(EMP+i);
+					pop();
+					fill(0, 100);
+					if(modules[5-chooseModule] == EMP+i) rect(width/2-120+i*50, height/2+205, 40, 40);
+				}
+
+				for(let i=0; i<5; ++i){
+					fill(100, 255, 100,
+						modules[5-chooseModule] == EMP+5+i ? 60 :
+						(mouseIn(width/2-100+i*50, height/2+275, 20, 20) ? 80 : 60)
+					);
+					rect(width/2-120+i*50, height/2+255, 40, 40);
+					push(); translate(width/2-100+i*50, height/2+275);
+					drawModule(EMP+5+i);
+					pop();
+					fill(0, 100);
+					if(modules[5-chooseModule] == EMP+5+i) rect(width/2-120+i*50, height/2+255, 40, 40);
+				}
+
+				for(let i=0; i<4; ++i){
+					fill(255, 100, 0, mouseIn(width/2-75+i*50, height/2+325, 20, 20) ? 80 : 60);
+					rect(width/2-95+i*50, height/2+305, 40, 40);
+					push(); translate(width/2-75+i*50, height/2+325);
+					drawModule(DECOY+i);
+					pop();
+				}
+			}
+		}
+
+		if(SECDISP[0]){
+			--SECDISP[0];
+
+			SECDISP[1][0] = _lerp(SECDISP[1][0], [width/2-50, height/2-200], 0.1);
+			SECDISP[1][1] = _lerp(SECDISP[1][1], [width/2, height/2-250], 0.1);
+			SECDISP[1][2] = _lerp(SECDISP[1][2], [width/2+50, height/2-200], 0.1);
+
+			const F = Math.min(1, SECDISP[0]/30);
+
+			push();
+			fill(lerp(0, 255, F), lerp(10, 180, F), lerp(25, 50, F)); noStroke();
+			for(let i=0; i<3; ++i) circle(...SECDISP[1][i], 10);
+			stroke(lerp(0, 255, F), lerp(10, 180, F), lerp(25, 50, F)); strokeWeight(3);
+			line(...SECDISP[1][0], ...SECDISP[1][1]);
+			line(...SECDISP[1][1], ...SECDISP[1][2]);
+			pop();
 		}
 
 	}else if(connected){
@@ -371,6 +450,59 @@ function stagingUI(){
 				chooseModule = -1;
 				localStorage.setItem("modules", JSON.stringify(modules));
 			}
+		}
+
+	}else if(chooseModule < -1){
+		for(let i=0; i<5; ++i){
+			if(mouseIn(width/2-100+i*50, height/2+125, 20, 20)){
+				modules[chooseModule+10] = LASER+i;
+				chooseModule = -1;
+			}
+		}
+
+		for(let i=0; i<6; ++i){
+			if(mouseIn(width/2-125+i*50, height/2+175, 20, 20)){
+				modules[chooseModule+10] = ALPHA+i;
+				chooseModule = -1;
+			}
+			rect(width/2-145+i*50, height/2+155, 40, 40);
+			push(); translate(width/2-125+i*50, height/2+175);
+			drawModule(ALPHA+i);
+			pop();
+		}
+
+		for(let i=0; i<5; ++i){
+			fill(100, 255, 100,
+				modules[5-chooseModule] == EMP+i ? 60 :
+				(mouseIn(width/2-100+i*50, height/2+225, 20, 20) ? 80 : 60)
+			);
+			rect(width/2-120+i*50, height/2+205, 40, 40);
+			push(); translate(width/2-100+i*50, height/2+225);
+			drawModule(EMP+i);
+			pop();
+			fill(0, 100);
+			if(modules[5-chooseModule] == EMP+i) rect(width/2-120+i*50, height/2+205, 40, 40);
+		}
+
+		for(let i=0; i<5; ++i){
+			fill(100, 255, 100,
+				modules[5-chooseModule] == EMP+5+i ? 60 :
+				(mouseIn(width/2-100+i*50, height/2+275, 20, 20) ? 80 : 60)
+			);
+			rect(width/2-120+i*50, height/2+255, 40, 40);
+			push(); translate(width/2-100+i*50, height/2+275);
+			drawModule(EMP+5+i);
+			pop();
+			fill(0, 100);
+			if(modules[5-chooseModule] == EMP+5+i) rect(width/2-120+i*50, height/2+255, 40, 40);
+		}
+
+		for(let i=0; i<4; ++i){
+			fill(255, 100, 0, mouseIn(width/2-75+i*50, height/2+325, 20, 20) ? 80 : 60);
+			rect(width/2-95+i*50, height/2+305, 40, 40);
+			push(); translate(width/2-75+i*50, height/2+325);
+			drawModule(DECOY+i);
+			pop();
 		}
 	}
 }

@@ -88,6 +88,10 @@ function _dist(a, b){
 	return sqrt((a[0]-b[0])*(a[0]-b[0]) + (a[1]-b[1])*(a[1]-b[1]));
 }
 
+function _lerp(a, b, c){
+	return [lerp(a[0], b[0], c), lerp(a[1], b[1], c)];
+}
+
 let select = null, moved;
 
 function selected(){
@@ -121,7 +125,7 @@ function mousePressed(){
 	select = selected();
 }
 
-let lastMouse = [], ALLMODULE = false;
+let lastMouse = [], ALLMODULE = false, SECDISP = [0];
 
 function mouseReleased(){
 	if(staging){
@@ -139,6 +143,8 @@ function mouseReleased(){
 		){
 			ALLMODULE = true;
 			modules = [null, null, null, null, null];
+			SECDISP = [100, []];
+			for(let i=0; i<3; ++i) SECDISP[1].push([...lastMouse[i][1]]);
 		}
 
 		stagingUI();
