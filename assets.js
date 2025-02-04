@@ -854,28 +854,6 @@ function drawModule(T){
 		circle(0, 0, 25);
 	}
 
-	if(T == VENG){
-		stroke(50, 150, 50); noFill();
-		beginShape();
-		vertex(0, -5);
-		vertex(-5, 0);
-		vertex(0, 5);
-		vertex(5, 0);
-		endShape(CLOSE);
-		line(5, 5, 10, 10);
-		line(-5, 5, -10, 10);
-		line(5, -5, 10, -10);
-		line(-5, -5, -10, -10);
-		line(-2, 8, -2.75, 9);
-		line(2, 8, 2.75, 9);
-		line(-2, -8, -2.75, -9);
-		line(2, -8, 2.75, -9);
-		line(-8, 2, -9, 2.75);
-		line(8, 2, 9, 2.75);
-		line(-8, -2, -9, -2.75);
-		line(8, -2, 9, -2.75);
-	}
-
 	if(T == DELTA){
 		stroke(50, 150, 50); fill(50, 150, 50);
 		beginShape();
@@ -898,6 +876,49 @@ function drawModule(T){
 		line(1.5, 7, 3, 12);
 		line(-7, -1.5, -12, -3);
 		line(7, 1.5, 12, 3);
+	}
+
+	if(T == RIPPLE){
+		stroke(50, 150, 50); noFill();
+		arc(0, -6, 18, 18, -PI*0.4, PI*0.6);
+		arc(6*sin(PI*2/3), -6*cos(PI*2/3), 18, 18, PI*2/3-PI*0.4, PI*2/3+PI*0.6);
+		arc(-6*sin(PI*2/3), -6*cos(PI*2/3), 18, 18, PI*4/3-PI*0.4, PI*4/3+PI*0.6);
+	}
+
+	if(T == DISRUPT){
+		stroke(50, 150, 50); noFill();
+		arc(0, 0, 25, 25, -PI*0.3, PI*0.3);
+		arc(0, 0, 25, 25, PI-PI*0.3, PI+PI*0.3);
+		beginShape();
+		vertex(0, -9);
+		vertex(-2, -6);
+		vertex(4, -3);
+		vertex(-4, 3);
+		vertex(2, 6);
+		vertex(0, 9);
+		endShape();
+	}
+
+	if(T == VENG){
+		stroke(50, 150, 50); noFill();
+		beginShape();
+		vertex(0, -5);
+		vertex(-5, 0);
+		vertex(0, 5);
+		vertex(5, 0);
+		endShape(CLOSE);
+		line(5, 5, 10, 10);
+		line(-5, 5, -10, 10);
+		line(5, -5, 10, -10);
+		line(-5, -5, -10, -10);
+		line(-2, 8, -2.75, 9);
+		line(2, 8, 2.75, 9);
+		line(-2, -8, -2.75, -9);
+		line(2, -8, 2.75, -9);
+		line(-8, 2, -9, 2.75);
+		line(8, 2, 9, 2.75);
+		line(-8, -2, -9, -2.75);
+		line(8, -2, 9, -2.75);
 	}
 
 	// DRONE
@@ -986,4 +1007,22 @@ function drawModule(T){
 	}
 
 	pop();
+}
+
+function drawModule2(T, S){
+	fill(0, 10, 25); noStroke();
+	rect(-20, -20, 40, 40);
+
+	fill(255, 40);
+	if(T >= LASER && T <= TURRETD) fill(255, 50, 50, 60);
+	if(T >= ALPHA && T <= ALLY) fill(0, 255, 255, 60);
+	if(T >= EMP && T <= VENG) fill(100, 255, 100, 60);
+	if(T >= DECOY && T <= TURRET) fill(255, 100, 0, 60);
+
+	rect(-20, -20, 40, 40);
+
+	drawModule(T);
+
+	fill(0, 100);
+	rect(-20, -20+40*abs(S), 40, 40-40*abs(S));
 }

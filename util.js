@@ -27,6 +27,10 @@ class Ship{
 		this.vpos = [...this.pos];
 		this.rot = PI*1.7;
 		this.uid = dat.uid;
+		this.lock = dat.lock;
+
+		if(this.move.length)
+			this.rot = atan2(this.move[0][1]-this.pos[1], this.move[0][0]-this.pos[0]);
 	}
 
 	decode(dat){
@@ -34,5 +38,115 @@ class Ship{
 		this.modules = dat.modules;
 		this.pos = dat.pos;
 		this.move = dat.move;
+		this.lock = dat.lock;
+	}
+
+	travel(){
+		let target;
+		if(this.move.length) target = atan2(this.move[0][1]-this.pos[1], this.move[0][0]-this.pos[0]);
+		else target = PI*1.7;
+
+		let diff = target - this.rot;
+		if(diff > PI) diff -= PI*2;
+		if(diff < -PI) diff += PI*2;
+
+		this.rot += diff * 0.1;
+		if(this.rot > PI*2) this.rot -= PI*2;
+		if(this.rot < -PI*2) this.rot += PI*2;
+
+		this.vpos[0] = lerp(this.vpos[0], this.pos[0], 0.05);
+		this.vpos[1] = lerp(this.vpos[1], this.pos[1], 0.05);
+
+		// this.vpos = this.pos; this.rot = target;
+	}
+}
+
+let camera = {x: 0, y: 0, z: 1}, lastMouseX = 0, lastMouseY = 0;
+
+function mousePos(){
+	return [camera.x+(mouseX-width/2)/camera.z, camera.y+(mouseY-height/2)/camera.z];
+}
+
+function screenPos(pos){
+	return [width/2+(pos[0]-camera.x)*camera.z, height/2+(pos[1]-camera.y)*camera.z];
+}
+
+function mouseWheel(e){
+	let old = camera.z;
+	if(e.delta > 0) camera.z /= 1.04;
+	if(e.delta < 0) camera.z *= 1.04;
+	camera.z = min(10, max(0.3, camera.z));
+	if(old != camera.z){
+		let offset = {x: mouseX-width/2, y: mouseY-height/2};
+		old = (camera.z-old)/old;
+		camera.x += offset.x*old/camera.z;
+		camera.y += offset.y*old/camera.z;
+	}
+}
+
+function _dist(a, b){
+	return sqrt((a[0]-b[0])*(a[0]-b[0]) + (a[1]-b[1])*(a[1]-b[1]));
+}
+
+let select = null, moved;
+
+function selected(){
+	let opt = [];
+
+	for(let i=0; i<rocks.length; ++i){
+		const d = _dist(screenPos(rocks[i]), [mouseX, mouseY]);
+		if(d < 50) opt.push([d, ["rock", i]]);
+	}
+
+	for(let i=0; i<ships.length; ++i){
+		const d = _dist(screenPos(ships[i].pos), [mouseX, mouseY]);
+		if(d < 50) opt.push([d-30, ["ship", i]]);
+	}
+
+	opt.sort((a, b) => a[0] - b[0]);
+
+	if(opt.length) return opt[0][1];
+
+	return null;
+}
+
+let startMouseX, startMouseY;
+
+let focus = null;
+
+function mousePressed(){
+	moved = false;
+	startMouseX = mouseX;
+	startMouseY = mouseY;
+	select = selected();
+}
+
+let lastMouse = [], ALLMODULE = false;
+
+function mouseReleased(){
+	if(staging){
+		lastMouse.push([Date.now(), [mouseX, mouseY]]);
+		if(lastMouse.length > 3) lastMouse = lastMouse.slice(1);
+
+		if(lastMouse.length == 3 && lastMouse[0][0] > Date.now()-2000
+			&& _dist(lastMouse[1][1], [width/2, height/2-250]) < 200
+			&& abs(atan2(lastMouse[0][1][0]-lastMouse[1][1][0], lastMouse[0][1][1]-lastMouse[1][1][1])+PI/4) < 1
+			&& abs(atan2(lastMouse[1][1][0]-lastMouse[2][1][0], lastMouse[1][1][1]-lastMouse[2][1][1])+PI*3/4) < 1
+			&& _dist(lastMouse[0][1], lastMouse[1][1]) < 300
+			&& _dist(lastMouse[1][1], lastMouse[2][1]) < 300
+			&& _dist(lastMouse[0][1], lastMouse[1][1]) > 50
+			&& _dist(lastMouse[1][1], lastMouse[2][1]) > 50
+		){
+			ALLMODULE = true;
+			modules = [null, null, null, null, null];
+		}
+
+		stagingUI();
+
+	}else if(connected && !moved && _dist([mouseX, mouseY], [startMouseX, startMouseY]) < 20){
+		let s = selected();
+		if(!s || (s[0] == select[0] && s[1] == select[1])){
+			click();
+		}
 	}
 }

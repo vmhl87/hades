@@ -46,6 +46,12 @@ socket.on("start", data => {
 		ships.push(new Ship(s));
 
 	rocks = data.rocks;
+
+	for(let s of data.ships)
+		if(s.type == BS && s.team == socket.id){
+			camera.x = s.pos[0];
+			camera.y = s.pos[1];
+		}
 });
 
 socket.on("state", data => {
@@ -78,9 +84,19 @@ socket.on("end", () => {
 	gameID = null;
 });
 
-let camera = {x: 0, y: 0, z: 1};
-
 function draw(){
+	if(!staging && mouseIsPressed){
+		const dist = _dist([mouseX, mouseY], [lastMouseX, lastMouseY]);
+		if(dist > 0.5){
+			camera.x += (lastMouseX-mouseX)/camera.z;
+			camera.y += (lastMouseY-mouseY)/camera.z;
+		}
+		if(dist > 4) moved = true;
+	}
+
+	lastMouseX = mouseX;
+	lastMouseY = mouseY;
+
 	background(0, 10, 25);
 
 	if(staging){
@@ -181,17 +197,17 @@ function draw(){
 					if(modules[5-chooseModule] == EMP+i) rect(width/2-120+i*50, height/2+105, 40, 40);
 				}
 
-				for(let i=0; i<4; ++i){
+				for(let i=0; i<5; ++i){
 					fill(100, 255, 100,
 						modules[5-chooseModule] == EMP+5+i ? 60 :
-						(mouseIn(width/2-75+i*50, height/2+175, 20, 20) ? 80 : 60)
+						(mouseIn(width/2-100+i*50, height/2+175, 20, 20) ? 80 : 60)
 					);
-					rect(width/2-95+i*50, height/2+155, 40, 40);
-					push(); translate(width/2-75+i*50, height/2+175);
+					rect(width/2-120+i*50, height/2+155, 40, 40);
+					push(); translate(width/2-100+i*50, height/2+175);
 					drawModule(EMP+5+i);
 					pop();
 					fill(0, 100);
-					if(modules[5-chooseModule] == EMP+5+i) rect(width/2-95+i*50, height/2+155, 40, 40);
+					if(modules[5-chooseModule] == EMP+5+i) rect(width/2-120+i*50, height/2+155, 40, 40);
 				}
 			}
 
@@ -207,47 +223,50 @@ function draw(){
 		}
 
 	}else if(connected){
-		for(let s of ships){
-			let target;
-			if(s.move.length) target = atan2(s.move[0][1]-s.pos[1], s.move[0][0]-s.pos[0]);
-			else target = PI*1.7;
+		const w = 5, h = 3;
 
-			let diff = target - s.rot;
-			if(diff > PI) diff -= PI*2;
-			if(diff < -PI) diff += PI*2;
+		push(); translate(width/2-camera.x*camera.z, height/2-camera.y*camera.z);
+		stroke(200, 30); strokeWeight(2*sqrt(camera.z));
+		for(let i=0; i<=h; ++i)
+			line(-300*w/2*camera.z, (-300*h/2+i*300)*camera.z, 300*w/2*camera.z, (-300*h/2+i*300)*camera.z);
+		for(let i=0; i<=w; ++i)
+			line((-300*w/2+i*300)*camera.z, -300*h/2*camera.z, (-300*w/2+i*300)*camera.z, 300*h/2*camera.z);
+		pop();
 
-			s.rot += diff * 0.1;
-			if(s.rot > PI*2) s.rot -= PI*2;
-			if(s.rot < -PI*2) s.rot += PI*2;
-
-			s.vpos[0] = lerp(s.vpos[0], s.pos[0], 0.05);
-			s.vpos[1] = lerp(s.vpos[1], s.pos[1], 0.05);
-		}
+		for(let s of ships) s.travel();
 
 		for(let r of rocks){
-			push();
-			translate(width/2-camera.x, height/2-camera.y); scale(camera.z);
+			let d = 1/sqrt(camera.z);
+			push(); translate(width/2, height/2); scale(camera.z);
+			translate(-camera.x, -camera.y);
 			noStroke(); fill(150, 100, 200);
-			rect(r[0]-1, r[1]-1, 2, 2);
+			rect(r[0]-d, r[1]-d, 2*d, 2*d);
+			pop();
+		}
+
+		for(let s of ships) if(s.move.length){
+			push(); translate(width/2, height/2);
+			translate(-camera.x*camera.z, -camera.y*camera.z);
+			stroke(100, 200, 200, 30); strokeWeight(4*sqrt(camera.z)); noFill();
+			beginShape();
+			vertex(s.vpos[0]*camera.z, s.vpos[1]*camera.z);
+			vertex(s.pos[0]*camera.z, s.pos[1]*camera.z);
+			for(let m of s.move)
+				vertex(m[0]*camera.z, m[1]*camera.z);
+			endShape();
 			pop();
 		}
 
 		for(let s of ships){
-			push();
-			translate(width/2-camera.x, height/2-camera.y); scale(camera.z);
-			stroke(100, 200, 200, 30); strokeWeight(4);
-			if(s.move.length) line(s.pos[0], s.pos[1], s.move[0][0], s.move[0][1]);
-			for(let i=0; i<s.move.length-1; ++i)
-				line(s.move[i][0], s.move[i][1], s.move[i+1][0], s.move[i+1][1]);
-			pop();
-		}
-
-		for(let s of ships){
-			push(); translate(s.vpos[0], s.vpos[1]);
-			translate(width/2-camera.x, height/2-camera.y); scale(camera.z);
-			rotate(s.rot);
+			push(); translate(width/2+(s.vpos[0]-camera.x)*camera.z, height/2+(s.vpos[1]-camera.y)*camera.z);
+			rotate(s.rot); scale(sqrt(camera.z));
 			drawShip(s.type, s.team != socket.id, s.move.length ? 1 : 0);
 			pop();
+		}
+
+		if(focus){
+			fill(0); noStroke();
+			rect(width/2-150, height-100, 300, 100);
 		}
 
 	}else{
@@ -256,109 +275,124 @@ function draw(){
 	}
 }
 
-function mouseReleased(){
-	if(staging){
-		if(!searching){
-			if(mouseIn(width/2-100, height/2+50, 20, 20)){
-				chooseModule = (chooseModule == 0 ? -1 : 0);
-			}
+function stagingUI(){
+	if(!searching){
+		if(mouseIn(width/2-100, height/2+50, 20, 20)){
+			chooseModule = (chooseModule == 0 ? -1 : 0);
+		}
 
-			if(mouseIn(width/2-50, height/2+50, 20, 20)){
-				chooseModule = (chooseModule == 1 ? -1 : 1);
-			}
+		if(mouseIn(width/2-50, height/2+50, 20, 20)){
+			chooseModule = (chooseModule == 1 ? -1 : 1);
+		}
 
-			if(mouseIn(width/2, height/2+50, 20, 20)){
-				chooseModule = (chooseModule == 2 ? -1 : 2);
-			}
+		if(mouseIn(width/2, height/2+50, 20, 20)){
+			chooseModule = (chooseModule == 2 ? -1 : 2);
+		}
 
-			if(mouseIn(width/2+50, height/2+50, 20, 20)){
-				chooseModule = (chooseModule == 3 ? -1 : 3);
-			}
+		if(mouseIn(width/2+50, height/2+50, 20, 20)){
+			chooseModule = (chooseModule == 3 ? -1 : 3);
+		}
 
-			if(mouseIn(width/2+100, height/2+50, 20, 20)){
-				chooseModule = (chooseModule == 4 ? -1 : 4);
+		if(mouseIn(width/2+100, height/2+50, 20, 20)){
+			chooseModule = (chooseModule == 4 ? -1 : 4);
+		}
+	}
+
+	if(chooseModule == -1){
+		if(mouseIn(width/2, height/2+150, 60, 30)){
+			if(!searching){
+				searching = 1;
+				setTimeout(() => {
+					if(searching){
+						start();
+						open = 1;
+					}
+				}, 3000);
 			}
 		}
 
-		if(chooseModule == -1){
-			if(mouseIn(width/2, height/2+150, 60, 30)){
-				if(!searching){
-					searching = 1;
-					setTimeout(() => {
-						if(searching){
-							start();
-							open = 1;
-						}
-					}, 3000);
-				}
-			}
-
-			if(mouseIn(width/2, height/2+200, 60, 15)){
-				if(searching){
-					searching = 0;
-					if(open) cancel();
-				}
-			}
-
-			if(mouseIn(width/2, height/2+230, 60, 15)){
-				if(searching){
-					searching = 0;
-					if(open) cancel();
-					solo();
-					staging = 0;
-				}
-			}
-
-		}else if(chooseModule == 0){
-			for(let i=0; i<5; ++i){
-				if(mouseIn(width/2-100+i*50, height/2+150, 20, 20)){
-					modules[0] = LASER+i;
-					chooseModule = -1;
-					localStorage.setItem("modules", JSON.stringify(modules));
-				}
-			}
-
-		}else if(chooseModule == 1){
-			for(let i=0; i<6; ++i){
-				if(mouseIn(width/2-125+i*50, height/2+150, 20, 20)){
-					modules[1] = ALPHA+i;
-					chooseModule = -1;
-					localStorage.setItem("modules", JSON.stringify(modules));
-				}
-			}
-
-		}else if(chooseModule == 2 || chooseModule == 3){
-			for(let i=0; i<5; ++i){
-				if(mouseIn(width/2-100+i*50, height/2+125, 20, 20) &&
-					modules[5-chooseModule] != EMP+i){
-					modules[chooseModule] = EMP+i;
-					chooseModule = -1;
-					localStorage.setItem("modules", JSON.stringify(modules));
-				}
-			}
-
-			for(let i=0; i<4; ++i){
-				if(mouseIn(width/2-75+i*50, height/2+175, 20, 20) &&
-					modules[5-chooseModule] != EMP+5+i){
-					modules[chooseModule] = EMP+5+i;
-					chooseModule = -1;
-					localStorage.setItem("modules", JSON.stringify(modules));
-				}
-			}
-
-		}else if(chooseModule == 4){
-			for(let i=0; i<4; ++i){
-				if(mouseIn(width/2-75+i*50, height/2+150, 20, 20)){
-					modules[4] = DECOY+i;
-					chooseModule = -1;
-					localStorage.setItem("modules", JSON.stringify(modules));
-				}
+		if(mouseIn(width/2, height/2+200, 60, 15)){
+			if(searching){
+				searching = 0;
+				if(open) cancel();
 			}
 		}
 
-	}else if(connected){
+		if(mouseIn(width/2, height/2+230, 60, 15)){
+			if(searching){
+				searching = 0;
+				if(open) cancel();
+				solo();
+				staging = 0;
+			}
+		}
+
+	}else if(chooseModule == 0){
+		for(let i=0; i<5; ++i){
+			if(mouseIn(width/2-100+i*50, height/2+150, 20, 20)){
+				modules[0] = LASER+i;
+				chooseModule = -1;
+				localStorage.setItem("modules", JSON.stringify(modules));
+			}
+		}
+
+	}else if(chooseModule == 1){
+		for(let i=0; i<6; ++i){
+			if(mouseIn(width/2-125+i*50, height/2+150, 20, 20)){
+				modules[1] = ALPHA+i;
+				chooseModule = -1;
+				localStorage.setItem("modules", JSON.stringify(modules));
+			}
+		}
+
+	}else if(chooseModule == 2 || chooseModule == 3){
+		for(let i=0; i<5; ++i){
+			if(mouseIn(width/2-100+i*50, height/2+125, 20, 20) &&
+				modules[5-chooseModule] != EMP+i){
+				modules[chooseModule] = EMP+i;
+				chooseModule = -1;
+				localStorage.setItem("modules", JSON.stringify(modules));
+			}
+		}
+
+		for(let i=0; i<5; ++i){
+			if(mouseIn(width/2-100+i*50, height/2+175, 20, 20) &&
+				modules[5-chooseModule] != EMP+5+i){
+				modules[chooseModule] = EMP+5+i;
+				chooseModule = -1;
+				localStorage.setItem("modules", JSON.stringify(modules));
+			}
+		}
+
+	}else if(chooseModule == 4){
+		for(let i=0; i<4; ++i){
+			if(mouseIn(width/2-75+i*50, height/2+150, 20, 20)){
+				modules[4] = DECOY+i;
+				chooseModule = -1;
+				localStorage.setItem("modules", JSON.stringify(modules));
+			}
+		}
+	}
+}
+
+function click(){
+	if(focus && mouseIn(width/2, height, 150, 100)){
+
+	}else{
+		focus = select ? [...select] : null;
+	}
+	/*
+	if(mouseButton == LEFT){
 		let ID = null;
 		for(let s of ships) if(s.type == BS && s.team == socket.id) ID = s.uid;
-		if(ID) socket.emit("move", {gameID: gameID, shipID: ID, pos: [mouseX-width/2, mouseY-height/2]});
+		if(ID) socket.emit("move", {gameID: gameID, shipID: ID, pos: mousePos()});
+
+	}else{
+		let ID = null, p = [0, 0];
+		for(let s of ships) if(s.type == BS && s.team == socket.id) ID = s.uid, p = [...s.pos];
+		socket.emit("spawn", {gameID: gameID, arg:
+			[DELTAP, socket.id, [PASSIVE], p, [mousePos()]]
+		});
 	}
+	*/
 }

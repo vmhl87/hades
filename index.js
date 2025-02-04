@@ -10,19 +10,31 @@ const io = require("socket.io")(server, {pingTimeout: 300000});
 
 let ct = 0;
 
+// SHIP TYPES
+
 const BS = ++ct, SENTINEL = ++ct, GUARD = ++ct, INT = ++ct, COL = ++ct;
-
-const LASER = ++ct, BATTERY = ++ct, MASS = ++ct, LASER2 = ++ct, DART = ++ct;
-
-const ALPHA = ++ct, IMPULSE = ++ct, PASSIVE = ++ct, OMEGA = ++ct, MIRROR = ++ct, ALLY = ++ct;
-
-const EMP = ++ct, SOL = ++ct, FORT = ++ct, TP = ++ct, AMP = ++ct, DESTINY = ++ct, BARRIER = ++ct, DELTA = ++ct, VENG = ++ct;
-
-const DECOY = ++ct, REPAIR = ++ct, ROCKET = ++ct, TURRET = ++ct;
 
 const DARTP = ++ct, ROCKETP = ++ct, DELTAP = ++ct;
 
-const CERB = ++ct;
+// DRONE TYPES
+
+const DECOY = ++ct, REPAIR = ++ct, ROCKET = ++ct, TURRET = ++ct;
+
+// WEAPON TYPES
+
+const LASER = ++ct, BATTERY = ++ct, MASS = ++ct, LASER2 = ++ct, DART = ++ct;
+
+/* UNOBTAIN */ const ROCKETD = ++ct, TURRETD = ++ct;
+
+// SHIELD TYPES
+
+const ALPHA = ++ct, IMPULSE = ++ct, PASSIVE = ++ct, OMEGA = ++ct, MIRROR = ++ct, ALLY = ++ct;
+
+// MODULE TYPES
+
+const EMP = ++ct, SOL = ++ct, FORT = ++ct, TP = ++ct, AMP = ++ct, DESTINY = ++ct, BARRIER = ++ct, DELTA = ++ct, RIPPLE = ++ct, DISRUPT = ++ct;
+
+/* UNOBTAIN */ const VENG = ++ct;
 
 // -- file xfer --
 
@@ -93,6 +105,18 @@ setInterval(tick, 250, null);
 
 // -- client interconnect --
 
+function spawnBS(){
+	const w = 5, h = 3;
+
+	let res = [Math.floor(Math.random()*w*h), -1];
+
+	do{
+		res[1] = Math.floor(Math.random()*w*h);
+	}while(res[1] == res[0]);
+
+	return [[res[0]%w, Math.floor(res[0]/w)], [res[1]%w, Math.floor(res[1]/w)]];
+}
+
 io.on("connect", (socket) => {
 	socket.on("error", e => {
 		throw (e.description || e);
@@ -123,8 +147,9 @@ io.on("connect", (socket) => {
 		if(queue.length == 2){
 			console.log("starting new game:", m);
 			const g = new Game([queue[0].s, queue[1].s]);
-			g.addShip(BS, 7000, queue[0].s.id, queue[0].modules, [-100, 0], []);
-			g.addShip(BS, 7000, queue[1].s.id, queue[1].modules, [100, 0], []);
+			const p = spawnBS();
+			g.addShip(BS, queue[0].s.id, queue[0].modules, [300*(p[0][0]-2), 300*(p[0][1]-1)]);
+			g.addShip(BS, queue[1].s.id, queue[1].modules, [300*(p[1][0]-2), 300*(p[1][1]-1)]);
 			g.start();
 			games.push(g);
 			queue = [];
@@ -142,8 +167,9 @@ io.on("connect", (socket) => {
 	socket.on("solo", modules => {
 		console.log("solo match started by", socket.id, "with", modules);
 		const g = new Game([socket]);
-		g.addShip(BS, 7000, socket.id, modules, [0, 0], []);
-		g.addShip(INT, 5000, CERB, [INT], [-100, 100], [[200, 200], [100, -100], [-100, -200]]);
+		const p = spawnBS();
+		g.addShip(BS, socket.id, modules, [300*(p[0][0]-2), 300*(p[0][1]-1)]);
+		g.addShip(BS, -1, [BATTERY, OMEGA, VENG], [300*(p[1][0]-2), 300*(p[1][1]-1)]);
 		g.start();
 		games.push(g);
 	});
@@ -156,6 +182,14 @@ io.on("connect", (socket) => {
 						s.moveTo(data.pos);
 					}
 				}
+			}
+		}
+	});
+
+	socket.on("spawn", data => {
+		for(let g of games){
+			if(g.uid == data.gameID){
+				g.addShip(...data.arg);
 			}
 		}
 	});
