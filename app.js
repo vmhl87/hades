@@ -351,8 +351,12 @@ function draw(){
 			if(focus[0] == "ship"){
 				push();
 				noFill(); stroke(...(ships[shipID].team == socket.id ? [70, 90, 90] : [90, 70, 70]), 100);
-				for(let i=0; i<ships[shipID].modules.length; ++i) if(RANGE[ships[shipID].modules[i].type])
-					circle(...screenPos(ships[shipID].vpos), RANGE[ships[shipID].modules[i].type]*2*camera.z);
+				for(let i=0; i<ships[shipID].modules.length; ++i){
+					if(RANGE[ships[shipID].modules[i].type])
+						circle(...screenPos(ships[shipID].vpos), RANGE[ships[shipID].modules[i].type]*2*camera.z);
+					if(ships[shipID].modules[i].type == ROCKETD)
+						circle(...screenPos(ships[shipID].vpos), 60*2*camera.z);
+				}
 				pop();
 
 				push();
@@ -365,8 +369,12 @@ function draw(){
 						_linedist(ships[shipID].vpos, ships[shipID].move[0], s.vpos) < 130) near = true;
 					for(let i=0; i<ships[shipID].move.length-1; ++i)
 						if(_linedist(ships[shipID].move[i], ships[shipID].move[i+1], s.vpos) < 130) near = true;
-					if(near) for(let i=0; i<s.modules.length; ++i) if(RANGE[s.modules[i].type])
-						circle(...screenPos(s.vpos), RANGE[s.modules[i].type]*2*camera.z);
+					if(near) for(let i=0; i<s.modules.length; ++i){
+						if(RANGE[s.modules[i].type])
+							circle(...screenPos(s.vpos), RANGE[s.modules[i].type]*2*camera.z);
+						if(s.modules[i].type == ROCKETD)
+							circle(...screenPos(s.vpos), 60*2*camera.z);
+					}
 				}
 				pop();
 			}
