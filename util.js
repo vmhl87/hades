@@ -25,6 +25,7 @@ class Ship{
 		this.pos = dat.pos;
 		this.move = dat.move;
 		this.wait = dat.wait;
+		this.tp = dat.tp;
 		this.vpos = [...this.pos];
 		this.rot = PI;
 		this.uid = dat.uid;
@@ -40,6 +41,7 @@ class Ship{
 		this.pos = dat.pos;
 		this.move = dat.move;
 		this.wait = dat.wait;
+		this.tp = dat.tp;
 		this.lock = dat.lock;
 	}
 
@@ -47,6 +49,7 @@ class Ship{
 		let target;
 		if(this.move.length) target = atan2(this.move[0][1]-this.pos[1], this.move[0][0]-this.pos[0]);
 		else if(this.wait) target = atan2(this.wait[1]-this.pos[1], this.wait[0]-this.pos[0]);
+		else if(this.tp != null) target = PI*1.6;
 		else target = PI*1.85;
 
 		let diff = target - this.rot;
@@ -114,7 +117,7 @@ function selected(){
 		if(d < 50) opt.push([d, ["rock", i]]);
 	}
 
-	for(let i=0; i<ships.length; ++i){
+	if(selectMove == null) for(let i=0; i<ships.length; ++i){
 		const d = _dist(screenPos(ships[i].pos), [mouseX, mouseY]);
 		if(d < 50) opt.push([d-20, ["ship", ships[i].uid]]);
 	}

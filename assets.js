@@ -1061,5 +1061,5 @@ function drawModule2(T, S){
 	drawModule(T);
 
 	fill(0, 100);
-	rect(-20, -20+40*abs(S), 40, 40-40*abs(S));
+	rect(-20, -20, 40, 40-40*abs(S));
 }

@@ -82,11 +82,8 @@ const COLS = Module.COLS, ROWS = Module.ROWS;
 let games = [], queue = [];
 
 function tick(game){
-	if(game){
-		game.update();
-		game.kill();
-
-	}else{
+	if(game) game.update();
+	else{
 		for(let g of games){
 			tick(g);
 
@@ -236,9 +233,12 @@ io.on("connect", (socket) => {
 	socket.on("activateModule", data => {
 		for(let g of games){
 			if(g.uid == data.gameID){
-				for(let s of g.ships){
-					if(s.uid == data.shipID){
-						console.log("activate module", data.i);
+				for(let i=0; i<g.ships.length; ++i){
+					if(g.ships[i].uid == data.shipID){
+						if(data.i != null && data.i < g.ships[i].modules.length &&
+							g.ships[i].modules[data.i].state == 1){
+							g.activateModule(i, data);
+						}
 					}
 				}
 			}

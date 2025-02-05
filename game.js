@@ -28,7 +28,66 @@ const EMP = ++ct, SOL = ++ct, FORT = ++ct, TP = ++ct, AMP = ++ct, DESTINY = ++ct
 
 /* UNOBTAIN */ const VENG = ++ct;
 
-let SPEED = new Array(ct), HP = new Array(ct);
+let SPEED = new Array(ct), HP = new Array(ct),
+	EFFECT_TIME = new Array(ct), RECHARGE_TIME = new Array(ct),
+	ACTIVATED = new Array(ct), RANGE = new Array(ct);
+
+EFFECT_TIME[EMP] = 6;
+RECHARGE_TIME[EMP] = 60;
+
+EFFECT_TIME[FORT] = 12;
+RECHARGE_TIME[FORT] = 60;
+
+EFFECT_TIME[TP] = 5;
+RECHARGE_TIME[TP] = 55;
+
+EFFECT_TIME[AMP] = 30;
+RECHARGE_TIME[AMP] = 60;
+
+EFFECT_TIME[DESTINY] = 3;
+RECHARGE_TIME[DESTINY] = 60;
+
+EFFECT_TIME[BARRIER] = 11;
+RECHARGE_TIME[BARRIER] = 60;
+
+EFFECT_TIME[DELTA] = 0;
+RECHARGE_TIME[DELTA] = 60;
+
+EFFECT_TIME[RIPPLE] = 5;
+RECHARGE_TIME[RIPPLE] = 60;
+
+EFFECT_TIME[DISRUPT] = 0;
+RECHARGE_TIME[DISRUPT] = 60;
+
+EFFECT_TIME[DECOY] = 0;
+RECHARGE_TIME[DECOY] = 60;
+
+EFFECT_TIME[REPAIR] = 0;
+RECHARGE_TIME[REPAIR] = 60;
+
+EFFECT_TIME[ROCKET] = 0;
+RECHARGE_TIME[ROCKET] = 60;
+
+EFFECT_TIME[TURRET] = 0;
+RECHARGE_TIME[TURRET] = 60;
+
+//ACTIVATED[ALPHA] = true;
+//ACTIVATED[IMPULSE] = true;
+//for(let i=OMEGA; i<=ALLY; ++i)
+	//ACTIVATED[i] = true;
+ACTIVATED[EMP] = true;
+ACTIVATED[FORT] = true;
+ACTIVATED[TP] = true;
+ACTIVATED[AMP] = true;
+ACTIVATED[DESTINY] = true;
+ACTIVATED[BARRIER] = true;
+ACTIVATED[DELTA] = true;
+ACTIVATED[RIPPLE] = true;
+ACTIVATED[DISRUPT] = true;
+ACTIVATED[DECOY] = true;
+ACTIVATED[REPAIR] = true;
+ACTIVATED[ROCKET] = true;
+ACTIVATED[TURRET] = true;
 
 SPEED[BS] = 20;
 SPEED[SENTINEL] = 10;
@@ -55,6 +114,15 @@ HP[DARTP] = 250;
 HP[ROCKETP] = 250;
 HP[DELTAP] = 180;
 
+RANGE[DESTINY] = 65;
+RANGE[DARTP] = 40;
+RANGE[ROCKETP] = 70;
+RANGE[DELTAP] = 70;
+
+function _dist(a, b){
+	return Math.sqrt((a[0]-b[0])*(a[0]-b[0]) + (a[1]-b[1])*(a[1]-b[1]));
+}
+
 let UID = 0;
 
 class Ship{
@@ -64,10 +132,11 @@ class Ship{
 		this.team = team;
 		this.modules = [];
 		for(let m of modules) if(m)
-			this.modules.push({type: m, state: 1, aux: 0});
+			this.modules.push({type: m, state: 1, aux: null});
 		this.pos = pos;
 		this.move = move;
 		this.wait = null;
+		this.tp = null;
 		this.uid = ++UID;
 		this.lock = false;
 		this.vel = 0;
@@ -102,9 +171,14 @@ class Ship{
 			pos: this.pos,
 			move: this.move,
 			wait: this.wait,
+			tp: this.tp,
 			uid: this.uid,
 			lock: this.lock
 		};
+	}
+	
+	hurt(x){
+		this.hp = Math.max(0, this.hp-x);
 	}
 
 	travel(){
@@ -145,10 +219,87 @@ class Game{
 		this.ships = [];
 		this.rocks = [];
 		this.uid = ++UID;
+		this.ev = [];
 	}
 
 	addShip(type, team, modules, pos, move = []){
 		this.ships.push(new Ship(type, HP[type], team, modules, pos, move));
+	}
+
+	activateModule(s, dat){
+		if(ACTIVATED[this.ships[s].modules[dat.i].type])
+			this.ships[s].modules[dat.i].state = -1;
+
+		const T = this.ships[s].modules[dat.i].type;
+
+		if(T == DELTA) this.addShip(DELTAP, this.ships[s].team, [], [...this.ships[s].pos], [dat.loc]);
+
+		if(T == DECOY) this.addShip(DECOY, this.ships[s].team, [], [...this.ships[s].pos], [dat.loc]);
+		if(T == REPAIR) this.addShip(REPAIR, this.ships[s].team, [], [...this.ships[s].pos], [dat.loc]);
+		if(T == ROCKET) this.addShip(ROCKET, this.ships[s].team, [ROCKETD], [...this.ships[s].pos], [dat.loc]);
+		if(T == TURRET) this.addShip(TURRET, this.ships[s].team, [TURRETD], [...this.ships[s].pos]);
+
+		if(T == TP){
+			this.ships[s].move = [];
+			this.ships[s].wait = null;
+			this.ships[s].tp = [...dat.loc];
+		}
+
+		if(T == DESTINY){
+			let T = [this.ships[s].pos[0]+COLS*150, this.ships[s].pos[1]+ROWS*150];
+			T[0] = Math.floor(T[0]/300);
+			T[1] = Math.floor(T[1]/300);
+			
+			const R = this.rocks.filter(x => {
+				let P = [x[0]+COLS*150, x[1]+ROWS*150];
+				P[0] = Math.floor(P[0]/300);
+				P[1] = Math.floor(P[1]/300);
+
+				return Math.abs(P[0]-T[0]) <= 1 && Math.abs(P[1]-T[1]) <= 1
+					&& (P[0] != T[0] || P[1] != T[1]);
+			});
+
+			this.ships[s].move = [];
+			this.ships[s].wait = null;
+			this.ships[s].tp = R[Math.floor(Math.random()*R.length)];
+		}
+	}
+
+	explode(pos, range, str){
+		this.ev.push(["explode", [pos, range, str]]);
+	}
+
+	die(pos){
+		this.ev.push(["die", pos]);
+	}
+
+	updateModules(s){
+		for(let i=0; i<s.modules.length; ++i){
+			const T = s.modules[i].type;
+
+			if(s.modules[i].state < 0)
+				s.modules[i].state = Math.min(0, s.modules[i].state+1/(1+EFFECT_TIME[T]*4));
+			else if(s.modules[i].state != 1)
+				s.modules[i].state = Math.min(1, s.modules[i].state+1/(1+(RECHARGE_TIME[T]-EFFECT_TIME[T])*4));
+
+			const S = s.modules[i].state;
+
+			if(T == TP && S == 0){
+				s.pos = [...s.tp];
+				s.tp = null;
+			}
+
+			if(T == DESTINY && S == 0){
+				for(let x of this.ships)
+					if(x.team != s.team)
+						if(_dist(x.pos, s.pos) < RANGE[DESTINY])
+							x.hurt(5000);
+
+				this.explode([...s.pos], RANGE[DESTINY], 9);
+				s.pos = [...s.tp];
+				s.tp = null;
+			}
+		}
 	}
 
 	start(){
@@ -181,32 +332,61 @@ class Game{
 	update(){
 		for(let s of this.ships) s.travel();
 
+		for(let s of this.ships) this.updateModules(s);
+
 		for(let s of this.ships){
 			if(!s.move.length){
 				if(s.type == DARTP){
-					s.hp = 0;
-					// explode();
+					s.hp = -1;
+					this.explode(s.pos, RANGE[DARTP], 9);
+					for(let x of this.ships)
+						if(x.team != s.team)
+							if(_dist(x.pos, s.pos) < RANGE[DARTP])
+								x.hurt(4000);
 				}
 
 				if(s.type == ROCKETP){
-					s.hp = 0;
-					// explode();
+					s.hp = -1;
+					this.explode(s.pos, RANGE[ROCKETP], 5);
+					for(let x of this.ships)
+						if(x.team != s.team)
+							if(_dist(x.pos, s.pos) < RANGE[ROCKETP])
+								x.hurt(700);
 				}
 
 				if(s.type == DELTAP){
-					s.hp = 0;
-					// explode();
+					s.hp = -1;
+					this.explode(s.pos, RANGE[DELTAP], 7);
+					for(let x of this.ships)
+						if(x.team != s.team)
+							if(_dist(x.pos, s.pos) < RANGE[DELTAP])
+								x.hurt(2000);
 				}
 			}
 		}
 
-		for(let s of this.ships){
+		for(let s of this.ships) if(s.hp == 0){
+			if(s.type == DELTAP){
+				explode(s.pos, RANGE[DELTAP], 1);
+				for(let x of this.ships)
+					if(x.team != s.team)
+						if(_dist(x.pos, s.pos) < RANGE[DELTAP])
+							x.hurt(500);
+			}
 		}
 
 		let q = [];
-		for(let s of this.ships) if(s.hp) q.push(s.encode());
+		for(let s of this.ships){
+			if(s.hp > 0) q.push(s.encode());
+			else if([BS, DECOY, REPAIR, ROCKET, TURRET].includes(s.type))
+				this.die(s.pos);
+		}
 
-		for(let p of this.players) p.emit("state", q);
+		this.ships = this.ships.filter(x => x.hp > 0);
+
+		for(let p of this.players) p.emit("state", {s: q, ev: [...this.ev]});
+
+		this.ev = [];
 	}
 
 	end(){
@@ -215,10 +395,6 @@ class Game{
 
 	alive(type){
 		return this.ships.filter(x => x.type == type).length;
-	}
-
-	kill(){
-		this.ships = this.ships.filter(x => x.hp > 0);
 	}
 }
 
