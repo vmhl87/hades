@@ -350,10 +350,18 @@ function draw(){
 			if(focus[0] == "rock") circle(...screenPos(rocks[focus[1]]), 20*sqrt(camera.z));
 			if(focus[0] == "ship"){
 				push();
+				stroke(90, 100); fill(90, 30);
+				for(let i=0; i<ships[shipID].modules.length; ++i)
+					if(mouseIn(width/2+25-25*ships[shipID].modules.length+50*i, height-120-10-25, 20, 20))
+						if(RANGE[ships[shipID].modules[i].type] != null)
+							circle(...screenPos(ships[shipID].vpos), RANGE[ships[shipID].modules[i].type]*2*camera.z);
+				pop();
+
+				push();
 				noFill(); stroke(...(ships[shipID].team == socket.id ? [70, 90, 90] : [90, 70, 70]), 100);
 				for(let i=0; i<ships[shipID].modules.length; ++i){
 					if(RANGE[ships[shipID].modules[i].type])
-						circle(...screenPos(ships[shipID].vpos), RANGE[ships[shipID].modules[i].type]*2*camera.z);
+						circle(...screenPos(ships[shipID].vpos), weaponRange(ships[shipID].modules[i].type)*2*camera.z);
 					if(ships[shipID].modules[i].type == ROCKETD)
 						circle(...screenPos(ships[shipID].vpos), 60*2*camera.z);
 				}
@@ -361,7 +369,7 @@ function draw(){
 
 				push();
 				noFill(); stroke(90, 70, 70, 100);
-				for(let s of ships) if(s.team != socket.id){
+				for(let s of ships) if(s.team != ships[shipID].team){
 					let near = _dist(ships[shipID].vpos, s.vpos) < 130;
 					if(ships[shipID].wait &&
 						_linedist(ships[shipID].vpos, ships[shipID].wait, s.vpos) < 130) near = true;
@@ -371,7 +379,7 @@ function draw(){
 						if(_linedist(ships[shipID].move[i], ships[shipID].move[i+1], s.vpos) < 130) near = true;
 					if(near) for(let i=0; i<s.modules.length; ++i){
 						if(RANGE[s.modules[i].type])
-							circle(...screenPos(s.vpos), RANGE[s.modules[i].type]*2*camera.z);
+							circle(...screenPos(s.vpos), weaponRange(s.modules[i].type)*2*camera.z);
 						if(s.modules[i].type == ROCKETD)
 							circle(...screenPos(s.vpos), 60*2*camera.z);
 					}

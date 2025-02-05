@@ -58,3 +58,23 @@ for(let i=LASER; i<=LASER2; ++i) RANGE[i] = 80;
 RANGE[DART] = 100;
 RANGE[ROCKETD] = 400;
 RANGE[TURRETD] = 80;
+for(let i=SENTINEL; i<=COL; ++i) RANGE[i] = 80;
+
+function weaponRange(T){
+	if(T >= LASER && T <= TURRETD) return RANGE[T];
+	if(T >= SENTINEL && T <= COL) return RANGE[t];
+	return null;
+}
+
+RANGE[IMPULSE] = 55;
+RANGE[MIRROR] = 70;
+RANGE[EMP] = 80;
+RANGE[TP] = 400;
+RANGE[AMP] = 100;
+RANGE[DESTINY] = 70;
+RANGE[BARRIER] = 100;
+RANGE[DISRUPT] = 70;
+RANGE[VENG] = 160;
+RANGE[DECOY] = 250;
+RANGE[REPAIR] = 200;
+RANGE[ROCKET] = 400;

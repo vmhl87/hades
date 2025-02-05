@@ -108,10 +108,12 @@ class Ship{
 	}
 
 	travel(){
-		// this.hp = Math.max(this.team == -1 ? -50 : 50, this.hp-100);
 		const now = Date.now();
 
 		if(this.wait && --this.wait[2] == 0) this.confirmMove();
+
+		while(this.move.length && this.move[0][0] == this.pos[0] && this.move[0][1] == this.pos[1])
+			this.move = this.move.slice(1);
 
 		if(this.move.length){
 			if(!this.lock){
@@ -196,6 +198,9 @@ class Game{
 					// explode();
 				}
 			}
+		}
+
+		for(let s of this.ships){
 		}
 
 		let q = [];
