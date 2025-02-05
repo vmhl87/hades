@@ -77,6 +77,8 @@ const Module = require("./game.js");
 
 const Ship = Module.Ship, Game = Module.Game;
 
+const COLS = Module.COLS, ROWS = Module.ROWS;
+
 let games = [], queue = [];
 
 function tick(game){
@@ -106,15 +108,13 @@ setInterval(tick, 250, null);
 // -- client interconnect --
 
 function spawnBS(){
-	const w = 5, h = 3;
-
-	let res = [Math.floor(Math.random()*w*h), -1];
+	let res = [Math.floor(Math.random()*COLS*ROWS), -1];
 
 	do{
-		res[1] = Math.floor(Math.random()*w*h);
+		res[1] = Math.floor(Math.random()*COLS*ROWS);
 	}while(res[1] == res[0]);
 
-	return [[res[0]%w, Math.floor(res[0]/w)], [res[1]%w, Math.floor(res[1]/w)]];
+	return [[res[0]%COLS, Math.floor(res[0]/COLS)], [res[1]%COLS, Math.floor(res[1]/COLS)]];
 }
 
 io.on("connect", (socket) => {
@@ -128,6 +128,15 @@ io.on("connect", (socket) => {
 
 	socket.on("disconnect", e => {
 		console.log("disconnect " + socket.id);
+
+		if(queue.filter(x => x.s.id == socket.id).length){
+			console.log("dequeued player", socket.id);
+			queue = queue.filter(x => x.s.id != socket.id);
+			let m = [];
+			for(let q of queue) m.push(q.s.id);
+			console.log(" =>", m);
+		}
+
 		for(let g of games){
 			for(let s of g.ships){
 				if(s.type == BS && s.team == socket.id){
@@ -148,8 +157,10 @@ io.on("connect", (socket) => {
 			console.log("starting new game:", m);
 			const g = new Game([queue[0].s, queue[1].s]);
 			const p = spawnBS();
-			g.addShip(BS, queue[0].s.id, queue[0].modules, [300*(p[0][0]-2), 300*(p[0][1]-1)]);
-			g.addShip(BS, queue[1].s.id, queue[1].modules, [300*(p[1][0]-2), 300*(p[1][1]-1)]);
+			g.addShip(BS, queue[0].s.id, queue[0].modules,
+				[300*(p[0][0]-COLS/2+0.5), 300*(p[0][1]-ROWS/2+0.5)]);
+			g.addShip(BS, queue[1].s.id, queue[1].modules,
+				[300*(p[1][0]-COLS/2+0.5), 300*(p[1][1]-ROWS/2+0.5)]);
 			g.start();
 			games.push(g);
 			queue = [];
@@ -168,8 +179,10 @@ io.on("connect", (socket) => {
 		console.log("solo match started by", socket.id, "with", modules);
 		const g = new Game([socket]);
 		const p = spawnBS();
-		g.addShip(BS, socket.id, modules, [300*(p[0][0]-2), 300*(p[0][1]-1)]);
-		g.addShip(BS, -1, [BATTERY, OMEGA, VENG], [300*(p[1][0]-2), 300*(p[1][1]-1)]);
+		g.addShip(BS, socket.id, modules,
+			[300*(p[0][0]-COLS/2+0.5), 300*(p[0][1]-ROWS/2+0.5)]);
+		g.addShip(BS, -1, [BATTERY, OMEGA, VENG],
+			[300*(p[1][0]-COLS/2+0.5), 300*(p[1][1]-ROWS/2+0.5)]);
 		g.start();
 		games.push(g);
 	});

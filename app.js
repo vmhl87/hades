@@ -22,13 +22,15 @@ function setup(){
 		element.addEventListener("contextmenu", e => e.preventDefault())
 }
 
-let ships = [], rocks = [], gameID = null;
+let ships = [], rocks = [], gameID = null, ROWS, COLS;
 
 socket.on("reset", () => {
 	searching = 0;
 	staging = 1;
 	open = 0;
 	connected = 0;
+	select = null;
+	selectMove = null;
 	gameID = null;
 });
 
@@ -38,6 +40,11 @@ socket.on("start", data => {
 	staging = 0;
 	open = 0;
 	connected = 1;
+	select = null;
+	selectMove = null;
+
+	ROWS = data.rows;
+	COLS = data.cols;
 
 	gameID = data.uid;
 
@@ -81,6 +88,8 @@ socket.on("end", () => {
 	staging = 1;
 	open = 0;
 	connected = 0;
+	select = null;
+	selectMove = null;
 	gameID = null;
 });
 
@@ -321,16 +330,46 @@ function draw(){
 
 		push(); translate(width/2-camera.x*camera.z, height/2-camera.y*camera.z);
 		stroke(200, 30); strokeWeight(2*sqrt(camera.z));
-		for(let i=0; i<=h; ++i)
-			line(-300*w/2*camera.z, (-300*h/2+i*300)*camera.z, 300*w/2*camera.z, (-300*h/2+i*300)*camera.z);
-		for(let i=0; i<=w; ++i)
-			line((-300*w/2+i*300)*camera.z, -300*h/2*camera.z, (-300*w/2+i*300)*camera.z, 300*h/2*camera.z);
+		for(let i=0; i<=ROWS; ++i)
+			line(-300*COLS/2*camera.z,(-300*ROWS/2+i*300)*camera.z,
+				300*COLS/2*camera.z, (-300*ROWS/2+i*300)*camera.z);
+		for(let i=0; i<=COLS; ++i)
+			line((-300*COLS/2+i*300)*camera.z, -300*ROWS/2*camera.z,
+				(-300*COLS/2+i*300)*camera.z, 300*ROWS/2*camera.z);
 		pop();
+
+		if(selectMove != null){
+			fill(255, 255, 100, 15); noStroke();
+			let x = selected();
+			if(x && x[0] == "rock" && (!focus || x[1] != focus[1]))
+				circle(...screenPos(rocks[x[1]]), 20*sqrt(camera.z));
+		}
 
 		if(focus){
 			fill(255, 15); noStroke();
 			if(focus[0] == "rock") circle(...screenPos(rocks[focus[1]]), 20*sqrt(camera.z));
-			if(focus[0] == "ship") circle(...screenPos(ships[shipID].vpos), 60*sqrt(camera.z));
+			if(focus[0] == "ship"){
+				push();
+				noFill(); stroke(...(ships[shipID].team == socket.id ? [70, 90, 90] : [90, 70, 70]), 100);
+				for(let i=0; i<ships[shipID].modules.length; ++i) if(RANGE[ships[shipID].modules[i].type])
+					circle(...screenPos(ships[shipID].vpos), RANGE[ships[shipID].modules[i].type]*2*camera.z);
+				pop();
+
+				push();
+				noFill(); stroke(90, 70, 70, 100);
+				for(let s of ships) if(s.team != socket.id){
+					let near = _dist(ships[shipID].vpos, s.vpos) < 130;
+					if(ships[shipID].wait &&
+						_linedist(ships[shipID].vpos, ships[shipID].wait, s.vpos) < 130) near = true;
+					if(ships[shipID].move.length &&
+						_linedist(ships[shipID].vpos, ships[shipID].move[0], s.vpos) < 130) near = true;
+					for(let i=0; i<ships[shipID].move.length-1; ++i)
+						if(_linedist(ships[shipID].move[i], ships[shipID].move[i+1], s.vpos) < 130) near = true;
+					if(near) for(let i=0; i<s.modules.length; ++i) if(RANGE[s.modules[i].type])
+						circle(...screenPos(s.vpos), RANGE[s.modules[i].type]*2*camera.z);
+				}
+				pop();
+			}
 		}
 
 		for(let r of rocks){
@@ -391,60 +430,105 @@ function draw(){
 		}
 
 		if(focus){
-			push();
-			fill(0, 20, 30); stroke(50, 200, 200, 50); strokeWeight(3);
-			rect(width/2-150, height-120, 300, 100);
-			pop();
-
-			push(); textAlign(LEFT, TOP); textSize(18);
-			fill(200); noStroke(); text(
-				focus[0] == "rock" ? "ASTEROID" : NAME[ships[shipID].type],
-				width/2-150 + 10, height-120 + 10);
-			pop();
-
-			if(focus[0] == "ship"){
-				const hp = ships[shipID].hp, max = HP[ships[shipID].type];
-
-				fill(20, 40, 60); noStroke();
-				rect(width/2+150-20-100, height-120+100-20-20, 100, 20);
-
-				fill(150*(1-hp/max), 150*(hp/max), 0);
-				rect(width/2+150-20-100, height-120+100-20-20, ceil(100*hp/max), 20);
-
-				push(); textSize(13);
-				fill(200); noStroke(); textAlign(CENTER, CENTER);
-				text(hp.toString() + " / " + max.toString(), width/2+150-20-100+50, height-120+100-20-20+7.5);
+			if(selectMove){
+				push();
+				fill(0, 20, 30); stroke(50, 200, 200, 50); strokeWeight(3);
+				rect(width/2-150, height-60, 300, 40);
 				pop();
 
-				for(let i=0; i<ships[shipID].modules.length; ++i){
-					push(); translate(width/2+25-25*ships[shipID].modules.length+50*i, height-120-10-25);
-					drawModule2(ships[shipID].modules[i].type, ships[shipID].modules.state);
+				push(); textSize(18); textAlign(LEFT, TOP);
+				fill(200); text("SELECT DESTINATION", width/2-140, height-50);
+				pop();
+
+				push();
+				fill(20, 40, 60); noStroke(); rect(width/2+77, height-51, 65, 22);
+				pop();
+
+				push(); textSize(14); textAlign(CENTER, CENTER);
+				fill(mouseIn(width/2+77+65/2, height-42, 40, 20) ? 255 : 200);
+				text("CANCEL", width/2+77+65/2, height-42);
+				pop();
+
+			}else{
+				if(focus[0] == "rock"){
+					push();
+					fill(0, 20, 30); stroke(50, 200, 200, 50); strokeWeight(3);
+					rect(width/2-55, height-60, 110, 40);
+					pop();
+
+					push(); textSize(18); textAlign(CENTER, TOP);
+					fill(200); text("ASTEROID", width/2, height-50);
+					pop();
+
+				}else if(focus[0] == "ship"){
+					const hp = ships[shipID].hp, max = HP[ships[shipID].type];
+
+					push();
+					fill(0, 20, 30); stroke(50, 200, 200, 50); strokeWeight(3);
+					rect(width/2-150, height-120, 300, 100);
+					pop();
+
+					push(); textAlign(LEFT, TOP); textSize(18);
+					fill(200); noStroke(); text(
+						focus[0] == "rock" ? "ASTEROID" : NAME[ships[shipID].type],
+						width/2-150 + 10, height-120 + 10);
+					pop();
+
+					fill(20, 40, 60); noStroke();
+					rect(width/2+150-20-100, height-120+100-20-20, 100, 20);
+
+					fill(150*(1-hp/max), 150*(hp/max), 0);
+					rect(width/2+150-20-100, height-120+100-20-20, ceil(100*hp/max), 20);
+
+					push(); textSize(13);
+					fill(200); noStroke(); textAlign(CENTER, CENTER);
+					text(hp.toString() + " / " + max.toString(), width/2+150-20-100+50, height-120+100-20-20+7.5);
+					pop();
+
+					for(let i=0; i<ships[shipID].modules.length; ++i){
+						push(); translate(width/2+25-25*ships[shipID].modules.length+50*i, height-120-10-25);
+						drawModule2(ships[shipID].modules[i].type, ships[shipID].modules.state);
+						pop();
+					}
+
+					let canMove = ships[shipID].team == socket.id,
+						canStop = ships[shipID].wait;
+
+					push(); strokeWeight(2);
+					if(canStop){
+						if(canMove){
+							if(mouseIn(width/2-117, height-50, 20, 20)) stroke(15, 45, 55);
+							else stroke(10, 35, 40);
+						}else stroke(7, 30, 40);
+						line(width/2-130, height-45, width/2-125, height-40);
+						line(width/2-125, height-40, width/2-105, height-60);
+
+						if(canMove){
+							if(mouseIn(width/2-117, height-50, 20, 20)) stroke(30, 90, 110);
+							else stroke(20, 70, 80);
+						}else stroke(10, 40, 60);
+						const wait = 25-floor(ships[shipID].wait[2]*25/40);
+						line(width/2-130, height-45, width/2-130+min(5, wait), height-45+min(5, wait));
+						if(wait >= 5)
+							line(width/2-125, height-40, width/2-125+wait-5, height-40-wait+5);
+
+					}else{
+						if(canMove){
+							if(mouseIn(width/2-117, height-50, 20, 20)) stroke(30, 90, 110);
+							else stroke(20, 70, 80);
+						}else stroke(10, 40, 60);
+						line(width/2-130, height-50, width/2-105, height-50);
+						line(width/2-115, height-60, width/2-105, height-50);
+						line(width/2-115, height-40, width/2-105, height-50);
+					}
+					if(canMove && (canStop || ships[shipID].move.length > 1)){
+						if(mouseIn(width/2-70, height-50, 20, 20)) stroke(30, 90, 110);
+						else stroke(20, 70, 80);
+					}else stroke(10, 40, 60);
+					line(width/2-80, height-60, width/2-60, height-40);
+					line(width/2-80, height-40, width/2-60, height-60);
 					pop();
 				}
-
-				let canMove = ships[shipID].team == socket.id,
-					canStop = canMove && ships[shipID].wait;
-
-				push(); strokeWeight(2);
-				if(canMove){
-					if(mouseIn(width/2-117, height-50, 20, 20)) stroke(30, 90, 110);
-					else stroke(20, 70, 80);
-				}else stroke(10, 40, 60);
-				if(canStop){
-					line(width/2-130, height-45, width/2-125, height-40);
-					line(width/2-125, height-40, width/2-105, height-60);
-				}else{
-					line(width/2-130, height-50, width/2-105, height-50);
-					line(width/2-115, height-60, width/2-105, height-50);
-					line(width/2-115, height-40, width/2-105, height-50);
-				}
-				if(canStop){
-					if(mouseIn(width/2-70, height-50, 20, 20)) stroke(30, 90, 110);
-					else stroke(20, 70, 80);
-				}else stroke(10, 40, 60);
-				line(width/2-80, height-60, width/2-60, height-40);
-				line(width/2-80, height-40, width/2-60, height-60);
-				pop();
 			}
 		}
 
@@ -609,44 +693,42 @@ function click(){
 		}
 	}
 
-	if(focus && selectMove == null && mouseIn(width/2, height-70, 150, 50)){
+	if(focus && selectMove == null &&
+		(focus[0] == "rock" ? mouseIn(width/2, height-40, 55, 20) : mouseIn(width/2, height-70, 150, 50))){
 		if(shipID != null){
 			let canMove = ships[shipID].team == socket.id,
 				canStop = canMove && ships[shipID].wait;
-			if(canMove && mouseIn(width/2-70, height-50, 20, 20)){
+			if(canMove && (ships[shipID].move.length > 1 || canStop) &&
+				mouseIn(width/2-70, height-50, 20, 20)){
 				socket.emit("cancelMove", {gameID: gameID, shipID: focus[1]});
 			}
 			if(canMove && mouseIn(width/2-117, height-50, 20, 20)){
 				if(canStop) socket.emit("confirmMove", {gameID: gameID, shipID: focus[1]});
-				else selectMove = true;
+				else selectMove = ["ship", focus[1]];
 			}
 		}
 
-	}else if(focus && selectMove){
-		if(select && select[0] == "rock" &&
-			_dist([rocks[select[1]][0], rocks[select[1]][1]+10], ships[shipID].pos) > 5){
-			socket.emit("move", {
-				gameID: gameID, shipID: focus[1],
-				pos: [rocks[select[1]][0], rocks[select[1]][1]+10]
-			});
+	}else if(focus && selectMove != null){
+
+		if(mouseIn(width/2, height-40, 150, 20)){
+			if(mouseIn(width/2+77+65/2, height-42, 40, 20)){
+				selectMove = null;
+			}
+
+		}else if(select && select[0] == "rock"){
+			if(selectMove[0] == "ship"){
+				socket.emit("move", {
+					gameID: gameID, shipID: selectMove[1],
+					pos: [rocks[select[1]][0], rocks[select[1]][1]+10]
+				});
+				selectMove = null;
+			}
+
+		}else{
 			selectMove = null;
 		}
 
 	}else{
 		focus = select && (!focus || focus[0] != select[0] || focus[1] != select[1]) ? [...select] : null;
 	}
-	/*
-	if(mouseButton == LEFT){
-		let ID = null;
-		for(let s of ships) if(s.type == BS && s.team == socket.id) ID = s.uid;
-		if(ID) socket.emit("move", {gameID: gameID, shipID: ID, pos: mousePos()});
-
-	}else{
-		let ID = null, p = [0, 0];
-		for(let s of ships) if(s.type == BS && s.team == socket.id) ID = s.uid, p = [...s.pos];
-		socket.emit("spawn", {gameID: gameID, arg:
-			[DELTAP, socket.id, [PASSIVE], p, [mousePos()]]
-		});
-	}
-	*/
 }

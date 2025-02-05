@@ -26,7 +26,7 @@ const EMP = ++ct, SOL = ++ct, FORT = ++ct, TP = ++ct, AMP = ++ct, DESTINY = ++ct
 
 /* UNOBTAIN */ const VENG = ++ct;
 
-let NAME = new Array(ct), HP = new Array(ct);
+let NAME = new Array(ct), HP = new Array(ct), RANGE = new Array(ct).fill(null);
 
 NAME[BS] = "BATTLESHIP";
 NAME[SENTINEL] = "CERBERUS SENTINEL";
@@ -53,3 +53,8 @@ HP[TURRET] = 600;
 HP[DARTP] = 250;
 HP[ROCKETP] = 250;
 HP[DELTAP] = 180;
+
+for(let i=LASER; i<=LASER2; ++i) RANGE[i] = 80;
+RANGE[DART] = 100;
+RANGE[ROCKETD] = 400;
+RANGE[TURRETD] = 80;

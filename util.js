@@ -91,6 +91,15 @@ function _dist(a, b){
 	return sqrt((a[0]-b[0])*(a[0]-b[0]) + (a[1]-b[1])*(a[1]-b[1]));
 }
 
+function _linedist(l, r, p) {
+	const x1 = l[0], y1 = l[1], x2 = r[0], y2 = r[1];
+	if(l[0] == r[0] && l[1] == r[1]) return _dist(l, p);
+	const lv = [x2-x1, y2-y1], pv = [p[0]-x1, p[1]-y1];
+	const dot = pv[0]*lv[0] + pv[1]*lv[1];
+	const t = max(0, min(1, dot/(lv[0]*lv[0]+lv[1]*lv[1])));
+	return _dist(p, [x1+t*lv[0], y1+t*lv[1]]);
+}
+
 function _lerp(a, b, c){
 	return [lerp(a[0], b[0], c), lerp(a[1], b[1], c)];
 }

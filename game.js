@@ -1,3 +1,5 @@
+const COLS = 5, ROWS = 3;
+
 let ct = 0;
 
 // SHIP TYPES
@@ -72,7 +74,7 @@ class Ship{
 	}
 
 	waitMoveTo(pos){
-		this.wait = [pos[0], pos[1], 20];
+		this.wait = [pos[0], pos[1], 40];
 	}
 
 	moveTo(pos){
@@ -87,7 +89,8 @@ class Ship{
 	}
 
 	cancelMove(){
-		this.wait = null;
+		if(this.wait) this.wait = null;
+		else if(this.move.length > 1) this.move.pop();
 	}
 
 	encode(){
@@ -147,17 +150,17 @@ class Game{
 	}
 
 	start(){
-		const w = 5, h = 3, d = 5;
+		const d = 5;
 
-		let count = new Array(w*h).fill(0);
+		let count = new Array(COLS*ROWS).fill(0);
 
-		for(let i=0; i<d*w*h; ++i){
-			let a = [Math.floor(Math.random()*w*h), Math.floor(Math.random()*w*h)];
+		for(let i=0; i<d*COLS*ROWS; ++i){
+			let a = [Math.floor(Math.random()*COLS*ROWS), Math.floor(Math.random()*COLS*ROWS)];
 			let b = count[a[0]] > count[a[1]] ? a[1] : a[0];
 			++count[b];
 			this.rocks.push([
-				Math.round(Math.random()*300) + 300*(b%w) - 300*w/2,
-				Math.round(Math.random()*300) + 300*Math.floor(b/w) - 300*h/2
+				Math.round(Math.random()*300) + 300*(b%COLS) - 300*COLS/2,
+				Math.round(Math.random()*300) + 300*Math.floor(b/COLS) - 300*ROWS/2
 			]);
 		}
 
@@ -169,7 +172,7 @@ class Game{
 		for(let s of this.ships) q.push(s.encode());
 
 		for(let p of this.players){
-			p.emit("start", {ships: q, rocks: this.rocks, uid: this.uid});
+			p.emit("start", {ships: q, rocks: this.rocks, uid: this.uid, rows: ROWS, cols: COLS});
 		}
 	}
 
@@ -214,4 +217,4 @@ class Game{
 	}
 }
 
-module.exports = { Ship, Game };
+module.exports = { Ship, Game, COLS, ROWS };

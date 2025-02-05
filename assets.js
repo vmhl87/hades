@@ -639,6 +639,43 @@ function drawModule(T){
 		line(5, 8, 5, 2);
 	}
 
+	// DRONE
+
+	if(T == ROCKETD){
+		stroke(200, 50, 50); fill(200, 50, 50);
+		beginShape();
+		vertex(10, -10);
+		vertex(10, -8);
+		vertex(8, -6);
+		vertex(6, -8);
+		vertex(8, -10);
+		endShape(CLOSE);
+		beginShape();
+		vertex(4, -6);
+		vertex(-4, 2);
+		vertex(-11, 9);
+		vertex(-11, 11);
+		vertex(-9, 11);
+		vertex(-2, 4);
+		vertex(6, -4);
+		endShape();
+		strokeWeight(2);
+		line(-11, 5, -2, -4);
+		line(-5, 11, 4, 2);
+	}
+
+	if(T == TURRETD){
+		stroke(200, 50, 50);
+		line(4, -10, 4, 10);
+		line(0, -10, 0, 10);
+		line(-4, -10, -4, 10);
+		line(-13, -10, 13, -10);
+		line(11.7, -5, 4, -9);
+		line(-11.7, -5, -4, -9);
+		line(9, -1.3, 4, -9);
+		line(-9, -1.3, -4, -9);
+	}
+
 	// CERB
 	
 	if(T == GUARD){
