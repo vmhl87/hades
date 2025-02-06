@@ -22,7 +22,7 @@ function setup(){
 		element.addEventListener("contextmenu", e => e.preventDefault())
 }
 
-let ships = [], rocks = [], blasts = [], deaths = [], gameID = null, ROWS, COLS;
+let ships = [], rocks = [], blasts = [], deaths = [], heals = [], gameID = null, ROWS, COLS;
 
 socket.on("reset", () => {
 	searching = 0;
@@ -93,6 +93,10 @@ socket.on("state", data => {
 
 		if(T == "die"){
 			deaths.push([D, Date.now() + 3000]);
+		}
+
+		if(T == "heal"){
+			heals.push([D, Date.now() + 2000]);
 		}
 	}
 });
@@ -475,6 +479,15 @@ function draw(){
 			}
 		}
 
+		push(); noStroke();
+		for(let h of heals){
+			fill(50, 200, 50, 60*sin((h[1]-Date.now())/2000*PI));
+			circle(...screenPos(h[0]), 60*2*camera.z);
+		}
+		pop();
+
+		heals = heals.filter(x => x[1] > Date.now());
+
 		push(); noFill(); strokeWeight(3*sqrt(camera.z));
 		for(let d of deaths){
 			stroke(0, 255, 255, 80*Math.min(1, (d[1]-Date.now())/800));
@@ -494,6 +507,12 @@ function draw(){
 						-PI/2, -PI/2+PI*2*(1+m.state));
 					pop();
 				}
+			}
+
+			if(s.type == REPAIR){
+				push(); fill(50, 200, 50, 20); noStroke();
+				circle(...screenPos(s.vpos), 60*2*camera.z);
+				pop();
 			}
 		}
 
@@ -517,6 +536,20 @@ function draw(){
 
 			stroke(50, 150, 150); noFill();
 			//circle(0, 0, 60);
+
+			const exp = s.expire;
+
+			if(exp != 1){
+				fill(100, 80); noStroke();
+				rect(-15, -23, 30, 3);
+
+				fill(200, 150, 50);
+				rect(-15, -23, ceil(30*exp), 3);
+
+				fill(50, 150, 150);
+
+				stroke(50, 150, 150); noFill();
+			}
 
 			pop();
 		}
@@ -562,6 +595,21 @@ function draw(){
 					pop();
 
 				}else if(focus[0] == "ship"){
+					const S = sqrt(camera.z);
+
+					for(let m of ships[shipID].modules)
+						if(m.type >= LASER && m.type <= TURRETD)
+							for(let s of ships) if(m.aux.includes(s.uid)){
+								push(); translate(...screenPos(s.vpos));
+								scale(S); rotate(-frameCount/30);
+								stroke(200, 150, 50); strokeWeight(2);
+								line(0, -7, 0, 7);
+								line(-7, 0, 7, 0);
+								pop();
+
+								// TODO RENDER WEAPONS
+							}
+
 					const hp = ships[shipID].hp, max = HP[ships[shipID].type];
 
 					push();

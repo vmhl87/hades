@@ -30,7 +30,13 @@ const EMP = ++ct, SOL = ++ct, FORT = ++ct, TP = ++ct, AMP = ++ct, DESTINY = ++ct
 
 let SPEED = new Array(ct), HP = new Array(ct),
 	EFFECT_TIME = new Array(ct), RECHARGE_TIME = new Array(ct),
-	ACTIVATED = new Array(ct), RANGE = new Array(ct);
+	ACTIVATED = new Array(ct), RANGE = new Array(ct),
+	EXPIRE_TIME = new Array(ct), TARGETS = new Array(ct);
+
+EXPIRE_TIME[DECOY] = 40;
+EXPIRE_TIME[REPAIR] = 40;
+EXPIRE_TIME[ROCKET] = 40;
+EXPIRE_TIME[TURRET] = 40;
 
 EFFECT_TIME[EMP] = 6;
 RECHARGE_TIME[EMP] = 60;
@@ -119,6 +125,26 @@ RANGE[DARTP] = 40;
 RANGE[ROCKETP] = 70;
 RANGE[DELTAP] = 70;
 
+RANGE[REPAIR] = 60;
+
+for(let i=LASER; i<=LASER2; ++i) RANGE[i] = 80;
+RANGE[DART] = 100;
+RANGE[ROCKETD] = 400;
+RANGE[TURRETD] = 80;
+for(let i=SENTINEL; i<=COL; ++i) RANGE[i] = 80;
+
+TARGETS[LASER] = 1;
+TARGETS[BATTERY] = 1;
+TARGETS[MASS] = 3;
+TARGETS[LASER2] = 2;
+TARGETS[DART] = 1;
+TARGETS[ROCKETD] = 1;
+TARGETS[TURRETD] = 3;
+TARGETS[SENTINEL] = 1;
+TARGETS[GUARD] = 1;
+TARGETS[INT] = 4;
+TARGETS[COL] = 1;
+
 function _dist(a, b){
 	return Math.sqrt((a[0]-b[0])*(a[0]-b[0]) + (a[1]-b[1])*(a[1]-b[1]));
 }
@@ -140,6 +166,11 @@ class Ship{
 		this.tp = null;
 		this.uid = ++UID;
 		this.vel = type == DARTP ? SPEED[DARTP] : 0;
+		this.expire = 1;
+
+		for(let m of this.modules)
+			if(m.type >= LASER && m.type <= TURRETD)
+				m.aux = [];
 	}
 
 	waitMoveTo(pos, i){
@@ -173,12 +204,17 @@ class Ship{
 			dock: this.dock,
 			wait: this.wait,
 			tp: this.tp,
-			uid: this.uid
+			uid: this.uid,
+			expire: this.expire,
 		};
 	}
 	
 	hurt(x){
 		this.hp = Math.max(0, this.hp-x);
+	}
+
+	heal(x){
+		this.hp = Math.min(HP[this.type], this.hp+x);
 	}
 
 	travel(){
@@ -256,26 +292,26 @@ class Game{
 			let T = [this.ships[s].pos[0]+COLS*150, this.ships[s].pos[1]+ROWS*150];
 			T[0] = Math.floor(T[0]/300);
 			T[1] = Math.floor(T[1]/300);
+
+			let R = [];
 			
-			const R = this.rocks.filter(x => {
+			for(let i=0; i<this.rocks.length; ++i){
+				const x = this.rocks[i];
+
 				let P = [x[0]+COLS*150, x[1]+ROWS*150];
 				P[0] = Math.floor(P[0]/300);
 				P[1] = Math.floor(P[1]/300);
 
-				return Math.abs(P[0]-T[0]) <= 1 && Math.abs(P[1]-T[1]) <= 1
-					&& (P[0] != T[0] || P[1] != T[1]);
-			});
-
+				if(Math.abs(P[0]-T[0]) <= 1 && Math.abs(P[1]-T[1]) <= 1
+					&& (P[0] != T[0] || P[1] != T[1]))
+					R.push([...x, i]);
+			}
+		
 			const I = Math.floor(Math.random()*R.length);
-			let J = null;
-
-			for(let i=0; i<this.rocks.length; ++i)
-				if(this.rocks[0] == R[I][0] && this.rocks[1] == R[I][1])
-					J = i;
 
 			this.ships[s].move = [];
 			this.ships[s].wait = null;
-			this.ships[s].tp = [R[I][0], R[I][1]+10, J];
+			this.ships[s].tp = [R[I][0], R[I][1]+10, R[I][2]];
 		}
 	}
 
@@ -368,6 +404,33 @@ class Game{
 		for(let s of this.ships) this.updateModules(s);
 
 		for(let s of this.ships){
+			for(let m of s.modules){
+				if(m.type >= LASER && m.type <= TURRETD){
+					// TODO add targeting delay & recharge
+
+					let targets = [];
+
+					for(let x of this.ships) if(x.team != s.team){
+						if(_dist(x.pos, s.pos) < RANGE[m.type]){
+							targets.push([_dist(x.pos, s.pos), x.uid]);
+						}
+					}
+
+					targets.sort((a, b) => a[0] - b[0]);
+
+					m.aux = m.aux.filter(x => targets.includes(x));
+
+					targets = targets.filter(x => !m.aux.includes(x));
+
+					while(m.aux.length < TARGETS[m.type] && targets.length){
+						m.aux.push(targets[0][1]);
+						targets = targets.slice(1);
+					}
+				}
+			}
+		}
+
+		for(let s of this.ships) if(s.hp){
 			if(!s.move.length){
 				if(s.type == DARTP){
 					s.hp = -1;
@@ -405,6 +468,32 @@ class Game{
 					if(x.team != s.team)
 						if(_dist(x.pos, s.pos) < RANGE[DELTAP])
 							x.hurt(500);
+			}
+		}
+
+		for(let s of this.ships){
+			if(s.type >= DECOY && s.type <= TURRET){
+				s.expire = Math.max(0, s.expire-1/(4*EXPIRE_TIME[s.type]));
+			}
+
+			if(s.type == REPAIR && s.hp == 0){
+				for(let x of this.ships) if(x.team == s.team && x.uid != s.uid)
+					if(_dist(x.pos, s.pos) < RANGE[REPAIR])
+						x.heal(2500);
+
+				this.ev.push(["heal", [...s.pos]]);
+			}
+
+			if(s.expire == 0){
+				s.hp = 0;
+
+				if(s.type == REPAIR){
+					for(let x of this.ships) if(x.team == s.team && x.uid != s.uid)
+						if(_dist(x.pos, s.pos) < RANGE[REPAIR])
+							x.heal(500);
+
+					this.ev.push(["heal", [...s.pos]]);
+				}
 			}
 		}
 

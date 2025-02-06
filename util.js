@@ -30,6 +30,7 @@ class Ship{
 		this.rot = PI;
 		this.uid = dat.uid;
 		this.dock = dat.dock;
+		this.expire = dat.expire;
 
 		if(this.move.length)
 			this.rot = atan2(this.move[0][1]-this.pos[1], this.move[0][0]-this.pos[0]);
@@ -43,6 +44,7 @@ class Ship{
 		this.wait = dat.wait;
 		this.tp = dat.tp;
 		this.dock = dat.dock;
+		this.expire = dat.expire;
 	}
 
 	travel(){
@@ -78,15 +80,17 @@ function screenPos(pos){
 }
 
 function mouseWheel(e){
-	let old = camera.z;
-	if(e.delta > 0) camera.z /= 1.04;
-	if(e.delta < 0) camera.z *= 1.04;
-	camera.z = min(10, max(0.3, camera.z));
-	if(old != camera.z){
-		let offset = {x: mouseX-width/2, y: mouseY-height/2};
-		old = (camera.z-old)/old;
-		camera.x += offset.x*old/camera.z;
-		camera.y += offset.y*old/camera.z;
+	if(!staging){
+		let old = camera.z;
+		if(e.delta > 0) camera.z /= 1.04;
+		if(e.delta < 0) camera.z *= 1.04;
+		camera.z = min(10, max(0.3, camera.z));
+		if(old != camera.z){
+			let offset = {x: mouseX-width/2, y: mouseY-height/2};
+			old = (camera.z-old)/old;
+			camera.x += offset.x*old/camera.z;
+			camera.y += offset.y*old/camera.z;
+		}
 	}
 }
 
