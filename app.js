@@ -84,8 +84,6 @@ socket.on("state", data => {
 		ships.push(new Ship(d));
 	}
 
-	if(data.ev.length) console.log(data.ev);
-
 	for(let e of data.ev){
 		const T = e[0], D = e[1];
 
@@ -595,8 +593,7 @@ function draw(){
 					}
 
 					let canMove = ships[shipID].team == socket.id &&
-						(ships[shipID].type == BS || ships[shipID].type == DELTAP) &&
-						ships[shipID].tp == null,
+						ships[shipID].type == BS && ships[shipID].tp == null,
 						canStop = ships[shipID].wait;
 
 					push(); strokeWeight(2);
@@ -787,7 +784,7 @@ function stagingUI(){
 }
 
 function click(){
-	if(focus && shipID != null){
+	if(focus && shipID != null && selectMove == null){
 		for(let i=0; i<ships[shipID].modules.length; ++i){
 			if(mouseIn(width/2+25-25*ships[shipID].modules.length+50*i, height-120-10-25, 20, 20)){
 				if(ships[shipID].team == socket.id && ships[shipID].modules[i].state == 1){
@@ -806,8 +803,7 @@ function click(){
 		(focus[0] == "rock" ? mouseIn(width/2, height-40, 55, 20) : mouseIn(width/2, height-70, 150, 50))){
 		if(shipID != null){
 			let canMove = ships[shipID].team == socket.id &&
-				(ships[shipID].type == BS || ships[shipID].type == DELTAP) &&
-				ships[shipID].tp == null,
+				ships[shipID].type == BS && ships[shipID].tp == null,
 				canStop = canMove && ships[shipID].wait;
 			if(canMove && (ships[shipID].move.length > 1 || canStop) &&
 				mouseIn(width/2-70, height-50, 20, 20)){
@@ -830,7 +826,8 @@ function click(){
 			if(selectMove[0] == "ship"){
 				socket.emit("move", {
 					gameID: gameID, shipID: selectMove[1],
-					pos: [rocks[select[1]][0], rocks[select[1]][1]+10]
+					pos: [rocks[select[1]][0], rocks[select[1]][1]+10],
+					dock: select[1]
 				});
 				selectMove = null;
 				
@@ -839,9 +836,12 @@ function click(){
 
 				if(RANGE[ships[shipID].modules[selectMove[1].i].type] == null ||
 					_dist(P, ships[shipID].vpos) < RANGE[ships[shipID].modules[selectMove[1].i].type]){
-					socket.emit("activateModule", {gameID: gameID, shipID: selectMove[1].s,
-						i: selectMove[1].i, loc: P});
-					selectMove = null;
+					if(ships[shipID].modules[selectMove[1].i].type != DELTA || ships[shipID].move.length > 0
+						|| (ships[shipID].move.length == 0 && select[1] != ships[shipID].dock)){
+						socket.emit("activateModule", {gameID: gameID, shipID: selectMove[1].s,
+							i: selectMove[1].i, loc: P, dock: select[1]});
+						selectMove = null;
+					}
 				}
 			}
 

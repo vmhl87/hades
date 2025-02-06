@@ -29,7 +29,7 @@ class Ship{
 		this.vpos = [...this.pos];
 		this.rot = PI;
 		this.uid = dat.uid;
-		this.lock = dat.lock;
+		this.dock = dat.dock;
 
 		if(this.move.length)
 			this.rot = atan2(this.move[0][1]-this.pos[1], this.move[0][0]-this.pos[0]);
@@ -42,7 +42,7 @@ class Ship{
 		this.move = dat.move;
 		this.wait = dat.wait;
 		this.tp = dat.tp;
-		this.lock = dat.lock;
+		this.dock = dat.dock;
 	}
 
 	travel(){

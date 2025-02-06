@@ -134,25 +134,25 @@ class Ship{
 		for(let m of modules) if(m)
 			this.modules.push({type: m, state: 1, aux: null});
 		this.pos = pos;
+		this.dock = null;
 		this.move = move;
 		this.wait = null;
 		this.tp = null;
 		this.uid = ++UID;
-		this.lock = false;
-		this.vel = 0;
+		this.vel = type == DARTP ? SPEED[DARTP] : 0;
 	}
 
-	waitMoveTo(pos){
-		this.wait = [pos[0], pos[1], 40];
+	waitMoveTo(pos, i){
+		this.wait = [...pos, 40, i];
 	}
 
-	moveTo(pos){
-		this.move.push(pos);
+	moveTo(pos, i){
+		this.move.push([...pos, i]);
 	}
 
 	confirmMove(){
 		if(this.wait){
-			this.move.push(this.wait.slice(0, 2));
+			this.move.push([this.wait[0], this.wait[1], this.wait[3]]);
 			this.wait = null;
 		}
 	}
@@ -170,10 +170,10 @@ class Ship{
 			modules: this.modules,
 			pos: this.pos,
 			move: this.move,
+			dock: this.dock,
 			wait: this.wait,
 			tp: this.tp,
-			uid: this.uid,
-			lock: this.lock
+			uid: this.uid
 		};
 	}
 	
@@ -186,26 +186,27 @@ class Ship{
 
 		if(this.wait && --this.wait[2] == 0) this.confirmMove();
 
-		while(this.move.length && this.move[0][0] == this.pos[0] && this.move[0][1] == this.pos[1])
+		while(this.move.length && this.move[0][0] == this.pos[0] && this.move[0][1] == this.pos[1]){
+			this.dock = this.move[0][2];
 			this.move = this.move.slice(1);
+		}
 
 		if(this.move.length){
-			if(!this.lock){
-				let move = this.move[0],
-					dir = [move[0]-this.pos[0], move[1]-this.pos[1]],
-					dist = this.vel/4,
-					mag = Math.sqrt(dir[0]*dir[0] + dir[1]*dir[1]);
-				if(dist > mag){
-					this.pos = [...move];
-					this.move = this.move.slice(1);
-				}else{
-					dist /= mag;
-					this.pos[0] += dir[0]*dist;
-					this.pos[1] += dir[1]*dist;
-				}
-
-				this.vel = Math.min(this.vel+8, SPEED[this.type]);
+			let move = this.move[0],
+				dir = [move[0]-this.pos[0], move[1]-this.pos[1]],
+				dist = this.vel/4,
+				mag = Math.sqrt(dir[0]*dir[0] + dir[1]*dir[1]);
+			this.dock = this.move[0][2];
+			if(dist > mag){
+				this.pos = [...move];
+				this.move = this.move.slice(1);
+			}else{
+				dist /= mag;
+				this.pos[0] += dir[0]*dist;
+				this.pos[1] += dir[1]*dist;
 			}
+
+			this.vel = Math.min(this.vel+8, SPEED[this.type]);
 
 		}else{
 			this.vel = 0;
@@ -232,17 +233,23 @@ class Game{
 
 		const T = this.ships[s].modules[dat.i].type;
 
-		if(T == DELTA) this.addShip(DELTAP, this.ships[s].team, [], [...this.ships[s].pos], [dat.loc]);
+		if(T == DELTA) this.addShip(DELTAP, this.ships[s].team, [], [...this.ships[s].pos], [[...dat.loc, dat.dock]]);
 
-		if(T == DECOY) this.addShip(DECOY, this.ships[s].team, [], [...this.ships[s].pos], [dat.loc]);
-		if(T == REPAIR) this.addShip(REPAIR, this.ships[s].team, [], [...this.ships[s].pos], [dat.loc]);
-		if(T == ROCKET) this.addShip(ROCKET, this.ships[s].team, [ROCKETD], [...this.ships[s].pos], [dat.loc]);
-		if(T == TURRET) this.addShip(TURRET, this.ships[s].team, [TURRETD], [...this.ships[s].pos]);
+		if(T == DECOY) this.addShip(DECOY, this.ships[s].team, [], [...this.ships[s].pos], [[...dat.loc, dat.dock]]);
+		if(T == REPAIR) this.addShip(REPAIR, this.ships[s].team, [], [...this.ships[s].pos], [[...dat.loc, dat.dock]]);
+		if(T == ROCKET) this.addShip(ROCKET, this.ships[s].team, [ROCKETD], [...this.ships[s].pos], [[...dat.loc, dat.dock]]);
+		if(T == TURRET){
+			const R = Math.random()*Math.PI*2;
+			this.addShip(TURRET, this.ships[s].team, [TURRETD], [
+				this.ships[s].pos[0]+10*Math.cos(R),
+				this.ships[s].pos[1]+10*Math.sin(R)
+			]);
+		}
 
 		if(T == TP){
 			this.ships[s].move = [];
 			this.ships[s].wait = null;
-			this.ships[s].tp = [...dat.loc];
+			this.ships[s].tp = [...dat.loc, dat.dock];
 		}
 
 		if(T == DESTINY){
@@ -259,9 +266,16 @@ class Game{
 					&& (P[0] != T[0] || P[1] != T[1]);
 			});
 
+			const I = Math.floor(Math.random()*R.length);
+			let J = null;
+
+			for(let i=0; i<this.rocks.length; ++i)
+				if(this.rocks[0] == R[I][0] && this.rocks[1] == R[I][1])
+					J = i;
+
 			this.ships[s].move = [];
 			this.ships[s].wait = null;
-			this.ships[s].tp = R[Math.floor(Math.random()*R.length)];
+			this.ships[s].tp = [R[I][0], R[I][1]+10, J];
 		}
 	}
 
@@ -285,7 +299,8 @@ class Game{
 			const S = s.modules[i].state;
 
 			if(T == TP && S == 0){
-				s.pos = [...s.tp];
+				s.pos = s.tp.slice(0, 2);
+				s.dock = s.tp[2];
 				s.tp = null;
 			}
 
@@ -296,7 +311,8 @@ class Game{
 							x.hurt(5000);
 
 				this.explode([...s.pos], RANGE[DESTINY], 9);
-				s.pos = [...s.tp];
+				s.pos = s.tp.slice(0, 2);
+				s.dock = s.tp[2];
 				s.tp = null;
 			}
 		}
@@ -331,6 +347,18 @@ class Game{
 
 	update(){
 		for(let s of this.ships) s.travel();
+
+		for(let j=0; j<this.rocks.length; ++j){
+			let e = [];
+			for(let i=0; i<this.ships.length; ++i)
+				if(!this.ships[i].move.length && this.ships[i].dock == j)
+					e.push(i);
+			for(let i=0; i<e.length; ++i)
+				this.ships[e[i]].pos = [
+					this.rocks[j][0]-10*Math.sin(2*Math.PI/e.length*(i-e.length/2+0.5)),
+					this.rocks[j][1]+10*Math.cos(2*Math.PI/e.length*(i-e.length/2+0.5))
+				];
+		}
 
 		for(let s of this.ships) this.updateModules(s);
 
@@ -367,7 +395,7 @@ class Game{
 
 		for(let s of this.ships) if(s.hp == 0){
 			if(s.type == DELTAP){
-				explode(s.pos, RANGE[DELTAP], 1);
+				this.explode(s.pos, RANGE[DELTAP], 1);
 				for(let x of this.ships)
 					if(x.team != s.team)
 						if(_dist(x.pos, s.pos) < RANGE[DELTAP])

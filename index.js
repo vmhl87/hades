@@ -190,8 +190,8 @@ io.on("connect", (socket) => {
 				for(let s of g.ships){
 					if(s.uid == data.shipID){
 						if(s.wait) s.cancelMove();
-						if(s.move.length)s.moveTo(data.pos);
-						else s.waitMoveTo(data.pos);
+						if(s.move.length) s.moveTo(data.pos, data.dock);
+						else s.waitMoveTo(data.pos, data.dock);
 					}
 				}
 			}
