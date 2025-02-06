@@ -68,6 +68,8 @@ function weaponRange(T){
 
 RANGE[IMPULSE] = 55;
 RANGE[MIRROR] = 70;
+RANGE[ALLY] = 90;
+
 RANGE[EMP] = 80;
 RANGE[TP] = 400;
 RANGE[AMP] = 100;
