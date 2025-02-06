@@ -407,12 +407,16 @@ class Game{
 			for(let m of s.modules){
 				if(m.type >= LASER && m.type <= TURRETD){
 					// TODO add targeting delay & recharge
+					// also support decoy drone
 
 					let targets = [];
 
 					for(let x of this.ships) if(x.team != s.team){
 						if(_dist(x.pos, s.pos) < RANGE[m.type]){
-							targets.push([_dist(x.pos, s.pos), x.uid]);
+							if(m.type != ROCKETD || _dist(x.pos, s.pos) > 60)
+								targets.push([
+									x.type == DECOY ? 0 : _dist(x.pos, s.pos),
+									x.uid]);
 						}
 					}
 
