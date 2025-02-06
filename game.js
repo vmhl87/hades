@@ -348,16 +348,21 @@ class Game{
 	update(){
 		for(let s of this.ships) s.travel();
 
-		for(let j=0; j<this.rocks.length; ++j){
-			let e = [];
+		{
+			let X = new Array(this.rocks.length);
+			for(let i=0; i<this.rocks.length; ++i)
+				X[i] = [];
+
 			for(let i=0; i<this.ships.length; ++i)
-				if(!this.ships[i].move.length && this.ships[i].dock == j)
-					e.push(i);
-			for(let i=0; i<e.length; ++i)
-				this.ships[e[i]].pos = [
-					this.rocks[j][0]-10*Math.sin(2*Math.PI/e.length*(i-e.length/2+0.5)),
-					this.rocks[j][1]+10*Math.cos(2*Math.PI/e.length*(i-e.length/2+0.5))
-				];
+				if(!this.ships[i].move.length && this.ships[i].dock != null && this.ships[i].tp == null)
+					X[this.ships[i].dock].push(i);
+
+			for(let i=0; i<this.rocks.length; ++i)
+				for(let j=0; j<X[i].length; ++j)
+					this.ships[X[i][j]].pos = [
+						this.rocks[i][0]-10*Math.sin(2*Math.PI/X[i].length*(j-X[i].length/2+0.5)),
+						this.rocks[i][1]+10*Math.cos(2*Math.PI/X[i].length*(j-X[i].length/2+0.5))
+					];
 		}
 
 		for(let s of this.ships) this.updateModules(s);
