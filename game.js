@@ -38,6 +38,15 @@ EXPIRE_TIME[REPAIR] = 40;
 EXPIRE_TIME[ROCKET] = 40;
 EXPIRE_TIME[TURRET] = 40;
 
+EFFECT_TIME[BATTERY] = 0;
+RECHARGE_TIME[BATTERY] = 2;
+
+EFFECT_TIME[DART] = 0;
+RECHARGE_TIME[DART] = 10;
+
+EFFECT_TIME[ROCKETD] = 0;
+RECHARGE_TIME[ROCKETD] = 15;
+
 EFFECT_TIME[EMP] = 6;
 RECHARGE_TIME[EMP] = 60;
 
@@ -144,6 +153,12 @@ TARGETS[SENTINEL] = 1;
 TARGETS[GUARD] = 1;
 TARGETS[INT] = 4;
 TARGETS[COL] = 1;
+
+const LASER_CHARGE = new Array(ct);
+
+LASER_CHARGE[LASER] = [6, 10];
+LASER_CHARGE[LASER2] = [3, 6];
+LASER_CHARGE[COL] = [10, 20];
 
 function _dist(a, b){
 	return Math.sqrt((a[0]-b[0])*(a[0]-b[0]) + (a[1]-b[1])*(a[1]-b[1]));
@@ -316,7 +331,7 @@ class Game{
 	}
 
 	explode(pos, range, str){
-		this.ev.push(["explode", [pos, range, str]]);
+		this.ev.push(["explode", [[...pos], range, str]]);
 	}
 
 	die(pos){
@@ -327,10 +342,12 @@ class Game{
 		for(let i=0; i<s.modules.length; ++i){
 			const T = s.modules[i].type;
 
-			if(s.modules[i].state < 0)
-				s.modules[i].state = Math.min(0, s.modules[i].state+1/(1+EFFECT_TIME[T]*4));
-			else if(s.modules[i].state != 1)
-				s.modules[i].state = Math.min(1, s.modules[i].state+1/(1+(RECHARGE_TIME[T]-EFFECT_TIME[T])*4));
+			if(EFFECT_TIME[T] != null){
+				if(s.modules[i].state < 0)
+					s.modules[i].state = Math.min(0, s.modules[i].state+1/(1+EFFECT_TIME[T]*4));
+				else if(s.modules[i].state != 1)
+					s.modules[i].state = Math.min(1, s.modules[i].state+1/(1+(RECHARGE_TIME[T]-EFFECT_TIME[T])*4));
+			}
 
 			const S = s.modules[i].state;
 
@@ -350,6 +367,54 @@ class Game{
 				s.pos = s.tp.slice(0, 2);
 				s.dock = s.tp[2];
 				s.tp = null;
+			}
+
+			if([LASER, LASER2, COL].includes(T)){
+				const A = s.modules[i].aux.length;
+
+				if(A == 0) s.modules[i].state = 0;
+				else if(A == TARGETS[T]){
+					s.modules[i].state = Math.max(0.3, s.modules[i].state);
+					if(s.modules[i].state < 0.6)
+						s.modules[i].state += 0.3/(4*LASER_CHARGE[T][0]);
+					else s.modules[i].state = Math.min(1,
+						s.modules[i].state+0.4/(4*(LASER_CHARGE[T][1]-LASER_CHARGE[T][0])));
+
+				}else s.modules[i].state = 0.3;
+			}
+
+			if(T == DART){
+				if(s.modules[i].aux.length){
+					if(S == 1){
+						let I = null;
+
+						for(let j=0; j<this.ships.length; ++j)
+							if(this.ships[j].uid == s.modules[i].aux[0])
+								I = j;
+
+						if(I != null){
+							this.addShip(DARTP, s.team, [], [...s.pos], [[...this.ships[I].pos, null]]);
+							s.modules[i].state = 0;
+						}
+					}
+				}
+			}
+
+			if(T == ROCKETD){
+				if(s.modules[i].aux.length){
+					if(S == 1){
+						let I = null;
+
+						for(let j=0; j<this.ships.length; ++j)
+							if(this.ships[j].uid == s.modules[i].aux[0])
+								I = j;
+
+						if(I != null){
+							this.addShip(ROCKETP, s.team, [], [...s.pos], [[...this.ships[I].pos, null]]);
+							s.modules[i].state = 0;
+						}
+					}
+				}
 			}
 		}
 	}
@@ -401,38 +466,51 @@ class Game{
 					];
 		}
 
-		for(let s of this.ships) this.updateModules(s);
-
 		for(let s of this.ships){
 			for(let m of s.modules){
-				if(m.type >= LASER && m.type <= TURRETD){
-					// TODO add targeting delay & recharge
-					// also support decoy drone
+				if(m.type >= LASER && m.type <= TURRETD &&
+					(m.type != BATTERY || m.state == 1)){
+					let targets = [], decoys = [];
 
-					let targets = [];
+					for(let x of this.ships) if(x.team != s.team)
+						if(_dist(x.pos, s.pos) < RANGE[m.type] && (![DART, ROCKETP].includes(m.type)
+							|| [BS, DECOY, REPAIR, ROCKET, TURRET].includes(x.type)))
+							if(m.type != ROCKETD || _dist(x.pos, s.pos) > 60){
+								if(x.type == DECOY) decoys.push(x.uid);
+								else targets.push(x.uid);
+							}
 
-					for(let x of this.ships) if(x.team != s.team){
-						if(_dist(x.pos, s.pos) < RANGE[m.type]){
-							if(m.type != ROCKETD || _dist(x.pos, s.pos) > 60)
-								targets.push([
-									x.type == DECOY ? 0 : _dist(x.pos, s.pos),
-									x.uid]);
-						}
-					}
-
-					targets.sort((a, b) => a[0] - b[0]);
+					const orig = m.aux.length ? m.aux[0] : null;
 
 					m.aux = m.aux.filter(x => targets.includes(x));
 
 					targets = targets.filter(x => !m.aux.includes(x));
+					decoys = decoys.filter(x => !m.aux.includes(x));
+
+					let old = [...m.aux];
+
+					m.aux = decoys.slice(0, Math.min(decoys.length, TARGETS[m.type]));
+
+					while(m.aux.length < TARGETS[m.type] && old.length){
+						const R = Math.floor(Math.random()*old.length);
+						m.aux.push(old.splice(R, 1)[0]);
+					}
 
 					while(m.aux.length < TARGETS[m.type] && targets.length){
-						m.aux.push(targets[0][1]);
-						targets = targets.slice(1);
+						const R = Math.floor(Math.random()*targets.length);
+						m.aux.push(targets.splice(R, 1)[0]);
+					}
+
+				if(orig != null && [LASER, COL, BATTERY].includes(m.type)
+					&& (!m.aux.length || m.aux[0] != orig)){
+						m.state = 0;
+						m.aux = [];
 					}
 				}
 			}
 		}
+
+		for(let s of this.ships) this.updateModules(s);
 
 		for(let s of this.ships) if(s.hp){
 			if(!s.move.length){

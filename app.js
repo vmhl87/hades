@@ -57,11 +57,17 @@ socket.on("start", data => {
 	blasts = [];
 	deaths = [];
 
+	camera.x = 0;
+	camera.y = 0;
+	camera.z = 1;
+
 	for(let s of data.ships)
 		if(s.type == BS && s.team == socket.id){
 			camera.x = s.pos[0];
 			camera.y = s.pos[1];
 		}
+
+	focus = null;
 });
 
 socket.on("state", data => {
