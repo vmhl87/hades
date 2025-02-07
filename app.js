@@ -568,7 +568,7 @@ function draw(){
 					beginShape();
 					for(let i=20; i<=RANGE[EMP]*min(1, (Date.now()-e[1]+2000)/300); i+=10){
 						const old = a;
-						a += (noise(floor(Date.now()/100+100*i), j)*2-1)*PI*0.1;
+						a += (noise(floor(Date.now()/100+i), j)*2-1)*PI*0.1;
 						if(a > PI*2) a -= PI*2;
 						if(a < 0) a += PI*2;
 
@@ -623,6 +623,12 @@ function draw(){
 			push(); translate(width/2+(s.vpos[0]-camera.x)*camera.z, height/2+(s.vpos[1]-camera.y)*camera.z);
 			rotate(s.rot); scale(sqrt(camera.z));
 			drawShip(s.type, s.team != socket.id, s.move.length && !s.emp ? 1 : 0);
+			rotate(-s.rot);
+			if(s.emp){
+				stroke(255, 50, 50); noFill(); strokeWeight(2);
+				arc(0, 0, 35, 35, -PI*0.25, PI*0.25);
+				arc(0, 0, 35, 35, PI-PI*0.25, PI+PI*0.25);
+			}
 			pop();
 		}
 
