@@ -526,7 +526,12 @@ function draw(){
 			push(); translate(width/2+(s.vpos[0]-camera.x)*camera.z, height/2+(s.vpos[1]-camera.y)*camera.z);
 			rotate(s.rot); scale(sqrt(camera.z));
 			drawShip(s.type, s.team != socket.id, s.move.length ? 1 : 0);
-			rotate(-s.rot);
+			pop();
+		}
+
+		for(let s of ships){
+			push(); translate(width/2+(s.vpos[0]-camera.x)*camera.z, height/2+(s.vpos[1]-camera.y)*camera.z);
+			scale(sqrt(camera.z));
 
 			const hp = s.hp, max = HP[s.type];
 
@@ -640,9 +645,9 @@ function draw(){
 							if(s != null){
 								push(); translate(...screenPos(s.vpos));
 								scale(S); rotate(-frameCount/30);
-								stroke(200, 150, 50); strokeWeight(2);
-								line(0, -7, 0, 7);
-								line(-7, 0, 7, 0);
+								stroke(200, 150, 50); strokeWeight(1);
+								line(0, -5, 0, 5);
+								line(-5, 0, 5, 0);
 								pop();
 							}
 						}

@@ -31,7 +31,19 @@ const EMP = ++ct, SOL = ++ct, FORT = ++ct, TP = ++ct, AMP = ++ct, DESTINY = ++ct
 let SPEED = new Array(ct), HP = new Array(ct),
 	EFFECT_TIME = new Array(ct), RECHARGE_TIME = new Array(ct),
 	ACTIVATED = new Array(ct), RANGE = new Array(ct),
-	EXPIRE_TIME = new Array(ct), TARGETS = new Array(ct);
+	EXPIRE_TIME = new Array(ct), TARGETS = new Array(ct),
+	DAMAGE = new Array(ct), LASER_DAMAGE = new Array(ct);
+
+DAMAGE[BATTERY] = 284;
+DAMAGE[MASS] = 210;
+DAMAGE[SENTINEL] = 200;
+DAMAGE[GUARD] = 50;
+DAMAGE[INT] = 90;
+DAMAGE[TURRETD] = 200;
+
+LASER_DAMAGE[LASER] = [160, 292, 584];
+LASER_DAMAGE[LASER2] = [212, 312, 850];
+LASER_DAMAGE[COL] = [60, 150, 500];
 
 EXPIRE_TIME[DECOY] = 40;
 EXPIRE_TIME[REPAIR] = 40;
@@ -510,6 +522,26 @@ class Game{
 			}
 		}
 
+		{
+			let M = new Map();
+			for(let i=0; i<this.ships.length; ++i) M.set(this.ships[i].uid, i);
+
+			for(let s of this.ships)
+				for(let m of s.modules)
+					if(m.type >= LASER && m.type <= TURRETD &&
+						(m.type != BATTERY || m.state == 1)){
+						const D = DAMAGE[m.type] != null ? DAMAGE[m.type] :
+							(LASER_DAMAGE[m.type] != null ? LASER_DAMAGE[m.type][
+								m.state < 0.6 ? 0 : (m.state < 1 ? 1 : 2)
+							] : null);
+
+						if(D != null)
+							for(let x of m.aux) if(M.has(x)){
+								this.ships[M.get(x)].hurt(D/4);
+							}
+					}
+		}
+
 		for(let s of this.ships) this.updateModules(s);
 
 		for(let s of this.ships) if(s.hp){
@@ -529,7 +561,7 @@ class Game{
 					for(let x of this.ships)
 						if(x.team != s.team)
 							if(_dist(x.pos, s.pos) < RANGE[ROCKETP])
-								x.hurt(700);
+								x.hurt(1000);
 				}
 
 				if(s.type == DELTAP){
@@ -550,6 +582,14 @@ class Game{
 					if(x.team != s.team)
 						if(_dist(x.pos, s.pos) < RANGE[DELTAP])
 							x.hurt(500);
+			}
+
+			if(s.type == ROCKETP){
+				this.explode(s.pos, RANGE[ROCKETP], 1);
+				for(let x of this.ships)
+					if(x.team != s.team)
+						if(_dist(x.pos, s.pos) < RANGE[ROCKETP])
+							x.hurt(200);
 			}
 		}
 
