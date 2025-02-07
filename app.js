@@ -569,6 +569,86 @@ function draw(){
 
 		blasts = blasts.filter(x => x[2] > Date.now());
 
+		{
+			const S = sqrt(camera.z);
+
+			let REV = new Map();
+			for(let i=0; i<ships.length; ++i)
+				REV.set(ships[i].uid, i);
+
+			function SH(uid){
+				return REV.has(uid) ? ships[REV.get(uid)] : null;
+			}
+
+			push();
+			for(let s of ships)
+				for(let m of s.modules)
+					if(Array.isArray(m.aux) && m.aux.length){
+						let C = [s.vpos[0]+17*Math.cos(s.rot)/S, s.vpos[1]+17*Math.sin(s.rot)/S];
+
+						if([LASER, LASER2, COL].includes(m.type)){
+							fill(200, 100, 50, 150); noStroke();
+							circle(...screenPos(C), 12*S*(5+sin(frameCount/20))/5);
+						}
+
+						for(let uid of m.aux){
+							let x = SH(uid);
+							if(x == null) continue;
+
+							if([LASER, LASER2, COL].includes(m.type)){
+								fill(200, 100, 50, 150); noStroke();
+								circle(...screenPos(x.vpos), 7*S*(8+sin(frameCount/20))/8);
+								if(m.state < 0.6){
+									stroke(200, 100, 50); strokeWeight(2*S);
+									line(...screenPos(C), ...screenPos(x.vpos));
+								}else if(m.state < 1){
+									stroke(200, 100, 50); strokeWeight(4*S);
+									line(...screenPos(C), ...screenPos(x.vpos));
+								}else{
+									stroke(200, 100, 50); strokeWeight(6*S);
+									line(...screenPos(C), ...screenPos(x.vpos));
+									stroke(255, 150, 100); strokeWeight(3*S);
+									line(...screenPos(C), ...screenPos(x.vpos));
+								}
+
+							}else if(m.type == TURRETD){
+								fill(50, 150, 200, 150); noStroke();
+								circle(...screenPos(x.vpos), 7*S*(8+sin(frameCount/20))/8);
+								let R = [x.vpos[0]-s.vpos[0], x.vpos[1]-s.vpos[1]],
+									D = _dist(x.vpos, s.vpos);
+								R[0] /= D; R[1] /= D;
+								R[0] = s.vpos[0]+R[0]*10/S;
+								R[1] = s.vpos[1]+R[1]*10/S;
+								stroke(50, 150, 200); strokeWeight(2*S);
+								line(...screenPos(R), ...screenPos(x.vpos));
+
+							}else if([BATTERY, MASS, SENTINEL, GUARD, INT].includes(m.type)){
+								stroke(200, 100, 50); strokeWeight(2*S);
+								const L = (((frameCount+x.uid*6+s.uid*3)/20) % 1) * 0.9;
+								line(...screenPos(_lerp(C, x.vpos, L)),
+									...screenPos(_lerp(C, x.vpos, L+0.1)));
+							}
+						}
+					}
+			pop();
+
+			if(focus && focus[0] == "ship" && shipID != null){
+				for(let m of ships[shipID].modules)
+					if(m.type >= LASER && m.type <= TURRETD)
+						for(let uid of m.aux){
+							let s = SH(uid);
+							if(s != null){
+								push(); translate(...screenPos(s.vpos));
+								scale(S); rotate(-frameCount/30);
+								stroke(200, 150, 50); strokeWeight(2);
+								line(0, -7, 0, 7);
+								line(-7, 0, 7, 0);
+								pop();
+							}
+						}
+			}
+		};
+
 		if(focus){
 			if(selectMove){
 				push();
@@ -601,21 +681,6 @@ function draw(){
 					pop();
 
 				}else if(focus[0] == "ship"){
-					const S = sqrt(camera.z);
-
-					for(let m of ships[shipID].modules)
-						if(m.type >= LASER && m.type <= TURRETD)
-							for(let s of ships) if(m.aux.includes(s.uid)){
-								push(); translate(...screenPos(s.vpos));
-								scale(S); rotate(-frameCount/30);
-								stroke(200, 150, 50); strokeWeight(2);
-								line(0, -7, 0, 7);
-								line(-7, 0, 7, 0);
-								pop();
-
-								// TODO RENDER WEAPONS
-							}
-
 					const hp = ships[shipID].hp, max = HP[ships[shipID].type];
 
 					push();
@@ -756,7 +821,7 @@ function stagingUI(){
 	}else if(chooseModule == 0){
 		for(let i=0; i<5; ++i){
 			if(mouseIn(width/2-100+i*50, height/2+150, 20, 20)){
-				modules[0] = LASER+i;
+				modules[0] = modules[0] == LASER+i ? null : LASER+i;
 				chooseModule = -1;
 				localStorage.setItem("modules", JSON.stringify(modules));
 			}
@@ -765,7 +830,7 @@ function stagingUI(){
 	}else if(chooseModule == 1){
 		for(let i=0; i<6; ++i){
 			if(mouseIn(width/2-125+i*50, height/2+150, 20, 20)){
-				modules[1] = ALPHA+i;
+				modules[1] = modules[1] == ALPHA+i ? null : ALPHA+i;
 				chooseModule = -1;
 				localStorage.setItem("modules", JSON.stringify(modules));
 			}
@@ -775,7 +840,7 @@ function stagingUI(){
 		for(let i=0; i<5; ++i){
 			if(mouseIn(width/2-100+i*50, height/2+125, 20, 20) &&
 				modules[5-chooseModule] != EMP+i){
-				modules[chooseModule] = EMP+i;
+				modules[chooseModule] = modules[chooseModule] == EMP+i ? null : EMP+i;
 				chooseModule = -1;
 				localStorage.setItem("modules", JSON.stringify(modules));
 			}
@@ -784,7 +849,7 @@ function stagingUI(){
 		for(let i=0; i<5; ++i){
 			if(mouseIn(width/2-100+i*50, height/2+175, 20, 20) &&
 				modules[5-chooseModule] != EMP+5+i){
-				modules[chooseModule] = EMP+5+i;
+				modules[chooseModule] = modules[chooseModule] == EMP+5+i ? null : EMP+5+i;
 				chooseModule = -1;
 				localStorage.setItem("modules", JSON.stringify(modules));
 			}
@@ -793,7 +858,7 @@ function stagingUI(){
 	}else if(chooseModule == 4){
 		for(let i=0; i<4; ++i){
 			if(mouseIn(width/2-75+i*50, height/2+150, 20, 20)){
-				modules[4] = DECOY+i;
+				modules[4] = modules[4] == DECOY+i ? null : DECOY+i;
 				chooseModule = -1;
 				localStorage.setItem("modules", JSON.stringify(modules));
 			}
@@ -802,35 +867,35 @@ function stagingUI(){
 	}else if(chooseModule < -1){
 		for(let i=0; i<7; ++i){
 			if(mouseIn(width/2-150+i*50, height/2+125, 20, 20)){
-				modules[chooseModule+10] = LASER+i;
+				modules[chooseModule+10] = modules[chooseModule+10] == LASER+i ? null : LASER+i;
 				chooseModule = -1;
 			}
 		}
 
 		for(let i=0; i<6; ++i){
 			if(mouseIn(width/2-125+i*50, height/2+175, 20, 20)){
-				modules[chooseModule+10] = ALPHA+i;
+				modules[chooseModule+10] = modules[chooseModule+10] == ALPHA+i ? null : ALPHA+i;
 				chooseModule = -1;
 			}
 		}
 
 		for(let i=0; i<5; ++i){
 			if(mouseIn(width/2-100+i*50, height/2+225, 20, 20)){
-				modules[chooseModule+10] = EMP+i;
+				modules[chooseModule+10] = modules[chooseModule+10] == EMP+i ? null : EMP+i;
 				chooseModule = -1;
 			}
 		}
 
 		for(let i=0; i<6; ++i){
 			if(mouseIn(width/2-125+i*50, height/2+275, 20, 20)){
-				modules[chooseModule+10] = EMP+5+i;
+				modules[chooseModule+10] = modules[chooseModule+10] == EMP+5+i ? null : EMP+5+i;
 				chooseModule = -1;
 			}
 		}
 
 		for(let i=0; i<4; ++i){
 			if(mouseIn(width/2-75+i*50, height/2+325, 20, 20)){
-				modules[chooseModule+10] = DECOY+i;
+				modules[chooseModule+10] = modules[chooseModule+10] == DECOY+i ? null : DECOY+i;
 				chooseModule = -1;
 			}
 		}
