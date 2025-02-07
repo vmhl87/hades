@@ -610,6 +610,17 @@ function draw(){
 						-PI/2, -PI/2+PI*2*(1+m.state));
 					pop();
 				}
+
+				if(m.type == BARRIER && m.state < 0){
+					push(); strokeWeight(2*sqrt(camera.z));
+					fill(255, 30); noStroke();
+					for(let i=0; i<6; ++i)
+						arc(...screenPos(s.vpos), RANGE[BARRIER]*2*camera.z, RANGE[BARRIER]*2*camera.z,
+							PI/3*i-PI*0.25+PI*Date.now()/10000, PI/3*i+PI*0.25+PI*Date.now()/10000, OPEN);
+					stroke(150, 150); noFill();
+					circle(...screenPos(s.vpos), RANGE[BARRIER]*2*camera.z);
+					pop();
+				}
 			}
 
 			if(s.type == REPAIR){

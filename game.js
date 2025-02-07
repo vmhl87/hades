@@ -48,6 +48,10 @@ DAMAGE[GUARD] = 50;
 DAMAGE[INT] = 90;
 DAMAGE[TURRETD] = 200;
 
+DAMAGE[BARRIER] = 3000;
+DAMAGE[SOL] = 1.5;
+DAMAGE[AMP] = 2.2;
+
 LASER_DAMAGE[LASER] = [160, 292, 584];
 LASER_DAMAGE[LASER2] = [184, 312, 800];
 LASER_DAMAGE[COL] = [60, 150, 500];
@@ -167,6 +171,7 @@ HP[ROCKETP] = 250;
 HP[DELTAP] = 180;
 
 RANGE[DESTINY] = 65;
+RANGE[BARRIER] = 100;
 RANGE[DARTP] = 40;
 RANGE[ROCKETP] = 70;
 RANGE[DELTAP] = 70;
@@ -444,6 +449,10 @@ class Game{
 				s.pos = s.tp.slice(0, 2);
 				s.dock = s.tp[2];
 				s.tp = null;
+
+				for(let x of this.ships) if(x.team != s.team)
+					for(let m of x.modules) if(m.type == BARRIER && m.state < 0)
+						s.hurt(DAMAGE[BARRIER]);
 			}
 
 			if(T == DESTINY && S == 0){
@@ -553,7 +562,15 @@ class Game{
 	update(){
 		for(let s of this.ships) s.emp = Math.max(0, s.emp - 1/(4*EFFECT_TIME[EMP]));
 
-		for(let s of this.ships) if(!s.emp) s.travel();
+		let locked = new Set();
+
+		for(let s of this.ships) for(let m of s.modules)
+			if(m.type == BARRIER && m.state < 0)
+				for(let x of this.ships) if(x.team != s.team && x.type != DELTAP)
+					if(_dist(x.pos, s.pos) < RANGE[BARRIER])
+						locked.add(x.uid);
+
+		for(let s of this.ships) if(!s.emp && !locked.has(s.uid)) s.travel();
 
 		{
 			let X = new Array(this.rocks.length);
@@ -625,6 +642,27 @@ class Game{
 			let M = new Map();
 			for(let i=0; i<this.ships.length; ++i) M.set(this.ships[i].uid, i);
 
+			let amp = new Array(this.ships.length, 1), sol = new Array(this.ships.length, 1);
+
+			for(let s of this.ships)
+				for(let m of s.modules) if(s.type == AMP && s.state < 0)
+					for(let x of this.ships) if(_dist(x.pos, s.pos) < RANGE[AMP])
+						amp[x.uid] = Math.max(amp[M.get(x.uid)], DAMAGE[AMP]);
+
+			let count = new Array(ROWS*COLS);
+
+			for(let s of this.ships)
+				++count[Math.floor((s.pos[0]+150*COLS)/300)+COLS*Math.floor((s.pos[1]+150*ROWS)/300)];
+
+			for(let s of this.ships)
+				for(let m of s.modules)
+					if(m.type == SOL){
+						m.state =
+							count[Math.floor((s.pos[0]+150*COLS)/300)+COLS*Math.floor((s.pos[1]+150*ROWS)/300)]
+							== 2 ? 1 : 0;
+						sol[M.get(s.uid)] = DAMAGE[SOL];
+					}
+
 			for(let s of this.ships) if(!s.emp)
 				for(let m of s.modules)
 					if(m.type >= LASER && m.type <= TURRETD &&
@@ -636,7 +674,7 @@ class Game{
 
 						if(D != null)
 							for(let x of m.aux) if(M.has(x)){
-								this.ships[M.get(x)].hurt(D/4);
+								this.ships[M.get(x)].hurt(D*amp[M.get(x)]*sol[M.get(x)]/4);
 							}
 					}
 		}
