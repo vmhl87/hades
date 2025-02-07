@@ -22,7 +22,7 @@ function setup(){
 		element.addEventListener("contextmenu", e => e.preventDefault())
 }
 
-let ships = [], rocks = [], blasts = [], deaths = [], heals = [], gameID = null, ROWS, COLS;
+let ships = [], rocks = [], blasts = [], deaths = [], heals = [], emps = [], gameID = null, ROWS, COLS;
 
 socket.on("reset", () => {
 	searching = 0;
@@ -56,6 +56,8 @@ socket.on("start", data => {
 
 	blasts = [];
 	deaths = [];
+	heals = [];
+	emps = [];
 
 	camera.x = 0;
 	camera.y = 0;
@@ -103,6 +105,10 @@ socket.on("state", data => {
 
 		if(T == "heal"){
 			heals.push([D, Date.now() + 2000]);
+		}
+
+		if(T == "emp"){
+			emps.push([D, Date.now() + 2000]);
 		}
 	}
 });
@@ -552,6 +558,31 @@ function draw(){
 		}
 
 		push(); noStroke();
+		for(let e of emps){
+			fill(100, 150, 255, 50*min(1, (e[1]-Date.now())/800));
+			circle(...screenPos(e[0]), RANGE[EMP]*2*camera.z*min(1, (Date.now()-e[1]+2000)/300));
+			stroke(100, 150, 255, 100); noFill(); strokeWeight(2*sqrt(camera.z));
+			if(e[1]-Date.now() > 800){
+				for(let j=0; j<3; ++j){
+					let a = noise(floor(Date.now()/100), j)*PI*2;
+					beginShape();
+					for(let i=20; i<=RANGE[EMP]*min(1, (Date.now()-e[1]+2000)/300); i+=10){
+						const old = a;
+						a += (noise(floor(Date.now()/100+100*i), j)*2-1)*PI*0.1;
+						if(a > PI*2) a -= PI*2;
+						if(a < 0) a += PI*2;
+
+						vertex(...screenPos([e[0][0]+cos(a)*i, e[0][1]+sin(a)*i]));
+					}
+					endShape();
+				}
+			}
+		}
+		pop();
+
+		emps = emps.filter(x => x[1] > Date.now());
+		
+		push(); noStroke();
 		for(let h of heals){
 			fill(50, 200, 50, 60*sin((h[1]-Date.now())/2000*PI));
 			circle(...screenPos(h[0]), 60*2*camera.z);
@@ -591,7 +622,7 @@ function draw(){
 		for(let s of ships){
 			push(); translate(width/2+(s.vpos[0]-camera.x)*camera.z, height/2+(s.vpos[1]-camera.y)*camera.z);
 			rotate(s.rot); scale(sqrt(camera.z));
-			drawShip(s.type, s.team != socket.id, s.move.length ? 1 : 0);
+			drawShip(s.type, s.team != socket.id, s.move.length && !s.emp ? 1 : 0);
 			pop();
 		}
 
@@ -660,7 +691,7 @@ function draw(){
 			}
 
 			push();
-			for(let s of ships)
+			for(let s of ships) if(!s.emp)
 				for(let m of s.modules)
 					if(Array.isArray(m.aux) && m.aux.length){
 						let C = [s.vpos[0]+17*Math.cos(s.rot)/S, s.vpos[1]+17*Math.sin(s.rot)/S];
@@ -787,6 +818,13 @@ function draw(){
 					fill(200); noStroke(); textAlign(CENTER, CENTER);
 					text(hp.toString() + " / " + max.toString(), width/2+150-20-100+50, height-120+100-20-20+7.5);
 					pop();
+
+					for(let m of ships[shipID].modules)
+						if(m.type >= ALPHA && m.type <= ALLY)
+							if(m.aux[0]){
+								fill(50, 150, 150);
+								rect(width/2+150-20-100, height-120+100-20-20-6, ceil(100*m.aux[0]), 3);
+							}
 
 					for(let i=0; i<ships[shipID].modules.length; ++i){
 						push(); translate(width/2+25-25*ships[shipID].modules.length+50*i, height-120-10-25);

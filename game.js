@@ -37,7 +37,7 @@ let SPEED = new Array(ct), HP = new Array(ct),
 
 STRENGTH[IMPULSE] = 2250;
 STRENGTH[PASSIVE] = 3500;
-STRENGTH[OMEGA] = 5000;
+STRENGTH[OMEGA] = 4500;
 STRENGTH[MIRROR] = 600;
 STRENGTH[ALLY] = 500;
 
@@ -172,6 +172,7 @@ RANGE[ROCKETP] = 70;
 RANGE[DELTAP] = 70;
 
 RANGE[REPAIR] = 60;
+RANGE[EMP] = 80;
 
 for(let i=LASER; i<=LASER2; ++i) RANGE[i] = 80;
 RANGE[DART] = 100;
@@ -221,6 +222,7 @@ class Ship{
 		this.uid = ++UID;
 		this.vel = type == DARTP ? SPEED[DARTP] : 0;
 		this.expire = 1;
+		this.emp = 0;
 
 		for(let m of this.modules){
 			if(m.type >= LASER && m.type <= TURRETD)
@@ -270,6 +272,7 @@ class Ship{
 			tp: this.tp,
 			uid: this.uid,
 			expire: this.expire,
+			emp: this.emp,
 		};
 	}
 	
@@ -399,6 +402,15 @@ class Game{
 			this.ships[s].wait = null;
 			this.ships[s].tp = [R[I][0], R[I][1]+10, R[I][2]];
 		}
+
+		if(T == EMP){
+			for(let x of this.ships)
+				if(x.team != this.ships[s].team)
+					if(_dist(x.pos, this.ships[s].pos) < RANGE[EMP])
+						x.emp = 1;
+
+			this.ev.push(["emp", [...this.ships[s].pos]]);
+		}
 	}
 
 	explode(pos, range, str){
@@ -452,10 +464,13 @@ class Game{
 				if(A == 0) s.modules[i].state = 0;
 				else if(A == TARGETS[T]){
 					s.modules[i].state = Math.max(0.3, s.modules[i].state);
-					if(s.modules[i].state < 0.6)
-						s.modules[i].state += 0.3/(4*LASER_CHARGE[T][0]);
-					else s.modules[i].state = Math.min(1,
-						s.modules[i].state+0.4/(4*(LASER_CHARGE[T][1]-LASER_CHARGE[T][0])));
+
+					if(!s.emp){
+						if(s.modules[i].state < 0.6)
+							s.modules[i].state += 0.3/(4*LASER_CHARGE[T][0]);
+						else s.modules[i].state = Math.min(1,
+							s.modules[i].state+0.4/(4*(LASER_CHARGE[T][1]-LASER_CHARGE[T][0])));
+					}
 
 				}else s.modules[i].state = 0.3;
 			}
@@ -536,7 +551,9 @@ class Game{
 	}
 
 	update(){
-		for(let s of this.ships) s.travel();
+		for(let s of this.ships) s.emp = Math.max(0, s.emp - 1/(4*EFFECT_TIME[EMP]));
+
+		for(let s of this.ships) if(!s.emp) s.travel();
 
 		{
 			let X = new Array(this.rocks.length);
@@ -608,7 +625,7 @@ class Game{
 			let M = new Map();
 			for(let i=0; i<this.ships.length; ++i) M.set(this.ships[i].uid, i);
 
-			for(let s of this.ships)
+			for(let s of this.ships) if(!s.emp)
 				for(let m of s.modules)
 					if(m.type >= LASER && m.type <= TURRETD &&
 						(m.type != BATTERY || m.state == 1)){
