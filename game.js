@@ -32,7 +32,14 @@ let SPEED = new Array(ct), HP = new Array(ct),
 	EFFECT_TIME = new Array(ct), RECHARGE_TIME = new Array(ct),
 	ACTIVATED = new Array(ct), RANGE = new Array(ct),
 	EXPIRE_TIME = new Array(ct), TARGETS = new Array(ct),
-	DAMAGE = new Array(ct), LASER_DAMAGE = new Array(ct);
+	DAMAGE = new Array(ct), LASER_DAMAGE = new Array(ct),
+	STRENGTH = new Array(ct);
+
+STRENGTH[IMPULSE] = 2250;
+STRENGTH[PASSIVE] = 3500;
+STRENGTH[OMEGA] = 5000;
+STRENGTH[MIRROR] = 600;
+STRENGTH[ALLY] = 500;
 
 DAMAGE[BATTERY] = 284;
 DAMAGE[MASS] = 210;
@@ -42,7 +49,7 @@ DAMAGE[INT] = 90;
 DAMAGE[TURRETD] = 200;
 
 LASER_DAMAGE[LASER] = [160, 292, 584];
-LASER_DAMAGE[LASER2] = [212, 312, 850];
+LASER_DAMAGE[LASER2] = [184, 312, 800];
 LASER_DAMAGE[COL] = [60, 150, 500];
 
 EXPIRE_TIME[DECOY] = 40;
@@ -98,10 +105,28 @@ RECHARGE_TIME[ROCKET] = 60;
 EFFECT_TIME[TURRET] = 0;
 RECHARGE_TIME[TURRET] = 60;
 
-//ACTIVATED[ALPHA] = true;
-//ACTIVATED[IMPULSE] = true;
-//for(let i=OMEGA; i<=ALLY; ++i)
-	//ACTIVATED[i] = true;
+// SHIELD
+
+EFFECT_TIME[ALPHA] = 8;
+RECHARGE_TIME[ALPHA] = 60;
+
+EFFECT_TIME[IMPULSE] = 45;
+RECHARGE_TIME[IMPULSE] = 60;
+
+EFFECT_TIME[OMEGA] = 45;
+RECHARGE_TIME[OMEGA] = 60;
+
+EFFECT_TIME[MIRROR] = 45;
+RECHARGE_TIME[MIRROR] = 60;
+
+EFFECT_TIME[MIRROR] = 45;
+RECHARGE_TIME[MIRROR] = 60;
+
+ACTIVATED[ALPHA] = true;
+ACTIVATED[IMPULSE] = true;
+for(let i=OMEGA; i<=ALLY; ++i)
+	ACTIVATED[i] = true;
+
 ACTIVATED[EMP] = true;
 ACTIVATED[FORT] = true;
 ACTIVATED[TP] = true;
@@ -172,6 +197,8 @@ LASER_CHARGE[LASER] = [6, 10];
 LASER_CHARGE[LASER2] = [3, 6];
 LASER_CHARGE[COL] = [10, 20];
 
+const PASSIVE_DELAY = 6, PASSIVE_TIME = 48;
+
 function _dist(a, b){
 	return Math.sqrt((a[0]-b[0])*(a[0]-b[0]) + (a[1]-b[1])*(a[1]-b[1]));
 }
@@ -195,9 +222,19 @@ class Ship{
 		this.vel = type == DARTP ? SPEED[DARTP] : 0;
 		this.expire = 1;
 
-		for(let m of this.modules)
+		for(let m of this.modules){
 			if(m.type >= LASER && m.type <= TURRETD)
 				m.aux = [];
+
+			else if(m.type == PASSIVE)
+				m.aux = [1, 1];
+
+			else if(m.type >= ALPHA && m.type <= ALLY)
+				m.aux = [0, 0];
+
+			if(m.type == MIRROR)
+				m.blast = [0, 0];
+		}
 	}
 
 	waitMoveTo(pos, i){
@@ -237,7 +274,25 @@ class Ship{
 	}
 	
 	hurt(x){
-		this.hp = Math.max(0, this.hp-x);
+		let dmg = x;
+
+		// TODO make mirror and ally functional
+
+		for(let m of this.modules) if(dmg && m.type >= ALPHA && m.type <= MIRROR && m.aux[0]){
+			if(m.type == ALPHA) return;
+
+			if(m.type == PASSIVE) m.aux[1] = 0;
+
+			const rem = Math.min(Math.ceil(m.aux[0]*STRENGTH[m.type]), dmg);
+
+			if(m.type == MIRROR)
+				m.blast[0] += rem;
+
+			m.aux[0] = Math.max(0, m.aux[0]-rem/STRENGTH[m.type]);
+			dmg -= rem;
+		}
+
+		if(dmg) this.hp = Math.max(0, this.hp-dmg);
 	}
 
 	heal(x){
@@ -291,10 +346,14 @@ class Game{
 	}
 
 	activateModule(s, dat){
-		if(ACTIVATED[this.ships[s].modules[dat.i].type])
-			this.ships[s].modules[dat.i].state = -1;
-
 		const T = this.ships[s].modules[dat.i].type;
+
+		if(ACTIVATED[T]){
+			if(T >= ALPHA && T <= ALLY)
+				this.ships[s].modules[dat.i].aux = [1, 1];
+
+			this.ships[s].modules[dat.i].state = -1;
+		}
 
 		if(T == DELTA) this.addShip(DELTAP, this.ships[s].team, [], [...this.ships[s].pos], [[...dat.loc, dat.dock]]);
 
@@ -357,8 +416,14 @@ class Game{
 			if(EFFECT_TIME[T] != null){
 				if(s.modules[i].state < 0)
 					s.modules[i].state = Math.min(0, s.modules[i].state+1/(1+EFFECT_TIME[T]*4));
-				else if(s.modules[i].state != 1)
-					s.modules[i].state = Math.min(1, s.modules[i].state+1/(1+(RECHARGE_TIME[T]-EFFECT_TIME[T])*4));
+				else if(s.modules[i].state != 1){
+					if(T >= ALPHA && T <= ALLY)
+						s.modules[i].state = Math.min(1, s.modules[i].state+1/(RECHARGE_TIME[T]*4));
+					else s.modules[i].state = Math.min(1, s.modules[i].state+1/((RECHARGE_TIME[T]-EFFECT_TIME[T])*4));
+				}
+
+				if(s.modules[i].state == 0 && T >= ALPHA && T <= ALLY)
+					s.modules[i].state = EFFECT_TIME[T]/RECHARGE_TIME[T];
 			}
 
 			const S = s.modules[i].state;
@@ -428,6 +493,18 @@ class Game{
 					}
 				}
 			}
+
+			if(T == PASSIVE){
+				s.modules[i].aux[1] = Math.min(1, s.modules[i].aux[1]+1/(4*PASSIVE_DELAY));
+
+				if(s.modules[i].aux[1] == 1)
+					s.modules[i].aux[0] = Math.min(1, s.modules[i].aux[0]+1/(4*PASSIVE_TIME));
+
+			}else if(T >= ALPHA && T <= ALLY){
+				if(s.modules[i].aux[0] <= 0) s.modules[i].aux[1] = 0;
+				s.modules[i].aux[1] = Math.max(0, s.modules[i].aux[1]-1/(4*EFFECT_TIME[T]));
+				if(!s.modules[i].aux[1]) s.modules[i].aux[0] = 0;
+			}
 		}
 	}
 
@@ -488,20 +565,25 @@ class Game{
 						if(_dist(x.pos, s.pos) < RANGE[m.type] && (![DART, ROCKETP].includes(m.type)
 							|| [BS, DECOY, REPAIR, ROCKET, TURRET].includes(x.type)))
 							if(m.type != ROCKETD || _dist(x.pos, s.pos) > 60){
-								if(x.type == DECOY) decoys.push(x.uid);
-								else targets.push(x.uid);
+								if(x.type == DECOY) decoys.push([_dist(x.pos, s.pos), x.uid]);
+								else targets.push([_dist(x.pos, s.pos), x.uid]);
 							}
 
 					const orig = m.aux.length ? m.aux[0] : null;
 
 					m.aux = m.aux.filter(x => targets.includes(x));
 
+					targets.sort((a, b) => a[0]-b[0]);
+					decoys.sort((a, b) => a[0]-b[0]);
+
 					targets = targets.filter(x => !m.aux.includes(x));
 					decoys = decoys.filter(x => !m.aux.includes(x));
 
 					let old = [...m.aux];
+					m.aux = [];
 
-					m.aux = decoys.slice(0, Math.min(decoys.length, TARGETS[m.type]));
+					for(let i=0; i<Math.min(decoys.length, TARGETS[m.type]); ++i)
+						m.aux.push(decoys[i][1]);
 
 					while(m.aux.length < TARGETS[m.type] && old.length){
 						const R = Math.floor(Math.random()*old.length);
@@ -509,8 +591,8 @@ class Game{
 					}
 
 					while(m.aux.length < TARGETS[m.type] && targets.length){
-						const R = Math.floor(Math.random()*targets.length);
-						m.aux.push(targets.splice(R, 1)[0]);
+						m.aux.push(targets[0][1]);
+						targets = targets.slice(1);
 					}
 
 				if(orig != null && [LASER, COL, BATTERY].includes(m.type)

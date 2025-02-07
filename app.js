@@ -388,7 +388,7 @@ function draw(){
 				noFill(); stroke(...(ships[shipID].team == socket.id ? [70, 90, 90] : [90, 70, 70]), 100);
 				let shade = true;
 				for(let i=0; i<ships[shipID].modules.length; ++i){
-					if(RANGE[ships[shipID].modules[i].type]){
+					if(weaponRange(ships[shipID].modules[i].type) != null){
 						circle(...screenPos(ships[shipID].vpos), weaponRange(ships[shipID].modules[i].type)*2*camera.z);
 						shade = false;
 					}
@@ -485,6 +485,72 @@ function draw(){
 			}
 		}
 
+		for(let s of ships){
+			push(); translate(width/2+(s.vpos[0]-camera.x)*camera.z, height/2+(s.vpos[1]-camera.y)*camera.z);
+			scale(sqrt(camera.z));
+
+			for(let m of s.modules) if(Array.isArray(m.aux) && m.aux.length && m.aux[0] &&
+				(m.aux[1] > 3/TIME[m.type] || (m.aux[1]*TIME[m.type])%1 < 0.5) || m.type == PASSIVE){
+				if(m.type == ALPHA){
+					stroke(50, 150, 150, 50); noFill(); strokeWeight(3);
+					arc(0, 0, 50-3, 50-3, -PI*0.25, PI*0.25);
+					arc(0, 0, 50-3, 50-3, PI-PI*0.25, PI+PI*0.25);
+
+					noStroke(); fill(50, 150, 150, 80);
+					circle(0, 0, 50);
+				}
+
+				if(m.type == IMPULSE){
+					stroke(50, 150, 150, 40); noFill(); strokeWeight(3);
+					arc(0, 0, 55-3, 55-3, -PI*0.25+frameCount/30, PI*0.25+frameCount/30);
+					arc(0, 0, 55-3, 55-3, PI-PI*0.25+frameCount/30, PI+PI*0.25+frameCount/30);
+
+					noStroke(); fill(50, 150, 150, 40);
+					circle(0, 0, 55);
+				}
+
+				if(m.type == PASSIVE){
+					stroke(50, 150, 150, ceil(150*m.aux[0])); noFill(); strokeWeight(3);
+					arc(0, 0, 55, 53, -PI*0.25, PI*0.25);
+					arc(0, 0, 55, 53, PI-PI*0.25, PI+PI*0.25);
+
+					noStroke(); fill(50, 150, 150, ceil(40*m.aux[0]));
+					ellipse(0, 0, 55+2, 53+2);
+				}
+
+				if(m.type == OMEGA){
+					stroke(50, 150, 150, 70); noFill(); strokeWeight(3);
+					circle(0, 0, 70-3);
+
+					noStroke(); fill(50, 150, 150, 40);
+					circle(0, 0, 70);
+				}
+
+				if(m.type == MIRROR){
+					scale(sqrt(camera.z));
+					fill(200, 50, 50, 30); noStroke();
+					circle(0, 0, RANGE[MIRROR]*2);
+					stroke(200, 50, 50, 150); strokeWeight(2); noFill();
+					arc(0, 0, RANGE[MIRROR]*2, RANGE[MIRROR]*2, -PI/2, -PI/2+PI*2*m.aux[0]);
+				}
+
+				if(m.type == ALLY){
+					scale(sqrt(camera.z));
+					fill(150, 200, 200, 15); noStroke();
+					circle(0, 0, RANGE[ALLY]*2);
+					stroke(150, 200, 200, 150); strokeWeight(2); noFill();
+					arc(0, 0, RANGE[ALLY]*2, RANGE[ALLY]*2, -PI/2, -PI/2+PI*2*m.aux[0]);
+					strokeWeight(1.5);
+					if(-PI/2+PI*2*m.aux > -PI*0.08) arc(0, 0, RANGE[ALLY]*2-6, RANGE[ALLY]*2-6,
+						max(-PI/2, -PI*0.08), min(-PI/2+PI*2*m.aux[0], PI*0.08));
+					if(-PI/2+PI*2*m.aux > PI-PI*0.08) arc(0, 0, RANGE[ALLY]*2-6, RANGE[ALLY]*2-6,
+						max(-PI/2, PI-PI*0.08), min(-PI/2+PI*2*m.aux[0], PI*1.08));
+				}
+			}
+
+			pop();
+		}
+
 		push(); noStroke();
 		for(let h of heals){
 			fill(50, 200, 50, 60*sin((h[1]-Date.now())/2000*PI));
@@ -536,26 +602,34 @@ function draw(){
 			const hp = s.hp, max = HP[s.type];
 
 			fill(100, 80); noStroke();
-			if(hp != max) rect(-15, -18, 30, 3);
-			//rect(-15, -23, 30, 3);
+			if(hp != max) rect(-15, -20, 30, 3);
 
-			fill(150*(1-hp/max), 150*(hp/max), 0);
-			if(hp != max) rect(-15, -18, ceil(30*hp/max), 3);
+			if(hp/max > 0.7) fill(50, 150, 50);
+			else if(hp/max > 0.5) fill(150, 150, 50);
+			else if(hp/max > 0.3) fill(200, 100, 0);
+			else fill(150, 50, 50);
 
-			fill(50, 150, 150);
-			//rect(-15, -23, (30*shieldhp/shieldmax), 3);
+			if(hp != max) rect(-15, -20, ceil(30*hp/max), 3);
 
-			stroke(50, 150, 150); noFill();
-			//circle(0, 0, 60);
+			for(let m of s.modules)
+				if(m.type >= ALPHA && m.type <= ALLY)
+					if(m.aux[0]){
+						fill(100, 80); noStroke();
+						rect(-15, -25, 30, 3);
+
+						fill(50, 150, 150);
+						rect(-15, -25, ceil(30*m.aux[0]), 3);
+					}
+
 
 			const exp = s.expire;
 
 			if(exp != 1){
 				fill(100, 80); noStroke();
-				rect(-15, -23, 30, 3);
+				rect(-15, -25, 30, 3);
 
 				fill(200, 150, 50);
-				rect(-15, -23, ceil(30*exp), 3);
+				rect(-15, -25, ceil(30*exp), 3);
 
 				fill(50, 150, 150);
 
@@ -702,7 +776,11 @@ function draw(){
 					fill(20, 40, 60); noStroke();
 					rect(width/2+150-20-100, height-120+100-20-20, 100, 20);
 
-					fill(150*(1-hp/max), 150*(hp/max), 0);
+					if(hp/max > 0.7) fill(50, 150, 50);
+					else if(hp/max > 0.5) fill(150, 150, 50);
+					else if(hp/max > 0.3) fill(200, 100, 0);
+					else fill(150, 50, 50);
+
 					rect(width/2+150-20-100, height-120+100-20-20, ceil(100*hp/max), 20);
 
 					push(); textSize(13);

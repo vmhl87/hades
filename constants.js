@@ -26,7 +26,14 @@ const EMP = ++ct, SOL = ++ct, FORT = ++ct, TP = ++ct, AMP = ++ct, DESTINY = ++ct
 
 /* UNOBTAIN */ const VENG = ++ct;
 
-let NAME = new Array(ct), HP = new Array(ct), RANGE = new Array(ct).fill(null);
+let NAME = new Array(ct), HP = new Array(ct), RANGE = new Array(ct).fill(null),
+	TIME = new Array(ct);
+
+TIME[ALPHA] = 6;
+TIME[IMPULSE] = 45;
+TIME[OMEGA] = 45;
+TIME[MIRROR] = 45;
+TIME[ALLY] = 45;
 
 NAME[BS] = "BATTLESHIP";
 NAME[SENTINEL] = "CERBERUS SENTINEL";
