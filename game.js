@@ -531,7 +531,9 @@ class Game{
 			}
 
 			if(T == RIPPLE)
-				s.modules[i].state = Math.min(0.75, s.modules[i].state+0.75/(RECHARGE_TIME[T]*4));
+				// TODO new ripple behavior
+				s.modules[i].state = Math.min(1, s.modules[i].state+1/(RECHARGE_TIME[T]*4));
+				//s.modules[i].state = Math.min(0.75, s.modules[i].state+0.75/(RECHARGE_TIME[T]*4));
 
 			if(T == TURRETD)
 				s.modules[i].state = Math.min(1, s.modules[i].state+1/(RECHARGE_TIME[T]*4));
@@ -857,7 +859,8 @@ class Game{
 			if(m.type >= LASER && m.type <= TURRETD) targets[i] += m.aux.length;
 
 		for(let i=0; i<this.ships.length; ++i) for(let m of this.ships[i].modules){
-			if(m.type == RIPPLE && targets[i] == 0 && m.state == 0.75) m.state = 1;
+			// TODO old ripple behavior
+			//if(m.type == RIPPLE && targets[i] == 0 && m.state == 0.75) m.state = 1;
 			if(m.type == IMPULSE && this.ships[i].move.length > 0 && m.state == 0.75) m.state = 1;
 		}
 
