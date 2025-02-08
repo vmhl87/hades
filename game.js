@@ -344,7 +344,7 @@ class Ship{
 				mag = Math.sqrt(dir[0]*dir[0] + dir[1]*dir[1]);
 			this.dock = this.move[0][2];
 			if(dist > mag){
-				this.pos = [...move];
+				this.pos = move.slice(0, 2);
 				this.move = this.move.slice(1);
 			}else{
 				dist /= mag;
@@ -541,7 +541,8 @@ class Game{
 								I = j;
 
 						if(I != null){
-							this.addShip(DARTP, s.team, [], [...s.pos], [[...this.ships[I].pos, null]]);
+							this.addShip(DARTP, s.team, [], [...s.pos], [[...this.ships[I].pos,
+								this.ships[I].move.length ? null : this.ships[I].dock]]);
 							s.modules[i].state = 0;
 						}
 					}
@@ -558,7 +559,8 @@ class Game{
 								I = j;
 
 						if(I != null){
-							this.addShip(ROCKETP, s.team, [], [...s.pos], [[...this.ships[I].pos, null]]);
+							this.addShip(ROCKETP, s.team, [], [...s.pos], [[...this.ships[I].pos,
+								this.ships[I].move.length ? null : this.ships[I].dock]]);
 							s.modules[i].state = 0;
 						}
 					}
@@ -639,7 +641,8 @@ class Game{
 				X[i] = [];
 
 			for(let i=0; i<this.ships.length; ++i)
-				if(!this.ships[i].move.length && this.ships[i].dock != null && this.ships[i].tp == null)
+				if(!this.ships[i].move.length && this.ships[i].dock != null && this.ships[i].tp == null
+					&& ![ROCKETP, DARTP, DELTAP].includes(this.ships[i].type))
 					X[this.ships[i].dock].push(i);
 
 			for(let i=0; i<this.rocks.length; ++i)
