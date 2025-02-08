@@ -38,19 +38,20 @@ let SPEED = new Array(ct), HP = new Array(ct),
 STRENGTH[IMPULSE] = 2250;
 STRENGTH[PASSIVE] = 3500;
 STRENGTH[OMEGA] = 4500;
-STRENGTH[MIRROR] = 600;
-STRENGTH[ALLY] = 500;
+STRENGTH[MIRROR] = 1000;
+STRENGTH[ALLY] = 600;
 
 DAMAGE[BATTERY] = 284;
 DAMAGE[MASS] = 210;
 DAMAGE[SENTINEL] = 200;
 DAMAGE[GUARD] = 50;
 DAMAGE[INT] = 90;
-DAMAGE[TURRETD] = 200;
+DAMAGE[TURRETD] = 150;
 
 DAMAGE[BARRIER] = 3000;
 DAMAGE[SOL] = 1.5;
 DAMAGE[AMP] = 2.2;
+DAMAGE[MIRROR] = 3;
 
 LASER_DAMAGE[LASER] = [160, 292, 584];
 LASER_DAMAGE[LASER2] = [184, 312, 800];
@@ -60,6 +61,8 @@ EXPIRE_TIME[DECOY] = 40;
 EXPIRE_TIME[REPAIR] = 40;
 EXPIRE_TIME[ROCKET] = 40;
 EXPIRE_TIME[TURRET] = 40;
+
+RECHARGE_TIME[TURRETD] = 5;
 
 EFFECT_TIME[BATTERY] = 0;
 RECHARGE_TIME[BATTERY] = 2;
@@ -91,7 +94,7 @@ RECHARGE_TIME[BARRIER] = 60;
 EFFECT_TIME[DELTA] = 0;
 RECHARGE_TIME[DELTA] = 60;
 
-EFFECT_TIME[RIPPLE] = 5;
+EFFECT_TIME[RIPPLE] = 0;
 RECHARGE_TIME[RIPPLE] = 60;
 
 EFFECT_TIME[DISRUPT] = 0;
@@ -125,6 +128,9 @@ RECHARGE_TIME[MIRROR] = 60;
 
 EFFECT_TIME[MIRROR] = 45;
 RECHARGE_TIME[MIRROR] = 60;
+
+EFFECT_TIME[ALLY] = 45;
+RECHARGE_TIME[ALLY] = 60;
 
 ACTIVATED[ALPHA] = true;
 ACTIVATED[IMPULSE] = true;
@@ -178,6 +184,8 @@ RANGE[DELTAP] = 70;
 
 RANGE[REPAIR] = 60;
 RANGE[EMP] = 80;
+RANGE[AMP] = 100;
+RANGE[MIRROR] = 90;
 
 for(let i=LASER; i<=LASER2; ++i) RANGE[i] = 80;
 RANGE[DART] = 100;
@@ -241,6 +249,9 @@ class Ship{
 
 			if(m.type == MIRROR)
 				m.blast = [0, 0];
+
+			if(m.type == TURRETD)
+				m.state = 0;
 		}
 	}
 
@@ -293,8 +304,10 @@ class Ship{
 
 			const rem = Math.min(Math.ceil(m.aux[0]*STRENGTH[m.type]), dmg);
 
-			if(m.type == MIRROR)
+			if(m.type == MIRROR){
 				m.blast[0] += rem;
+				if(m.blast[1] == 0) m.blast[1] = 5;
+			}
 
 			m.aux[0] = Math.max(0, m.aux[0]-rem/STRENGTH[m.type]);
 			dmg -= rem;
@@ -308,6 +321,13 @@ class Ship{
 	}
 
 	travel(){
+		if(this.type == TURRET){
+			this.move = [];
+			this.wait = null;
+			this.dock = null;
+			return;
+		}
+
 		const now = Date.now();
 
 		if(this.wait && --this.wait[2] == 0) this.confirmMove();
@@ -416,6 +436,30 @@ class Game{
 
 			this.ev.push(["emp", [...this.ships[s].pos]]);
 		}
+
+		if(T == RIPPLE){
+			for(let x of this.ships) if(x.uid == dat.loc){
+				const W = x.wait;
+				x.wait = this.ships[s].wait;
+				this.ships[s].wait = W;
+
+				let M1 = [], M2 = [];
+				for(let p of this.ships[s].move) M1.push([...p]);
+				for(let p of x.move) M2.push([...p]);
+				this.ships[s].move = [];
+				x.move = [];
+				for(let p of M1) x.move.push(p);
+				for(let p of M2) this.ships[s].move.push(p);
+
+				const D = x.dock;
+				x.dock = this.ships[s].dock;
+				this.ships[s].dock = D;
+
+				const P = [...this.ships[s].pos];
+				this.ships[s].pos = [...x.pos];
+				x.pos = [...P];
+			}
+		}
 	}
 
 	explode(pos, range, str){
@@ -442,6 +486,9 @@ class Game{
 				if(s.modules[i].state == 0 && T >= ALPHA && T <= ALLY)
 					s.modules[i].state = EFFECT_TIME[T]/RECHARGE_TIME[T];
 			}
+
+			if(T == TURRETD)
+				s.modules[i].state = Math.min(1, s.modules[i].state+1/(RECHARGE_TIME[T]*4));
 
 			const S = s.modules[i].state;
 
@@ -529,6 +576,20 @@ class Game{
 				s.modules[i].aux[1] = Math.max(0, s.modules[i].aux[1]-1/(4*EFFECT_TIME[T]));
 				if(!s.modules[i].aux[1]) s.modules[i].aux[0] = 0;
 			}
+
+			if(T == MIRROR){
+				if(s.modules[i].blast[0] > 0){
+					for(let x of this.ships)
+						if(x.team != s.team)
+							if(_dist(x.pos, s.pos) < RANGE[MIRROR])
+								x.hurt(s.modules[i].blast[0]*DAMAGE[MIRROR]);
+
+					s.modules[i].blast[0] = 0;
+				}
+
+				if(s.modules[i].blast[1] && --s.modules[i].blast[1] == 1)
+					this.explode([...s.pos], RANGE[MIRROR], 3);
+			}
 		}
 	}
 
@@ -592,7 +653,7 @@ class Game{
 		for(let s of this.ships){
 			for(let m of s.modules){
 				if(m.type >= LASER && m.type <= TURRETD &&
-					(m.type != BATTERY || m.state == 1)){
+					(![BATTERY, TURRETD].includes(m.type) || m.state == 1)){
 					let targets = [], decoys = [];
 
 					for(let x of this.ships) if(x.team != s.team)
@@ -605,13 +666,21 @@ class Game{
 
 					const orig = m.aux.length ? m.aux[0] : null;
 
-					m.aux = m.aux.filter(x => targets.includes(x));
+					m.aux = m.aux.filter(x => {
+						for(let y of targets)
+							if(y[1] == x) return true;
+
+						for(let y of decoys)
+							if(y[1] == x) return true;
+						
+						return false;
+					});
 
 					targets.sort((a, b) => a[0]-b[0]);
 					decoys.sort((a, b) => a[0]-b[0]);
 
-					targets = targets.filter(x => !m.aux.includes(x));
-					decoys = decoys.filter(x => !m.aux.includes(x));
+					targets = targets.filter(x => !m.aux.includes(x[1]));
+					decoys = decoys.filter(x => !m.aux.includes(x[1]));
 
 					let old = [...m.aux];
 					m.aux = [];
@@ -642,16 +711,17 @@ class Game{
 			let M = new Map();
 			for(let i=0; i<this.ships.length; ++i) M.set(this.ships[i].uid, i);
 
-			let amp = new Array(this.ships.length, 1), sol = new Array(this.ships.length, 1);
+			let amp = new Array(this.ships.length).fill(1), sol = new Array(this.ships.length).fill(1);
 
 			for(let s of this.ships)
-				for(let m of s.modules) if(s.type == AMP && s.state < 0)
+				for(let m of s.modules) if(m.type == AMP && m.state < 0){
 					for(let x of this.ships) if(_dist(x.pos, s.pos) < RANGE[AMP])
-						amp[x.uid] = Math.max(amp[M.get(x.uid)], DAMAGE[AMP]);
+						amp[M.get(x.uid)] = DAMAGE[AMP];
+				}
 
-			let count = new Array(ROWS*COLS);
+			let count = new Array(ROWS*COLS).fill(0);
 
-			for(let s of this.ships)
+			for(let s of this.ships) if(s.type == BS)
 				++count[Math.floor((s.pos[0]+150*COLS)/300)+COLS*Math.floor((s.pos[1]+150*ROWS)/300)];
 
 			for(let s of this.ships)
@@ -660,7 +730,9 @@ class Game{
 						m.state =
 							count[Math.floor((s.pos[0]+150*COLS)/300)+COLS*Math.floor((s.pos[1]+150*ROWS)/300)]
 							== 2 ? 1 : 0;
-						sol[M.get(s.uid)] = DAMAGE[SOL];
+						// TODO this switches off multi-sol tactic
+						//if(m.state) sol[M.get(s.uid)] = DAMAGE[SOL];
+						if(m.state) sol[M.get(s.uid)] *= DAMAGE[SOL];
 					}
 
 			for(let s of this.ships) if(!s.emp)
@@ -674,7 +746,7 @@ class Game{
 
 						if(D != null)
 							for(let x of m.aux) if(M.has(x)){
-								this.ships[M.get(x)].hurt(D*amp[M.get(x)]*sol[M.get(x)]/4);
+								this.ships[M.get(x)].hurt(D*amp[M.get(s.uid)]*sol[M.get(s.uid)]/4);
 							}
 					}
 		}
@@ -774,8 +846,10 @@ class Game{
 		for(let p of this.players) p.emit("end");
 	}
 
-	alive(type){
-		return this.ships.filter(x => x.type == type).length;
+	alive(){
+		let S = new Set();
+		for(let p of this.players) S.add(p.id);
+		return this.ships.filter(x => x.type == BS && S.has(x.team)).length > 0;
 	}
 }
 

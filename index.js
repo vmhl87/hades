@@ -87,7 +87,7 @@ function tick(game){
 		for(let g of games){
 			tick(g);
 
-			if(g.alive(BS) == 0){
+			if(!g.alive()){
 				g.end();
 
 				let p = [];

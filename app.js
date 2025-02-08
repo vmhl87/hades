@@ -372,8 +372,15 @@ function draw(){
 		if(selectMove != null){
 			fill(255, 255, 100, 15); noStroke();
 			let x = selected();
+
 			if(x && x[0] == "rock" && (!focus || x[1] != focus[1]))
 				circle(...screenPos(rocks[x[1]]), 20*sqrt(camera.z));
+
+			if(x && x[0] == "ship" && (!focus || x[1] != focus[1])){
+				let I = null;
+				for(let i=0; i<ships.length; ++i) if(ships[i].uid == x[1]) I = i;
+				if(I) circle(...screenPos(ships[I].vpos), 40*sqrt(camera.z));
+			}
 		}
 
 		if(focus){
@@ -613,12 +620,33 @@ function draw(){
 
 				if(m.type == BARRIER && m.state < 0){
 					push(); strokeWeight(2*sqrt(camera.z));
-					fill(255, 30); noStroke();
-					for(let i=0; i<6; ++i)
-						arc(...screenPos(s.vpos), RANGE[BARRIER]*2*camera.z, RANGE[BARRIER]*2*camera.z,
-							PI/3*i-PI*0.25+PI*Date.now()/10000, PI/3*i+PI*0.25+PI*Date.now()/10000, OPEN);
+					if(m.state < -3/TIME[m.type] || ((-m.state*TIME[m.type])%1 < 0.5)){
+						fill(255, 20); noStroke();
+						for(let i=0; i<6; ++i)
+							arc(...screenPos(s.vpos), RANGE[BARRIER]*2*camera.z, RANGE[BARRIER]*2*camera.z,
+								PI/3*i-PI*0.25+PI*Date.now()/10000, PI/3*i+PI*0.25+PI*Date.now()/10000, OPEN);
+					}
 					stroke(150, 150); noFill();
 					circle(...screenPos(s.vpos), RANGE[BARRIER]*2*camera.z);
+					pop();
+				}
+
+				if(m.type == AMP && m.state < 0){
+					push(); strokeWeight(2*sqrt(camera.z));
+					fill(200, 50, 50, 30); noStroke();
+					circle(...screenPos(s.vpos), RANGE[AMP]*2*camera.z);
+					stroke(200, 50, 50, 100); noFill();
+					circle(...screenPos(s.vpos), RANGE[AMP]*2*camera.z);
+					if(m.state < -3/TIME[m.type] || ((-m.state*TIME[m.type])%1 < 0.5)){
+						strokeWeight(1.5*sqrt(camera.z));
+						circle(...screenPos(s.vpos), (RANGE[AMP]-4)*2*camera.z);
+						strokeWeight(sqrt(camera.z));
+						circle(...screenPos(s.vpos), (RANGE[AMP]-8)*2*camera.z);
+						strokeWeight(0.6*sqrt(camera.z));
+						circle(...screenPos(s.vpos), (RANGE[AMP]-12)*2*camera.z);
+						strokeWeight(0.3*sqrt(camera.z));
+						circle(...screenPos(s.vpos), (RANGE[AMP]-16)*2*camera.z);
+					}
 					pop();
 				}
 			}
@@ -639,6 +667,11 @@ function draw(){
 				stroke(255, 50, 50); noFill(); strokeWeight(2);
 				arc(0, 0, 35, 35, -PI*0.25, PI*0.25);
 				arc(0, 0, 35, 35, PI-PI*0.25, PI+PI*0.25);
+			}
+			if(s.type == TURRET && s.modules[0].state < 1){
+				stroke(50, 150, 200, 150*(1-s.modules[0].state)); noFill(); strokeWeight(2);
+				for(let i=0; i<3; ++i)
+					arc(0, 0, 20, 20, PI*2*i/3+Date.now()/500, PI*2*i/3+PI/3+Date.now()/500);
 			}
 			pop();
 		}
@@ -708,9 +741,16 @@ function draw(){
 			}
 
 			push();
-			for(let s of ships) if(!s.emp)
+			for(let s of ships) if(!s.emp){
+				let sol = false;
+
 				for(let m of s.modules)
-					if(Array.isArray(m.aux) && m.aux.length){
+					if(m.type == SOL && m.state == 1)
+						sol = true;
+
+				for(let m of s.modules)
+					if((m.type >= LASER && m.type <= TURRETD) || (m.type >= SENTINEL && m.type <= COL))
+					if(m.aux.length){
 						let C = [s.vpos[0]+17*Math.cos(s.rot)/S, s.vpos[1]+17*Math.sin(s.rot)/S];
 
 						if([LASER, LASER2, COL].includes(m.type)){
@@ -756,7 +796,14 @@ function draw(){
 									...screenPos(_lerp(C, x.vpos, L+0.1)));
 							}
 						}
+
+						if(sol){
+							push(); translate(...screenPos(s.vpos)); scale(S);
+							translate(0, 25); scale(1/2); drawModule(SOL);
+							pop();
+						}
 					}
+			}
 			pop();
 
 			if(focus && focus[0] == "ship" && shipID != null){
@@ -833,7 +880,7 @@ function draw(){
 
 					push(); textSize(13);
 					fill(200); noStroke(); textAlign(CENTER, CENTER);
-					text(hp.toString() + " / " + max.toString(), width/2+150-20-100+50, height-120+100-20-20+7.5);
+					text(ceil(hp).toString() + " / " + max.toString(), width/2+150-20-100+50, height-120+100-20-20+7.5);
 					pop();
 
 					for(let m of ships[shipID].modules)
@@ -1045,7 +1092,7 @@ function click(){
 		for(let i=0; i<ships[shipID].modules.length; ++i){
 			if(mouseIn(width/2+25-25*ships[shipID].modules.length+50*i, height-120-10-25, 20, 20)){
 				if(ships[shipID].team == socket.id && ships[shipID].modules[i].state == 1){
-					if(ships[shipID].tp != null && [TP, DESTINY].includes(ships[shipID].modules[i].type))
+					if(ships[shipID].tp != null && [TP, DESTINY, RIPPLE].includes(ships[shipID].modules[i].type))
 						return;
 					if(LOCMOD.includes(ships[shipID].modules[i].type))
 						selectMove = ["module", {s: focus[1], i: i}];
@@ -1101,6 +1148,14 @@ function click(){
 					}
 				}
 			}
+
+		}else if(ships[shipID].modules[selectMove[1].i].type == RIPPLE){
+			for(let s of ships) if(s.uid == select[1])
+				if(_dist(ships[shipID].vpos, s.vpos) < RANGE[RIPPLE]){
+					socket.emit("activateModule", {gameID: gameID, shipID: selectMove[1].s,
+						i: selectMove[1].i, loc: select[1]});
+					selectMove = null;
+				}
 
 		}else{
 			selectMove = null;
