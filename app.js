@@ -22,7 +22,8 @@ function setup(){
 		element.addEventListener("contextmenu", e => e.preventDefault())
 }
 
-let ships = [], rocks = [], blasts = [], deaths = [], heals = [], emps = [], gameID = null, ROWS, COLS;
+let ships = [], rocks = [], blasts = [], deaths = [], heals = [], emps = [],
+	imps = [], gameID = null, ROWS, COLS;
 
 socket.on("reset", () => {
 	searching = 0;
@@ -58,6 +59,7 @@ socket.on("start", data => {
 	deaths = [];
 	heals = [];
 	emps = [];
+	imps = [];
 
 	camera.x = 0;
 	camera.y = 0;
@@ -109,6 +111,10 @@ socket.on("state", data => {
 
 		if(T == "emp"){
 			emps.push([D, Date.now() + 2000]);
+		}
+
+		if(T == "imp"){
+			imps.push([D, Date.now() + 2000]);
 		}
 	}
 });
@@ -498,7 +504,7 @@ function draw(){
 			}
 		}
 
-		for(let s of ships){
+		for(let s of ships) if(s.imp == 0){
 			push(); translate(width/2+(s.vpos[0]-camera.x)*camera.z, height/2+(s.vpos[1]-camera.y)*camera.z);
 			scale(sqrt(camera.z));
 
@@ -590,6 +596,23 @@ function draw(){
 		emps = emps.filter(x => x[1] > Date.now());
 		
 		push(); noStroke();
+		for(let i of imps){
+			fill(100, 255, 150, 50*min(1, (i[1]-Date.now())/800));
+			circle(...screenPos(i[0]), RANGE[DISRUPT]*2*camera.z*min(1, (Date.now()-i[1]+2000)/300));
+			stroke(100, 255, 150, 100*min(1, (i[1]-Date.now())/400)); noFill(); strokeWeight(2*sqrt(camera.z));
+			for(let j=0; j<3; ++j){
+				let a = (1-Math.pow(noise(floor(Date.now()/100), j), 2))*
+						(2*(RANGE[DISRUPT]+20)*min(1, (Date.now()-i[1]+2000)/300)-40)+40,
+					b = noise(floor(Date.now()/100)+100, j)*PI*2,
+					c = (b+noise(floor(Date.now()/100)+200, j)*PI*2)%(PI*2);
+				arc(...screenPos(i[0]), a*camera.z, a*camera.z, b, c);
+			}
+		}
+		pop();
+
+		imps = imps.filter(x => x[1] > Date.now());
+		
+		push(); noStroke();
 		for(let h of heals){
 			fill(50, 200, 50, 60*sin((h[1]-Date.now())/2000*PI));
 			circle(...screenPos(h[0]), 60*2*camera.z);
@@ -614,6 +637,15 @@ function draw(){
 					circle(...screenPos(s.vpos), RANGE[DESTINY]*2*camera.z);
 					noFill(); stroke(200, 100, 50); strokeWeight(2*sqrt(camera.z));
 					arc(...screenPos(s.vpos), RANGE[DESTINY]*2*camera.z, RANGE[DESTINY]*2*camera.z,
+						-PI/2, -PI/2+PI*2*(1+m.state));
+					pop();
+				}
+
+				if(m.type == VENG && m.state < 0){
+					push(); fill(255, 50, 50, 20); noStroke();
+					circle(...screenPos(s.vpos), RANGE[VENG]*2*camera.z);
+					noFill(); stroke(200, 50, 50); strokeWeight(2*sqrt(camera.z));
+					arc(...screenPos(s.vpos), RANGE[VENG]*2*camera.z, RANGE[VENG]*2*camera.z,
 						-PI/2, -PI/2+PI*2*(1+m.state));
 					pop();
 				}
@@ -656,6 +688,16 @@ function draw(){
 				circle(...screenPos(s.vpos), 60*2*camera.z);
 				pop();
 			}
+
+			if(s.fort > 0){
+				push(); stroke(200, 100, 50, 255*min(1, (0.5-abs(s.fort-0.5))*3)); noFill(); strokeWeight(2);
+				translate(...screenPos(s.vpos)); scale(sqrt(camera.z));
+				for(let i=0; i<6; ++i){
+					arc(0, 0, 50, 50, PI/3*i-PI/2-PI/15+Date.now()/2000, PI/3*i-PI/2+PI/15+Date.now()/2000);
+					line(21*sin(PI/3*i+Date.now()/1500), 21*cos(PI/3*i+Date.now()/1500), 17*sin(PI/3*i+Date.now()/1500), 17*cos(PI/3*i+Date.now()/1500));
+				}
+				pop();
+			}
 		}
 
 		for(let s of ships){
@@ -692,7 +734,7 @@ function draw(){
 
 			if(hp != max) rect(-15, -20, ceil(30*hp/max), 3);
 
-			for(let m of s.modules)
+			if(s.imp == 0) for(let m of s.modules)
 				if(m.type >= ALPHA && m.type <= ALLY)
 					if(m.aux[0]){
 						fill(100, 80); noStroke();
@@ -1149,7 +1191,7 @@ function click(){
 				}
 			}
 
-		}else if(ships[shipID].modules[selectMove[1].i].type == RIPPLE){
+		}else if(ships[shipID].modules[selectMove[1].i].type == RIPPLE && select[1] != selectMove[1].s){
 			for(let s of ships) if(s.uid == select[1])
 				if(_dist(ships[shipID].vpos, s.vpos) < RANGE[RIPPLE]){
 					socket.emit("activateModule", {gameID: gameID, shipID: selectMove[1].s,

@@ -52,6 +52,8 @@ DAMAGE[BARRIER] = 3000;
 DAMAGE[SOL] = 1.5;
 DAMAGE[AMP] = 2.2;
 DAMAGE[MIRROR] = 3;
+DAMAGE[FORT] = 1.15;
+DAMAGE[VENG] = 7000;
 
 LASER_DAMAGE[LASER] = [160, 292, 584];
 LASER_DAMAGE[LASER2] = [184, 312, 800];
@@ -94,10 +96,12 @@ RECHARGE_TIME[BARRIER] = 60;
 EFFECT_TIME[DELTA] = 0;
 RECHARGE_TIME[DELTA] = 60;
 
-EFFECT_TIME[RIPPLE] = 0;
 RECHARGE_TIME[RIPPLE] = 60;
 
-EFFECT_TIME[DISRUPT] = 0;
+EFFECT_TIME[VENG] = 10;
+RECHARGE_TIME[VENG] = 60;
+
+EFFECT_TIME[DISRUPT] = 6;
 RECHARGE_TIME[DISRUPT] = 60;
 
 EFFECT_TIME[DECOY] = 0;
@@ -186,6 +190,8 @@ RANGE[REPAIR] = 60;
 RANGE[EMP] = 80;
 RANGE[AMP] = 100;
 RANGE[MIRROR] = 90;
+RANGE[DISRUPT] = 70;
+RANGE[VENG] = 150;
 
 for(let i=LASER; i<=LASER2; ++i) RANGE[i] = 80;
 RANGE[DART] = 100;
@@ -236,6 +242,8 @@ class Ship{
 		this.vel = type == DARTP ? SPEED[DARTP] : 0;
 		this.expire = 1;
 		this.emp = 0;
+		this.fort = 0;
+		this.imp = 0;
 
 		for(let m of this.modules){
 			if(m.type >= LASER && m.type <= TURRETD)
@@ -289,6 +297,8 @@ class Ship{
 			uid: this.uid,
 			expire: this.expire,
 			emp: this.emp,
+			fort: this.fort,
+			imp: this.imp,
 		};
 	}
 	
@@ -297,7 +307,7 @@ class Ship{
 
 		// TODO make mirror and ally functional
 
-		for(let m of this.modules) if(dmg && m.type >= ALPHA && m.type <= MIRROR && m.aux[0]){
+		if(this.imp == 0) for(let m of this.modules) if(dmg && m.type >= ALPHA && m.type <= MIRROR && m.aux[0]){
 			if(m.type == ALPHA) return;
 
 			if(m.type == PASSIVE) m.aux[1] = 0;
@@ -367,6 +377,7 @@ class Game{
 		this.rocks = [];
 		this.uid = ++UID;
 		this.ev = [];
+		this.lifetime = 4*6;
 	}
 
 	addShip(type, team, modules, pos, move = []){
@@ -382,6 +393,8 @@ class Game{
 
 			this.ships[s].modules[dat.i].state = -1;
 		}
+
+		if(T == RIPPLE) this.ships[s].modules[dat.i].state = 0;
 
 		if(T == DELTA) this.addShip(DELTAP, this.ships[s].team, [], [...this.ships[s].pos], [[...dat.loc, dat.dock]]);
 
@@ -437,6 +450,16 @@ class Game{
 			this.ev.push(["emp", [...this.ships[s].pos]]);
 		}
 
+		if(T == DISRUPT){
+			for(let x of this.ships)
+				if(_dist(x.pos, this.ships[s].pos) < RANGE[DISRUPT])
+					x.imp = 1;
+
+			this.ev.push(["imp", [...this.ships[s].pos]]);
+		}
+
+		if(T == FORT) this.ships[s].fort = 1;
+
 		if(T == RIPPLE){
 			for(let x of this.ships) if(x.uid == dat.loc){
 				const W = x.wait;
@@ -486,6 +509,9 @@ class Game{
 				if(s.modules[i].state == 0 && T >= ALPHA && T <= ALLY)
 					s.modules[i].state = EFFECT_TIME[T]/RECHARGE_TIME[T];
 			}
+
+			if(T == RIPPLE)
+				s.modules[i].state = Math.min(0.75, s.modules[i].state+0.75/(RECHARGE_TIME[T]*4));
 
 			if(T == TURRETD)
 				s.modules[i].state = Math.min(1, s.modules[i].state+1/(RECHARGE_TIME[T]*4));
@@ -592,6 +618,28 @@ class Game{
 				if(s.modules[i].blast[1] && --s.modules[i].blast[1] == 1)
 					this.explode([...s.pos], RANGE[MIRROR], 3);
 			}
+
+			if(T == VENG){
+				if(S == 0){
+					for(let x of this.ships)
+						if(x.team != s.team)
+							if(_dist(x.pos, s.pos) < RANGE[VENG])
+								x.hurt(DAMAGE[VENG]);
+
+					this.explode([...s.pos], RANGE[VENG], 9);
+				}
+				
+				if(S == 1 && s.hp <= 2000){
+					s.modules[i].state = -1;
+
+					for(let i=0; i<this.ships.length; ++i)
+						if(this.ships[i].uid == s.uid)
+							for(let j=0; j<s.modules.length; ++j)
+								if(s.modules[j].type >= ALPHA && s.modules[j].type <= ALLY
+									&& s.modules[j].state == 1)
+									this.activateModule(i, {i: j});
+				}
+			}
 		}
 	}
 
@@ -623,7 +671,13 @@ class Game{
 	}
 
 	update(){
-		for(let s of this.ships) s.emp = Math.max(0, s.emp - 1/(4*EFFECT_TIME[EMP]));
+		if(!this.alive()) this.lifetime = Math.max(0, this.lifetime-1);
+
+		for(let s of this.ships){
+			s.emp = Math.max(0, s.emp - 1/(4*EFFECT_TIME[EMP]));
+			s.fort = Math.max(0, s.fort - 1/(4*EFFECT_TIME[FORT]));
+			s.imp = Math.max(0, s.imp - 1/(4*EFFECT_TIME[DISRUPT]));
+		}
 
 		let locked = new Set();
 
@@ -633,7 +687,7 @@ class Game{
 					if(_dist(x.pos, s.pos) < RANGE[BARRIER])
 						locked.add(x.uid);
 
-		for(let s of this.ships) if(!s.emp && !locked.has(s.uid)) s.travel();
+		for(let s of this.ships) if(!s.emp && !locked.has(s.uid) && !s.fort) s.travel();
 
 		{
 			let X = new Array(this.rocks.length);
@@ -736,7 +790,9 @@ class Game{
 						// TODO this switches off multi-sol tactic
 						//if(m.state) sol[M.get(s.uid)] = DAMAGE[SOL];
 						if(m.state) sol[M.get(s.uid)] *= DAMAGE[SOL];
-					}
+
+					}else if(m.type == FORT && m.state < 0)
+						sol[M.get(s.uid)] *= DAMAGE[FORT];
 
 			for(let s of this.ships) if(!s.emp)
 				for(let m of s.modules)
@@ -755,6 +811,14 @@ class Game{
 		}
 
 		for(let s of this.ships) this.updateModules(s);
+
+		let targets = new Array(this.ships.length).fill(0);
+
+		for(let i=0; i<this.ships.length; ++i) for(let m of this.ships[i].modules)
+			if(m.type >= LASER && m.type <= TURRETD) targets[i] += m.aux.length;
+
+		for(let i=0; i<this.ships.length; ++i) for(let m of this.ships[i].modules)
+			if(m.type == RIPPLE) if(targets[i] == 0 && m.state == 0.75) m.state = 1;
 
 		for(let s of this.ships) if(s.hp){
 			if(!s.move.length){

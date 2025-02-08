@@ -87,7 +87,7 @@ function tick(game){
 		for(let g of games){
 			tick(g);
 
-			if(!g.alive()){
+			if(g.lifetime == 0){
 				g.end();
 
 				let p = [];
@@ -96,7 +96,7 @@ function tick(game){
 			}
 		}
 
-		games = games.filter(x => x.alive(BS) > 0);
+		games = games.filter(x => x.lifetime > 0);
 	}
 }
 
