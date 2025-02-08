@@ -520,6 +520,11 @@ function draw(){
 				}
 
 				if(m.type == IMPULSE){
+					if(m.aux[2]){
+						fill(200, 100, 50, 100); noStroke();
+						circle(0, 0, RANGE[IMPULSE]*2*sqrt(camera.z));
+					}
+
 					stroke(50, 150, 150, 40); noFill(); strokeWeight(3);
 					arc(0, 0, 55-3, 55-3, -PI*0.25+frameCount/30, PI*0.25+frameCount/30);
 					arc(0, 0, 55-3, 55-3, PI-PI*0.25+frameCount/30, PI+PI*0.25+frameCount/30);
@@ -1205,5 +1210,87 @@ function click(){
 
 	}else{
 		focus = select && (!focus || focus[0] != select[0] || focus[1] != select[1]) ? [...select] : null;
+	}
+}
+
+function keyReleased(){
+	if(!staging && connected){
+		if(focus && shipID != null && selectMove == null){
+			const keys = ['a', 's', 'd', 'f', 'g'];
+
+			for(let i=0; i<ships[shipID].modules.length; ++i){
+				if(key == keys[i]){
+					if(ships[shipID].team == socket.id && ships[shipID].modules[i].state == 1){
+						if(ships[shipID].tp != null && [TP, DESTINY, RIPPLE].includes(ships[shipID].modules[i].type))
+							return;
+						if(LOCMOD.includes(ships[shipID].modules[i].type))
+							selectMove = ["module", {s: focus[1], i: i}];
+						else socket.emit("activateModule", {gameID: gameID, shipID: focus[1], i: i});
+					}
+					return;
+				}
+			}
+		}
+
+		if(focus && selectMove == null){
+			if(shipID != null){
+				let canMove = ships[shipID].team == socket.id &&
+					ships[shipID].type == BS && ships[shipID].tp == null,
+					canStop = canMove && ships[shipID].wait;
+				if(canMove && (ships[shipID].move.length > 1 || canStop) &&
+					key == 'x'){
+					socket.emit("cancelMove", {gameID: gameID, shipID: focus[1]});
+				}
+				if(canMove && key == 'e'){
+					if(canStop) socket.emit("confirmMove", {gameID: gameID, shipID: focus[1]});
+					else selectMove = ["ship", focus[1]];
+				}
+			}
+
+		}/*else if(focus && selectMove != null){
+
+			if(mouseIn(width/2, height-40, 150, 20)){
+				if(mouseIn(width/2+77+65/2, height-42, 40, 20)){
+					selectMove = null;
+				}
+
+			}else if(select && select[0] == "rock"){
+				if(selectMove[0] == "ship"){
+					socket.emit("move", {
+						gameID: gameID, shipID: selectMove[1],
+						pos: [rocks[select[1]][0], rocks[select[1]][1]+10],
+						dock: select[1]
+					});
+					selectMove = null;
+					
+				}else if(selectMove[0] == "module"){
+					const P = [rocks[select[1]][0], rocks[select[1]][1]+10];
+
+					if(RANGE[ships[shipID].modules[selectMove[1].i].type] == null ||
+						_dist(P, ships[shipID].vpos) < RANGE[ships[shipID].modules[selectMove[1].i].type]){
+						if(ships[shipID].modules[selectMove[1].i].type != DELTA || ships[shipID].move.length > 0
+							|| (ships[shipID].move.length == 0 && select[1] != ships[shipID].dock)){
+							socket.emit("activateModule", {gameID: gameID, shipID: selectMove[1].s,
+								i: selectMove[1].i, loc: P, dock: select[1]});
+							selectMove = null;
+						}
+					}
+				}
+
+			}else if(ships[shipID].modules[selectMove[1].i].type == RIPPLE && select[1] != selectMove[1].s){
+				for(let s of ships) if(s.uid == select[1])
+					if(_dist(ships[shipID].vpos, s.vpos) < RANGE[RIPPLE]){
+						socket.emit("activateModule", {gameID: gameID, shipID: selectMove[1].s,
+							i: selectMove[1].i, loc: select[1]});
+						selectMove = null;
+					}
+
+			}else{
+				selectMove = null;
+			}
+
+		}else{
+			focus = select && (!focus || focus[0] != select[0] || focus[1] != select[1]) ? [...select] : null;
+		}*/
 	}
 }

@@ -54,6 +54,7 @@ DAMAGE[AMP] = 2.2;
 DAMAGE[MIRROR] = 3;
 DAMAGE[FORT] = 1.15;
 DAMAGE[VENG] = 7000;
+DAMAGE[IMPULSE] = 600;
 
 LASER_DAMAGE[LASER] = [160, 292, 584];
 LASER_DAMAGE[LASER2] = [184, 312, 800];
@@ -167,6 +168,8 @@ SPEED[DARTP] = 25;
 SPEED[ROCKETP] = 70;
 SPEED[DELTAP] = 110;
 
+SPEED[IMPULSE] = 2;
+
 HP[BS] = 7000;
 HP[SENTINEL] = 600;
 HP[GUARD] = 5600;
@@ -192,6 +195,7 @@ RANGE[AMP] = 100;
 RANGE[MIRROR] = 90;
 RANGE[DISRUPT] = 70;
 RANGE[VENG] = 150;
+RANGE[IMPULSE] = 55;
 
 for(let i=LASER; i<=LASER2; ++i) RANGE[i] = 80;
 RANGE[DART] = 100;
@@ -252,6 +256,9 @@ class Ship{
 			else if(m.type == PASSIVE)
 				m.aux = [1, 1];
 
+			else if(m.type == IMPULSE)
+				m.aux = [0, 0, 0];
+
 			else if(m.type >= ALPHA && m.type <= ALLY)
 				m.aux = [0, 0];
 
@@ -305,7 +312,7 @@ class Ship{
 	hurt(x){
 		let dmg = x;
 
-		// TODO make mirror and ally functional
+		// TODO make ally functional
 
 		if(this.imp == 0) for(let m of this.modules) if(dmg && m.type >= ALPHA && m.type <= MIRROR && m.aux[0]){
 			if(m.type == ALPHA) return;
@@ -362,7 +369,12 @@ class Ship{
 				this.pos[1] += dir[1]*dist;
 			}
 
-			this.vel = Math.min(this.vel+8, SPEED[this.type]);
+			let S = SPEED[this.type];
+
+			for(let m of this.modules) if(m.type == IMPULSE && m.aux[2])
+				S *= SPEED[IMPULSE];
+
+			this.vel = Math.min(this.vel+8, S);
 
 		}else{
 			this.vel = 0;
@@ -388,7 +400,10 @@ class Game{
 		const T = this.ships[s].modules[dat.i].type;
 
 		if(ACTIVATED[T]){
-			if(T >= ALPHA && T <= ALLY)
+			if(T == IMPULSE)
+				this.ships[s].modules[dat.i].aux = [1, 1, 1];
+
+			else if(T >= ALPHA && T <= ALLY)
 				this.ships[s].modules[dat.i].aux = [1, 1];
 
 			this.ships[s].modules[dat.i].state = -1;
@@ -500,14 +515,19 @@ class Game{
 			if(EFFECT_TIME[T] != null){
 				if(s.modules[i].state < 0)
 					s.modules[i].state = Math.min(0, s.modules[i].state+1/(1+EFFECT_TIME[T]*4));
-				else if(s.modules[i].state != 1){
-					if(T >= ALPHA && T <= ALLY)
+				else{
+					if(T == IMPULSE)
+						s.modules[i].state = Math.min(0.75, s.modules[i].state+0.75/(RECHARGE_TIME[T]*4));
+					else if(T >= ALPHA && T <= ALLY)
 						s.modules[i].state = Math.min(1, s.modules[i].state+1/(RECHARGE_TIME[T]*4));
 					else s.modules[i].state = Math.min(1, s.modules[i].state+1/((RECHARGE_TIME[T]-EFFECT_TIME[T])*4));
 				}
 
-				if(s.modules[i].state == 0 && T >= ALPHA && T <= ALLY)
-					s.modules[i].state = EFFECT_TIME[T]/RECHARGE_TIME[T];
+				if(s.modules[i].state == 0 && T >= ALPHA && T <= ALLY){
+					if(T == IMPULSE)
+						s.modules[i].state = 0.75*EFFECT_TIME[T]/RECHARGE_TIME[T];
+					else s.modules[i].state = EFFECT_TIME[T]/RECHARGE_TIME[T];
+				}
 			}
 
 			if(T == RIPPLE)
@@ -593,6 +613,17 @@ class Game{
 				}
 			}
 
+			if(T == IMPULSE){
+				if(1+S > 10/EFFECT_TIME[T] || (s.modules[i].aux[2] && s.move.length == 0))
+					s.modules[i].aux[2] = 0;
+
+				if(s.modules[i].aux[2] == 1)
+					for(let x of this.ships)
+						if(x.team != s.team)
+							if(_dist(x.pos, s.pos) < RANGE[IMPULSE])
+								x.hurt(DAMAGE[IMPULSE]);
+			}
+
 			if(T == PASSIVE){
 				s.modules[i].aux[1] = Math.min(1, s.modules[i].aux[1]+1/(4*PASSIVE_DELAY));
 
@@ -600,7 +631,15 @@ class Game{
 					s.modules[i].aux[0] = Math.min(1, s.modules[i].aux[0]+1/(4*PASSIVE_TIME));
 
 			}else if(T >= ALPHA && T <= ALLY){
-				if(s.modules[i].aux[0] <= 0) s.modules[i].aux[1] = 0;
+				if(s.modules[i].aux[0] <= 0){
+					s.modules[i].aux[1] = 0;
+					if(S < 0){
+						if(T == IMPULSE)
+							s.modules[i].state = (1+s.modules[i].state)*0.75*EFFECT_TIME[T]/RECHARGE_TIME[T];
+						else s.modules[i].state = (1+s.modules[i].state)*EFFECT_TIME[T]/RECHARGE_TIME[T];
+					}
+				}
+
 				s.modules[i].aux[1] = Math.max(0, s.modules[i].aux[1]-1/(4*EFFECT_TIME[T]));
 				if(!s.modules[i].aux[1]) s.modules[i].aux[0] = 0;
 			}
@@ -817,8 +856,10 @@ class Game{
 		for(let i=0; i<this.ships.length; ++i) for(let m of this.ships[i].modules)
 			if(m.type >= LASER && m.type <= TURRETD) targets[i] += m.aux.length;
 
-		for(let i=0; i<this.ships.length; ++i) for(let m of this.ships[i].modules)
-			if(m.type == RIPPLE) if(targets[i] == 0 && m.state == 0.75) m.state = 1;
+		for(let i=0; i<this.ships.length; ++i) for(let m of this.ships[i].modules){
+			if(m.type == RIPPLE && targets[i] == 0 && m.state == 0.75) m.state = 1;
+			if(m.type == IMPULSE && this.ships[i].move.length > 0 && m.state == 0.75) m.state = 1;
+		}
 
 		for(let s of this.ships) if(s.hp){
 			if(!s.move.length){
