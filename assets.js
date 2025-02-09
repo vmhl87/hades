@@ -1067,6 +1067,7 @@ function drawModule2(T, S){
 
 	fill(255, 40);
 	if(T >= LASER && T <= TURRETD) fill(255, 50, 50, 60);
+	if(T >= SENTINEL && T <= COL) fill(255, 50, 50, 60);
 	if(T >= ALPHA && T <= ALLY) fill(0, 255, 255, 60);
 	if(T >= EMP && T <= VENG) fill(100, 255, 100, 60);
 	if(T >= DECOY && T <= TURRET) fill(255, 100, 0, 60);

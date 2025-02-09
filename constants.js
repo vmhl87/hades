@@ -72,7 +72,7 @@ for(let i=SENTINEL; i<=COL; ++i) RANGE[i] = 80;
 
 function weaponRange(T){
 	if(T >= LASER && T <= TURRETD) return RANGE[T];
-	if(T >= SENTINEL && T <= COL) return RANGE[t];
+	if(T >= SENTINEL && T <= COL) return RANGE[T];
 	return null;
 }
 

@@ -224,8 +224,14 @@ LASER_CHARGE[COL] = [10, 20];
 
 const PASSIVE_DELAY = 6, PASSIVE_TIME = 48;
 
+const CERB = 3.14;
+
 function _dist(a, b){
 	return Math.sqrt((a[0]-b[0])*(a[0]-b[0]) + (a[1]-b[1])*(a[1]-b[1]));
+}
+
+function IS_WEAPON(T){
+	return (T >= LASER && T <= TURRETD) || (T >= SENTINEL && T <= COL);
 }
 
 let UID = 0;
@@ -252,7 +258,7 @@ class Ship{
 		this.ally = null;
 
 		for(let m of this.modules){
-			if(m.type >= LASER && m.type <= TURRETD)
+			if(IS_WEAPON(m.type))
 				m.aux = [];
 
 			else if(m.type == PASSIVE)
@@ -401,6 +407,7 @@ class Game{
 		this.uid = ++UID;
 		this.ev = [];
 		this.lifetime = 4*6;
+		this.age = 0;
 	}
 
 	addShip(type, team, modules, pos, move = []){
@@ -770,7 +777,7 @@ class Game{
 
 		for(let s of this.ships){
 			for(let m of s.modules){
-				if(m.type >= LASER && m.type <= TURRETD &&
+				if(IS_WEAPON(m.type) &&
 					(![BATTERY, TURRETD].includes(m.type) || m.state == 1)){
 					let targets = [], decoys = [];
 
@@ -822,11 +829,9 @@ class Game{
 					}
 
 					while(m.aux.length < TARGETS[m.type] && targets.length){
-						m.aux.push(targets[0][1]);
-						targets = targets.slice(1);
+						const R = Math.floor(Math.random()*targets.length);
+						m.aux.push(targets.splice(R, 1)[0][1]);
 					}
-					
-					 console.log("res", m.aux);
 
 				if(orig != null && [LASER, COL, BATTERY].includes(m.type)
 					&& (!m.aux.length || m.aux[0] != orig)){
@@ -869,7 +874,7 @@ class Game{
 
 			for(let s of this.ships) if(!s.emp)
 				for(let m of s.modules)
-					if(m.type >= LASER && m.type <= TURRETD &&
+					if(IS_WEAPON(m.type) &&
 						(m.type != BATTERY || m.state == 1)){
 						const D = DAMAGE[m.type] != null ? DAMAGE[m.type] :
 							(LASER_DAMAGE[m.type] != null ? LASER_DAMAGE[m.type][
@@ -892,7 +897,7 @@ class Game{
 		let targets = new Array(this.ships.length).fill(0);
 
 		for(let i=0; i<this.ships.length; ++i) for(let m of this.ships[i].modules)
-			if(m.type >= LASER && m.type <= TURRETD) targets[i] += m.aux.length;
+			if(IS_WEAPON(m.type)) targets[i] += m.aux.length;
 
 		for(let i=0; i<this.ships.length; ++i) for(let m of this.ships[i].modules){
 			// TODO old ripple behavior
@@ -975,6 +980,35 @@ class Game{
 			}
 		}
 
+		// spawn cerberus
+
+		if(this.age % (TPS*5) == 0){
+			let COUNT = new Array(4).fill(0);
+
+			// TODO not futureproof
+
+			for(let s of this.ships)
+				if(s.type >= SENTINEL && s.type <= COL)
+					++COUNT[s.type-SENTINEL];
+
+			const OPTIMAL = [0.75, 0.75, 0.5, 0.3];
+
+			let idx = [];
+
+			for(let i=0; i<4; ++i) if(COUNT[i] < OPTIMAL[i]*ROWS*COLS)
+				idx.push(i);
+
+			if(idx.length){
+				const I = idx[Math.floor(Math.random()*idx.length)];
+				const J = Math.floor(Math.random()*this.rocks.length);
+				const P = this.rocks[J];
+				this.addShip(SENTINEL+I, CERB, [SENTINEL+I], [P[0], P[1]+10-300*ROWS*10], []);
+				this.ships[this.ships.length-1].dock = J;
+			}
+		}
+
+		// ---
+
 		let q = [];
 		for(let s of this.ships){
 			if(s.hp > 0) q.push(s.encode());
@@ -987,6 +1021,8 @@ class Game{
 		for(let p of this.players) p.emit("state", {s: q, ev: [...this.ev]});
 
 		this.ev = [];
+		
+		++this.age;
 	}
 
 	end(){
