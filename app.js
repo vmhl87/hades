@@ -140,7 +140,7 @@ function main(){
 		pop();
 
 		if(ALLMODULE){
-			for(let i=0; i<5; ++i){
+			if(!MOBILE || chooseModule == -1) for(let i=0; i<5; ++i){
 				push(); translate(width/2-100+50*i, height/2+50);
 				drawModule2(modules[i], mouseIn(width/2-100+i*50, height/2+50, 20, 20) ? 1 : 0);
 				pop();
@@ -265,10 +265,14 @@ function main(){
 			}
 
 			if(chooseModule < -1){
-				for(let i=0; i<7; ++i){
-					fill(255, 50, 50, mouseIn(width/2-150+i*50, height/2+125, 20, 20) ? 80 : 60);
-					rect(width/2-170+i*50, height/2+105, 40, 40);
-					push(); translate(width/2-150+i*50, height/2+125);
+				if(MOBILE){
+					push(); translate(0, -100);
+				}
+
+				for(let i=0; i<6; ++i){
+					fill(255, 50, 50, mouseIn(width/2-125+i*50, height/2+125, 20, 20) ? 80 : 60);
+					rect(width/2-145+i*50, height/2+105, 40, 40);
+					push(); translate(width/2-125+i*50, height/2+125);
 					drawModule(LASER+i);
 					pop();
 				}
@@ -314,6 +318,8 @@ function main(){
 					drawModule(DECOY+i);
 					pop();
 				}
+
+				if(MOBILE) pop();
 			}
 		}
 
@@ -363,7 +369,7 @@ function main(){
 				(-300*COLS/2+i*300)*camera.z, 300*ROWS/2*camera.z);
 		pop();
 
-		if(selectMove != null){
+		if(selectMove != null && !MOBILE){
 			fill(255, 255, 100, 15); noStroke();
 			let x = selected();
 
@@ -983,8 +989,10 @@ function stagingUI(){
 	if(!searching){
 		if(ALLMODULE){
 			for(let i=0; i<5; ++i)
-				if(mouseIn(width/2-100+i*50, height/2+50, 20, 20))
+				if(mouseIn(width/2-100+i*50, height/2+50, 20, 20)){
 					chooseModule = chooseModule == i-10 ? -1 : i-10;
+					return;
+				}
 
 		}else{
 			if(mouseIn(width/2-100, height/2+50, 20, 20)){
@@ -1085,36 +1093,38 @@ function stagingUI(){
 		}
 
 	}else if(chooseModule < -1){
-		for(let i=0; i<7; ++i){
-			if(mouseIn(width/2-150+i*50, height/2+125, 20, 20)){
+		const OFFSET = MOBILE ? 100 : 0;
+
+		for(let i=0; i<6; ++i){
+			if(mouseIn(width/2-125+i*50, height/2+125-OFFSET, 20, 20)){
 				modules[chooseModule+10] = modules[chooseModule+10] == LASER+i ? null : LASER+i;
 				chooseModule = -1;
 			}
 		}
 
 		for(let i=0; i<6; ++i){
-			if(mouseIn(width/2-125+i*50, height/2+175, 20, 20)){
+			if(mouseIn(width/2-125+i*50, height/2+175-OFFSET, 20, 20)){
 				modules[chooseModule+10] = modules[chooseModule+10] == ALPHA+i ? null : ALPHA+i;
 				chooseModule = -1;
 			}
 		}
 
 		for(let i=0; i<5; ++i){
-			if(mouseIn(width/2-100+i*50, height/2+225, 20, 20)){
+			if(mouseIn(width/2-100+i*50, height/2+225-OFFSET, 20, 20)){
 				modules[chooseModule+10] = modules[chooseModule+10] == EMP+i ? null : EMP+i;
 				chooseModule = -1;
 			}
 		}
 
 		for(let i=0; i<6; ++i){
-			if(mouseIn(width/2-125+i*50, height/2+275, 20, 20)){
+			if(mouseIn(width/2-125+i*50, height/2+275-OFFSET, 20, 20)){
 				modules[chooseModule+10] = modules[chooseModule+10] == EMP+5+i ? null : EMP+5+i;
 				chooseModule = -1;
 			}
 		}
 
 		for(let i=0; i<4; ++i){
-			if(mouseIn(width/2-75+i*50, height/2+325, 20, 20)){
+			if(mouseIn(width/2-75+i*50, height/2+325-OFFSET, 20, 20)){
 				modules[chooseModule+10] = modules[chooseModule+10] == DECOY+i ? null : DECOY+i;
 				chooseModule = -1;
 			}

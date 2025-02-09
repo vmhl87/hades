@@ -623,7 +623,7 @@ class Game{
 					for(let x of this.ships)
 						if(x.team != s.team)
 							if(_dist(x.pos, s.pos) < RANGE[IMPULSE])
-								x.hurt(DAMAGE[IMPULSE]);
+								x.hurt(DAMAGE[IMPULSE]/TPS);
 			}
 
 			if(T == PASSIVE){

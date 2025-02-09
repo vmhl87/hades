@@ -127,19 +127,23 @@ function _lerp(a, b, c){
 let select = null, moved, shipID = null, selectMove = null;
 
 function selected(){
+	return selectedPos([mouseX, mouseY]);
+}
+
+function selectedPos(pos){
 	let opt = [];
 
 	if(selectMove == null || selectMove[0] != "module" ||
 	ships[shipID].modules[selectMove[1].i].type != RIPPLE)
 		for(let i=0; i<rocks.length; ++i){
-			const d = _dist(screenPos(rocks[i]), [mouseX, mouseY]);
+			const d = _dist(screenPos(rocks[i]), pos);
 			if(d < 50) opt.push([d, ["rock", i]]);
 		}
 
 	if(selectMove == null || (selectMove[0] == "module" &&
 	ships[shipID].modules[selectMove[1].i].type == RIPPLE))
 		for(let i=0; i<ships.length; ++i){
-			const d = _dist(screenPos(ships[i].pos), [mouseX, mouseY]);
+			const d = _dist(screenPos(ships[i].pos), pos);
 			if(d < 50) opt.push([d-20, ["ship", ships[i].uid]]);
 		}
 
@@ -161,10 +165,12 @@ let focus = null;
 let posTouches = new Map(), movedTouches = new Set();
 
 function mousePressed(){
-	moved = false;
-	startMouseX = mouseX;
-	startMouseY = mouseY;
-	select = selected();
+	if(!MOBILE){
+		moved = false;
+		startMouseX = mouseX;
+		startMouseY = mouseY;
+		select = selected();
+	}
 }
 
 let lastMouse = [], ALLMODULE = false, SECDISP = [0];
@@ -183,23 +189,33 @@ function mobileClick(P){
 			&& _dist(lastMouse[0][1], lastMouse[1][1]) > 50
 			&& _dist(lastMouse[1][1], lastMouse[2][1]) > 50
 		){
-			ALLMODULE = true;
-			modules = [null, null, null, null, null];
-			SECDISP = [100, []];
-			for(let i=0; i<3; ++i) SECDISP[1].push([...lastMouse[i][1]]);
+			if(ALLMODULE){
+				ALLMODULE = false;
+				if(localStorage.getItem("modules"))
+					modules = JSON.parse(localStorage.getItem("modules"));
+				SECDISP = [100, []];
+				for(let i=0; i<3; ++i) SECDISP[1].push([...lastMouse[i][1]]);
+			}else{
+				ALLMODULE = true;
+				modules = [null, null, null, null, null];
+				SECDISP = [100, []];
+				for(let i=0; i<3; ++i) SECDISP[1].push([...lastMouse[i][1]]);
+			}
 		}
 
 		stagingUI();
 
-	}else if(connected && !moved && _dist(P.last, P.first) < 20){
-		let s = selected();
-		if(!s || (s[0] == select[0] && s[1] == select[1])){
-			click();
-		}
+	}else if(connected){
+		const s = selectedPos(P.last);
+		if(s == null && select == null) click();
+		else if(s == null || select == null) return;
+		else if(s[0] == select[0] && s[1] == select[1]) click();
 	}
 }
 
 function mouseReleased(){
+	if(MOBILE) return;
+
 	if(staging){
 		lastMouse.push([Date.now(), [mouseX, mouseY]]);
 		if(lastMouse.length > 3) lastMouse = lastMouse.slice(1);
@@ -213,10 +229,18 @@ function mouseReleased(){
 			&& _dist(lastMouse[0][1], lastMouse[1][1]) > 50
 			&& _dist(lastMouse[1][1], lastMouse[2][1]) > 50
 		){
-			ALLMODULE = true;
-			modules = [null, null, null, null, null];
-			SECDISP = [100, []];
-			for(let i=0; i<3; ++i) SECDISP[1].push([...lastMouse[i][1]]);
+			if(ALLMODULE){
+				ALLMODULE = false;
+				if(localStorage.getItem("modules"))
+					modules = JSON.parse(localStorage.getItem("modules"));
+				SECDISP = [100, []];
+				for(let i=0; i<3; ++i) SECDISP[1].push([...lastMouse[i][1]]);
+			}else{
+				ALLMODULE = true;
+				modules = [null, null, null, null, null];
+				SECDISP = [100, []];
+				for(let i=0; i<3; ++i) SECDISP[1].push([...lastMouse[i][1]]);
+			}
 		}
 
 		stagingUI();
@@ -233,18 +257,21 @@ function echo(...x){
 	socket.emit("echo", x);
 }
 
-let clicks = [];
-
 function draw(){
-	if(touches.length) MOBILE = true;
+	if(touches.length && !MOBILE){
+		MOBILE = true;
+		frameRate(40);
+	}
 
-	if(!staging && mouseIsPressed){
-		const dist = _dist([mouseX, mouseY], [lastMouseX, lastMouseY]);
-		if(dist > 0.5){
-			camera.x += (lastMouseX-mouseX)/camera.z;
-			camera.y += (lastMouseY-mouseY)/camera.z;
+	if(!staging){
+		if(!MOBILE && mouseIsPressed){
+			const dist = _dist([mouseX, mouseY], [lastMouseX, lastMouseY]);
+			if(dist > 0.5){
+				camera.x += (lastMouseX-mouseX)/camera.z;
+				camera.y += (lastMouseY-mouseY)/camera.z;
+			}
+			if(dist > 4) moved = true;
 		}
-		if(dist > 4) moved = true;
 	}
 
 	lastMouseX = mouseX;
@@ -253,21 +280,9 @@ function draw(){
 	if(MOBILE) updateTouch();
 
 	main();
-
-	for(let c of clicks){
-		fill(255, 15*min(1, (100-c[2])/40)); noStroke();
-		circle(c[0], c[1], min(100, c[2]*4));
-		c[2] += 2;
-	}
-
-	fill(255, 15);
-
-	for(let t of touches){
-		circle(t.x, t.y, 150);
-	}
-
-	clicks = clicks.filter(x => x[2] < 100);
 }
+
+let lockID = null, offset = [0, 0], ctlState = 0;
 
 function updateTouch(){
 	let S = new Set();
@@ -278,12 +293,44 @@ function updateTouch(){
 		if(posTouches.has(t.id)){
 			const P = posTouches.get(t.id);
 
-			if(_dist(P.first, [t.x, t.y]) > 50)
+			if(_dist(P.first, [t.x, t.y]) > 20)
 				movedTouches.add(t.id);
 
 			P.last = [t.x, t.y];
 
 		}else posTouches.set(t.id, {first: [t.x, t.y], last: [t.x, t.y]});
+	}
+
+	if(!staging) if(touches.length == 1){
+		if(ctlState == 1 || ctlState == 0){
+			if(movedTouches.has(touches[0].id)){
+				ctlState = 1;
+
+				if(lockID == touches[0].id){
+					const P = posTouches.get(touches[0].id);
+					camera.x = offset[0] + (P.first[0]-P.last[0])/camera.z;
+					camera.y = offset[1] + (P.first[1]-P.last[1])/camera.z;
+
+				}else{
+					lockID = touches[0].id;
+					offset = [camera.x, camera.y];
+				}
+			}
+		}
+
+	}else if(touches.length == 2){
+		ctlState = 2;
+
+		if(lockID == touches[0].id+touches[1].id){
+			const D = _dist([touches[0].x, touches[0].y], [touches[1].x, touches[1].y]);
+
+			camera.z = offset[0]*D/offset[1];
+			camera.z = min(10, max(0.3, camera.z));
+
+		}else{
+			lockID = touches[0].id+touches[1].id;
+			offset = [camera.z, _dist([touches[0].x, touches[0].y], [touches[1].x, touches[1].y])];
+		}
 	}
 
 	let rem = [];
@@ -293,10 +340,9 @@ function updateTouch(){
 
 	for(let k of rem){
 		if(movedTouches.has(k)) movedTouches.delete(k);
-		else if(touches.length == 0){
+		else if(touches.length == 0 && ctlState == 0){
 			const P = posTouches.get(k);
 			mobileClick({first: [...P.first], last: [...P.last]});
-			clicks.push([...P.last, 0]);
 		}
 
 		posTouches.delete(k);
@@ -305,11 +351,16 @@ function updateTouch(){
 }
 
 function touchStarted(){
+	if(touches.length == 1 && !posTouches.has(touches[0].id)){
+		select = selectedPos([touches[0].x, touches[0].y]);
+		echo("init", select);
+	}
 	updateTouch();
 }
 
 function touchEnded(){
 	updateTouch();
+	if(touches.length == 0) ctlState = 0;
 }
 
 function windowResized(){
