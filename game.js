@@ -39,7 +39,7 @@ STRENGTH[IMPULSE] = 2250;
 STRENGTH[PASSIVE] = 3500;
 STRENGTH[OMEGA] = 4500;
 STRENGTH[MIRROR] = 1000;
-STRENGTH[ALLY] = 600;
+STRENGTH[ALLY] = 1500;
 
 DAMAGE[BATTERY] = 284;
 DAMAGE[MASS] = 210;
@@ -196,6 +196,7 @@ RANGE[MIRROR] = 90;
 RANGE[DISRUPT] = 70;
 RANGE[VENG] = 150;
 RANGE[IMPULSE] = 55;
+RANGE[ALLY] = 90;
 
 for(let i=LASER; i<=LASER2; ++i) RANGE[i] = 80;
 RANGE[DART] = 100;
@@ -248,6 +249,7 @@ class Ship{
 		this.emp = 0;
 		this.fort = 0;
 		this.imp = 0;
+		this.ally = null;
 
 		for(let m of this.modules){
 			if(m.type >= LASER && m.type <= TURRETD)
@@ -306,6 +308,7 @@ class Ship{
 			emp: this.emp,
 			fort: this.fort,
 			imp: this.imp,
+			ally: this.ally,
 		};
 	}
 	
@@ -313,6 +316,14 @@ class Ship{
 		let dmg = x;
 
 		// TODO make ally functional
+
+		if(this.ally != null){
+			const rem = Math.min(Math.ceil(this.ally[0].modules[this.ally[1]].aux[0]*STRENGTH[ALLY]), dmg);
+
+			this.ally[0].modules[this.ally[1]].aux[0] = Math.max(0,
+				this.ally[0].modules[this.ally[1]].aux[0]-rem/STRENGTH[ALLY]);
+			dmg -= rem;
+		}
 
 		if(this.imp == 0) for(let m of this.modules) if(dmg && m.type >= ALPHA && m.type <= MIRROR && m.aux[0]){
 			if(m.type == ALPHA) return;
@@ -626,6 +637,14 @@ class Game{
 								x.hurt(DAMAGE[IMPULSE]/TPS);
 			}
 
+			if(T == ALLY && s.modules[i].aux[0] > 0 && s.imp == 0){
+				for(let x of this.ships)
+					if(x.team == s.team && x.uid != s.uid)
+						if(_dist(x.pos, s.pos) < RANGE[ALLY])
+							if(x.ally == null || x.ally[0].modules[x.ally[1]].aux[0] < s.modules[i].aux[0])
+								x.ally = [s, i];
+			}
+
 			if(T == PASSIVE){
 				s.modules[i].aux[1] = Math.min(1, s.modules[i].aux[1]+1/(TPS*PASSIVE_DELAY));
 
@@ -850,6 +869,10 @@ class Game{
 							}
 					}
 		}
+
+		for(let s of this.ships) if(s.ally)
+			if(s.ally[0].modules[s.ally[1]].type != ALLY || s.ally[0].modules[s.ally[1]].aux[0] <= 0
+				|| _dist(s.ally[0].pos, s.pos) > RANGE[ALLY] || s.ally[0].imp > 0) s.ally = null;
 
 		for(let s of this.ships) this.updateModules(s);
 

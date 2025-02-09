@@ -709,6 +709,11 @@ function main(){
 				arc(0, 0, 35, 35, -PI*0.25, PI*0.25);
 				arc(0, 0, 35, 35, PI-PI*0.25, PI+PI*0.25);
 			}
+			if(s.ally != null){
+				stroke(50, 200, 200); noFill(); strokeWeight(2);
+				arc(0, 0, 40, 40, -PI*0.25, PI*0.25);
+				arc(0, 0, 40, 40, PI-PI*0.25, PI+PI*0.25);
+			}
 			if(s.type == TURRET && s.modules[0].state < 1){
 				stroke(50, 150, 200, 150*(1-s.modules[0].state)); noFill(); strokeWeight(2);
 				for(let i=0; i<3; ++i)
@@ -1140,6 +1145,11 @@ function stagingUI(){
 }
 
 function click(){
+	if(mouseIn(30, 30, 30, 30)){
+		socket.emit("quit");
+		return;
+	}
+
 	if(focus && shipID != null && selectMove == null){
 		for(let i=0; i<ships[shipID].modules.length; ++i){
 			if(mouseIn(width/2+25-25*ships[shipID].modules.length+50*i, height-120-10-25, 20, 20)){
