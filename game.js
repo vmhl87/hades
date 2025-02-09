@@ -56,7 +56,7 @@ DAMAGE[FORT] = 1.15;
 DAMAGE[VENG] = 7000;
 DAMAGE[IMPULSE] = 600;
 
-LASER_DAMAGE[LASER] = [160, 292, 584];
+LASER_DAMAGE[LASER] = [160, 350, 600];
 LASER_DAMAGE[LASER2] = [184, 312, 800];
 LASER_DAMAGE[COL] = [60, 150, 500];
 
@@ -427,6 +427,7 @@ class Game{
 		if(T == DECOY) this.addShip(DECOY, this.ships[s].team, [], [...this.ships[s].pos], [[...dat.loc, dat.dock]]);
 		if(T == REPAIR) this.addShip(REPAIR, this.ships[s].team, [], [...this.ships[s].pos], [[...dat.loc, dat.dock]]);
 		if(T == ROCKET) this.addShip(ROCKET, this.ships[s].team, [ROCKETD], [...this.ships[s].pos], [[...dat.loc, dat.dock]]);
+
 		if(T == TURRET){
 			const R = Math.random()*Math.PI*2;
 			this.addShip(TURRET, this.ships[s].team, [TURRETD], [

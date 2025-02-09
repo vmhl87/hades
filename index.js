@@ -145,6 +145,8 @@ io.on("connect", (socket) => {
 	});
 
 	socket.on("quit", () => {
+		console.log("quit " + socket.id);
+
 		for(let g of games){
 			for(let s of g.ships){
 				if(s.type == BS && s.team == socket.id){

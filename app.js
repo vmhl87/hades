@@ -136,7 +136,7 @@ function main(){
 	if(staging){
 		fill(200); noStroke();
 		push(); translate(width/2, height/2-100);
-		scale(5); drawShip(BS, 0, 1);
+		scale(5); drawShip(BS, 0, 2);
 		pop();
 
 		if(ALLMODULE){
