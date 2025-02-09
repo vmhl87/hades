@@ -77,19 +77,19 @@ EFFECT_TIME[ROCKETD] = 0;
 RECHARGE_TIME[ROCKETD] = 15;
 
 EFFECT_TIME[EMP] = 6;
-RECHARGE_TIME[EMP] = 60;
+RECHARGE_TIME[EMP] = 45;
 
 EFFECT_TIME[FORT] = 12;
 RECHARGE_TIME[FORT] = 60;
 
-EFFECT_TIME[TP] = 5;
+EFFECT_TIME[TP] = 3;
 RECHARGE_TIME[TP] = 55;
 
 EFFECT_TIME[AMP] = 30;
 RECHARGE_TIME[AMP] = 60;
 
 EFFECT_TIME[DESTINY] = 6;
-RECHARGE_TIME[DESTINY] = 60;
+RECHARGE_TIME[DESTINY] = 90;
 
 EFFECT_TIME[BARRIER] = 11;
 RECHARGE_TIME[BARRIER] = 60;
@@ -97,19 +97,19 @@ RECHARGE_TIME[BARRIER] = 60;
 EFFECT_TIME[DELTA] = 0;
 RECHARGE_TIME[DELTA] = 60;
 
-RECHARGE_TIME[RIPPLE] = 60;
+RECHARGE_TIME[RIPPLE] = 30;
 
 EFFECT_TIME[VENG] = 10;
-RECHARGE_TIME[VENG] = 60;
+RECHARGE_TIME[VENG] = 120;
 
 EFFECT_TIME[DISRUPT] = 6;
-RECHARGE_TIME[DISRUPT] = 60;
+RECHARGE_TIME[DISRUPT] = 45;
 
 EFFECT_TIME[DECOY] = 0;
 RECHARGE_TIME[DECOY] = 60;
 
 EFFECT_TIME[REPAIR] = 0;
-RECHARGE_TIME[REPAIR] = 60;
+RECHARGE_TIME[REPAIR] = 30;
 
 EFFECT_TIME[ROCKET] = 0;
 RECHARGE_TIME[ROCKET] = 60;
@@ -120,10 +120,10 @@ RECHARGE_TIME[TURRET] = 60;
 // SHIELD
 
 EFFECT_TIME[ALPHA] = 8;
-RECHARGE_TIME[ALPHA] = 60;
+RECHARGE_TIME[ALPHA] = 45;
 
 EFFECT_TIME[IMPULSE] = 45;
-RECHARGE_TIME[IMPULSE] = 60;
+RECHARGE_TIME[IMPULSE] = 75;
 
 EFFECT_TIME[OMEGA] = 45;
 RECHARGE_TIME[OMEGA] = 60;
@@ -308,7 +308,7 @@ class Ship{
 			emp: this.emp,
 			fort: this.fort,
 			imp: this.imp,
-			ally: this.ally,
+			ally: this.ally == null ? 0 : 1,
 		};
 	}
 	
@@ -630,7 +630,7 @@ class Game{
 				if(1+S > 10/EFFECT_TIME[T] || (s.modules[i].aux[2] && s.move.length == 0))
 					s.modules[i].aux[2] = 0;
 
-				if(s.modules[i].aux[2] == 1)
+				if(s.modules[i].aux[2] == 1 && s.imp == 0)
 					for(let x of this.ships)
 						if(x.team != s.team)
 							if(_dist(x.pos, s.pos) < RANGE[IMPULSE])

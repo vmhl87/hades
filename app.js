@@ -386,7 +386,7 @@ function main(){
 		if(focus){
 			fill(255, 15); noStroke();
 			if(focus[0] == "rock") circle(...screenPos(rocks[focus[1]]), 20*sqrt(camera.z));
-			if(focus[0] == "ship"){
+			if(focus[0] == "ship" && shipID != null){
 				push();
 				stroke(90, 100); fill(90, 30);
 				if(selectMove == null) for(let i=0; i<ships[shipID].modules.length; ++i)
@@ -504,6 +504,8 @@ function main(){
 
 			for(let m of s.modules) if(Array.isArray(m.aux) && m.aux.length && m.aux[0] &&
 				(m.aux[1] > 3/TIME[m.type] || (m.aux[1]*TIME[m.type])%1 < 0.5) || m.type == PASSIVE){
+				push();
+
 				if(m.type == ALPHA){
 					stroke(50, 150, 150, 50); noFill(); strokeWeight(3);
 					arc(0, 0, 50-3, 50-3, -PI*0.25, PI*0.25);
@@ -564,6 +566,8 @@ function main(){
 					if(-PI/2+PI*2*m.aux[0] > PI-PI*0.08) arc(0, 0, RANGE[ALLY]*2-6, RANGE[ALLY]*2-6,
 						max(-PI/2, PI-PI*0.08), min(-PI/2+PI*2*m.aux[0], PI*1.08));
 				}
+
+				pop();
 			}
 
 			pop();
@@ -709,7 +713,7 @@ function main(){
 				arc(0, 0, 35, 35, -PI*0.25, PI*0.25);
 				arc(0, 0, 35, 35, PI-PI*0.25, PI+PI*0.25);
 			}
-			if(s.ally != null){
+			if(s.ally){
 				stroke(50, 200, 200); noFill(); strokeWeight(2);
 				arc(0, 0, 40, 40, -PI*0.25, PI*0.25);
 				arc(0, 0, 40, 40, PI-PI*0.25, PI+PI*0.25);
@@ -1150,6 +1154,19 @@ function click(){
 		return;
 	}
 
+	if(focus && focus[0] == "ship"){
+		let found = false;
+		for(let i=0; i<ships.length; ++i) if(ships[i].uid == focus[1]){
+			shipID = i;
+			found = true;
+		}
+		if(!found){
+			focus = null;
+			shipID = null;
+		}
+		
+	}else shipID = null;
+
 	if(focus && shipID != null && selectMove == null){
 		for(let i=0; i<ships[shipID].modules.length; ++i){
 			if(mouseIn(width/2+25-25*ships[shipID].modules.length+50*i, height-120-10-25, 20, 20)){
@@ -1197,7 +1214,7 @@ function click(){
 				});
 				selectMove = null;
 				
-			}else if(selectMove[0] == "module"){
+			}else if(selectMove[0] == "module" && shipID != null){
 				const P = [rocks[select[1]][0], rocks[select[1]][1]+10];
 
 				if(RANGE[ships[shipID].modules[selectMove[1].i].type] == null ||
@@ -1211,7 +1228,7 @@ function click(){
 				}
 			}
 
-		}else if(ships[shipID].modules[selectMove[1].i].type == RIPPLE && select != null && select[1] != selectMove[1].s){
+		}else if(shipID != null && ships[shipID].modules[selectMove[1].i].type == RIPPLE && select != null && select[1] != selectMove[1].s){
 			for(let s of ships) if(s.uid == select[1])
 				if(_dist(ships[shipID].vpos, s.vpos) < RANGE[RIPPLE]
 					// TODO modification to ripple

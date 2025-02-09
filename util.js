@@ -347,7 +347,6 @@ function updateTouch(){
 function touchStarted(){
 	if(touches.length == 1 && !posTouches.has(touches[0].id)){
 		select = selectedPos([touches[0].x, touches[0].y]);
-		echo("init", select);
 	}
 	updateTouch();
 }
