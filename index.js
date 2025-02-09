@@ -144,6 +144,17 @@ io.on("connect", (socket) => {
 		}
 	});
 
+	socket.on("quit", () => {
+		for(let g of games){
+			for(let s of g.ships){
+				if(s.type == BS && s.team == socket.id){
+					console.log(" => killing ships");
+					s.hp = 0;
+				}
+			}
+		}
+	});
+
 	socket.on("enqueue", modules => {
 		console.log("enqueued player", socket.id, "with", modules);
 		queue.push({s: socket, modules: modules});

@@ -979,6 +979,13 @@ function main(){
 			}
 		}
 
+		push();
+		stroke(50, 200, 200, mouseIn(30, 30, 30, 30) ? 80 : 60); strokeWeight(3);
+		line(20, 20, 40, 40);
+		line(20, 40, 27, 33);
+		line(33, 27, 40, 20);
+		pop();
+
 	}else{
 		fill(200); textSize(25); noStroke();
 		text("CONNECTING", width/2, height/2);

@@ -205,6 +205,9 @@ function mobileClick(P){
 
 		stagingUI();
 
+	}else if(abs(P.last[0]-30) < 30 && abs(P.last[1]-30) < 30){
+		socket.emit("quit");
+
 	}else if(connected) click();
 }
 
@@ -239,6 +242,9 @@ function mouseReleased(){
 		}
 
 		stagingUI();
+
+	}else if(mouseIn(30, 30, 30, 30)){
+		socket.emit("quit");
 
 	}else if(connected && !moved && _dist([mouseX, mouseY], [startMouseX, startMouseY]) < 20){
 		click();
