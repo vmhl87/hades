@@ -77,7 +77,7 @@ const Module = require("./game.js");
 
 const Ship = Module.Ship, Game = Module.Game;
 
-const COLS = Module.COLS, ROWS = Module.ROWS;
+const COLS = Module.COLS, ROWS = Module.ROWS, TPS = Module.TPS;
 
 let games = [], queue = [];
 
@@ -100,7 +100,7 @@ function tick(game){
 	}
 }
 
-setInterval(tick, 250, null);
+setInterval(tick, 1000/TPS, null);
 
 // -- client interconnect --
 
@@ -244,4 +244,6 @@ io.on("connect", (socket) => {
 			}
 		}
 	});
+
+	socket.on("echo", e => console.log("echo", ...e));
 });

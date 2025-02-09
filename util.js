@@ -13,7 +13,14 @@ function solo(){
 }
 
 function mouseIn(x, y, w, h){
-	return abs(mouseX-x) < w && abs(mouseY-y) < h;
+	if(MOBILE){
+		for(const [k, v] of posTouches)
+			if(!movedTouches.has(k))
+				if(abs(v.last[0]-x) < w && abs(v.last[1]-y) < h) return true;
+
+		return false;
+
+	}else return abs(mouseX-x) < w && abs(mouseY-y) < h;
 }
 
 class Ship{
@@ -143,9 +150,15 @@ function selected(){
 	return null;
 }
 
+window.addEventListener('touchmove',e => e.preventDefault(), {passive:false});
+
+let MOBILE = false;
+
 let startMouseX, startMouseY;
 
 let focus = null;
+
+let posTouches = new Map(), movedTouches = new Set();
 
 function mousePressed(){
 	moved = false;
@@ -155,6 +168,36 @@ function mousePressed(){
 }
 
 let lastMouse = [], ALLMODULE = false, SECDISP = [0];
+
+function mobileClick(P){
+	if(staging){
+		lastMouse.push([Date.now(), P.last]);
+		if(lastMouse.length > 3) lastMouse = lastMouse.slice(1);
+
+		if(lastMouse.length == 3 && lastMouse[0][0] > Date.now()-2000
+			&& _dist(lastMouse[1][1], [width/2, height/2-250]) < 200
+			&& abs(atan2(lastMouse[0][1][0]-lastMouse[1][1][0], lastMouse[0][1][1]-lastMouse[1][1][1])+PI/4) < 1
+			&& abs(atan2(lastMouse[1][1][0]-lastMouse[2][1][0], lastMouse[1][1][1]-lastMouse[2][1][1])+PI*3/4) < 1
+			&& _dist(lastMouse[0][1], lastMouse[1][1]) < 300
+			&& _dist(lastMouse[1][1], lastMouse[2][1]) < 300
+			&& _dist(lastMouse[0][1], lastMouse[1][1]) > 50
+			&& _dist(lastMouse[1][1], lastMouse[2][1]) > 50
+		){
+			ALLMODULE = true;
+			modules = [null, null, null, null, null];
+			SECDISP = [100, []];
+			for(let i=0; i<3; ++i) SECDISP[1].push([...lastMouse[i][1]]);
+		}
+
+		stagingUI();
+
+	}else if(connected && !moved && _dist(P.last, P.first) < 20){
+		let s = selected();
+		if(!s || (s[0] == select[0] && s[1] == select[1])){
+			click();
+		}
+	}
+}
 
 function mouseReleased(){
 	if(staging){
@@ -184,4 +227,91 @@ function mouseReleased(){
 			click();
 		}
 	}
+}
+
+function echo(...x){
+	socket.emit("echo", x);
+}
+
+let clicks = [];
+
+function draw(){
+	if(touches.length) MOBILE = true;
+
+	if(!staging && mouseIsPressed){
+		const dist = _dist([mouseX, mouseY], [lastMouseX, lastMouseY]);
+		if(dist > 0.5){
+			camera.x += (lastMouseX-mouseX)/camera.z;
+			camera.y += (lastMouseY-mouseY)/camera.z;
+		}
+		if(dist > 4) moved = true;
+	}
+
+	lastMouseX = mouseX;
+	lastMouseY = mouseY;
+
+	if(MOBILE) updateTouch();
+
+	main();
+
+	for(let c of clicks){
+		fill(255, 15*min(1, (100-c[2])/40)); noStroke();
+		circle(c[0], c[1], min(100, c[2]*4));
+		c[2] += 2;
+	}
+
+	fill(255, 15);
+
+	for(let t of touches){
+		circle(t.x, t.y, 150);
+	}
+
+	clicks = clicks.filter(x => x[2] < 100);
+}
+
+function updateTouch(){
+	let S = new Set();
+
+	for(let t of touches){
+		S.add(t.id);
+
+		if(posTouches.has(t.id)){
+			const P = posTouches.get(t.id);
+
+			if(_dist(P.first, [t.x, t.y]) > 50)
+				movedTouches.add(t.id);
+
+			P.last = [t.x, t.y];
+
+		}else posTouches.set(t.id, {first: [t.x, t.y], last: [t.x, t.y]});
+	}
+
+	let rem = [];
+
+	for(const [k, v] of posTouches)
+		if(!S.has(k)) rem.push(k);
+
+	for(let k of rem){
+		if(movedTouches.has(k)) movedTouches.delete(k);
+		else if(touches.length == 0){
+			const P = posTouches.get(k);
+			mobileClick({first: [...P.first], last: [...P.last]});
+			clicks.push([...P.last, 0]);
+		}
+
+		posTouches.delete(k);
+		movedTouches.delete(k);
+	}
+}
+
+function touchStarted(){
+	updateTouch();
+}
+
+function touchEnded(){
+	updateTouch();
+}
+
+function windowResized(){
+	resizeCanvas(windowWidth, windowHeight);
 }

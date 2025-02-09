@@ -1,4 +1,4 @@
-const COLS = 5, ROWS = 3;
+const COLS = 5, ROWS = 3, TPS = 16;
 
 let ct = 0;
 
@@ -82,7 +82,7 @@ RECHARGE_TIME[EMP] = 60;
 EFFECT_TIME[FORT] = 12;
 RECHARGE_TIME[FORT] = 60;
 
-EFFECT_TIME[TP] = 5;
+EFFECT_TIME[TP] = 7;
 RECHARGE_TIME[TP] = 55;
 
 EFFECT_TIME[AMP] = 30;
@@ -323,7 +323,7 @@ class Ship{
 
 			if(m.type == MIRROR){
 				m.blast[0] += rem;
-				if(m.blast[1] == 0) m.blast[1] = 5;
+				if(m.blast[1] == 0) m.blast[1] = 1+TPS;
 			}
 
 			m.aux[0] = Math.max(0, m.aux[0]-rem/STRENGTH[m.type]);
@@ -357,7 +357,7 @@ class Ship{
 		if(this.move.length){
 			let move = this.move[0],
 				dir = [move[0]-this.pos[0], move[1]-this.pos[1]],
-				dist = this.vel/4,
+				dist = this.vel/TPS,
 				mag = Math.sqrt(dir[0]*dir[0] + dir[1]*dir[1]);
 			this.dock = this.move[0][2];
 			if(dist > mag){
@@ -374,7 +374,7 @@ class Ship{
 			for(let m of this.modules) if(m.type == IMPULSE && m.aux[2])
 				S *= SPEED[IMPULSE];
 
-			this.vel = Math.min(this.vel+8, S);
+			this.vel = Math.min(this.vel+32/TPS, S);
 
 		}else{
 			this.vel = 0;
@@ -514,13 +514,13 @@ class Game{
 
 			if(EFFECT_TIME[T] != null){
 				if(s.modules[i].state < 0)
-					s.modules[i].state = Math.min(0, s.modules[i].state+1/(1+EFFECT_TIME[T]*4));
+					s.modules[i].state = Math.min(0, s.modules[i].state+1/(1+EFFECT_TIME[T]*TPS));
 				else{
 					if(T == IMPULSE)
-						s.modules[i].state = Math.min(0.75, s.modules[i].state+0.75/(RECHARGE_TIME[T]*4));
+						s.modules[i].state = Math.min(0.75, s.modules[i].state+0.75/(RECHARGE_TIME[T]*TPS));
 					else if(T >= ALPHA && T <= ALLY)
-						s.modules[i].state = Math.min(1, s.modules[i].state+1/(RECHARGE_TIME[T]*4));
-					else s.modules[i].state = Math.min(1, s.modules[i].state+1/((RECHARGE_TIME[T]-EFFECT_TIME[T])*4));
+						s.modules[i].state = Math.min(1, s.modules[i].state+1/(RECHARGE_TIME[T]*TPS));
+					else s.modules[i].state = Math.min(1, s.modules[i].state+1/((RECHARGE_TIME[T]-EFFECT_TIME[T])*TPS));
 				}
 
 				if(s.modules[i].state == 0 && T >= ALPHA && T <= ALLY){
@@ -532,11 +532,11 @@ class Game{
 
 			if(T == RIPPLE)
 				// TODO new ripple behavior
-				s.modules[i].state = Math.min(1, s.modules[i].state+1/(RECHARGE_TIME[T]*4));
-				//s.modules[i].state = Math.min(0.75, s.modules[i].state+0.75/(RECHARGE_TIME[T]*4));
+				s.modules[i].state = Math.min(1, s.modules[i].state+1/(RECHARGE_TIME[T]*TPS));
+				//s.modules[i].state = Math.min(0.75, s.modules[i].state+0.75/(RECHARGE_TIME[T]*TPS));
 
 			if(T == TURRETD)
-				s.modules[i].state = Math.min(1, s.modules[i].state+1/(RECHARGE_TIME[T]*4));
+				s.modules[i].state = Math.min(1, s.modules[i].state+1/(RECHARGE_TIME[T]*TPS));
 
 			const S = s.modules[i].state;
 
@@ -571,9 +571,9 @@ class Game{
 
 					if(!s.emp){
 						if(s.modules[i].state < 0.6)
-							s.modules[i].state += 0.3/(4*LASER_CHARGE[T][0]);
+							s.modules[i].state += 0.3/(TPS*LASER_CHARGE[T][0]);
 						else s.modules[i].state = Math.min(1,
-							s.modules[i].state+0.4/(4*(LASER_CHARGE[T][1]-LASER_CHARGE[T][0])));
+							s.modules[i].state+0.4/(TPS*(LASER_CHARGE[T][1]-LASER_CHARGE[T][0])));
 					}
 
 				}else s.modules[i].state = 0.3;
@@ -627,10 +627,10 @@ class Game{
 			}
 
 			if(T == PASSIVE){
-				s.modules[i].aux[1] = Math.min(1, s.modules[i].aux[1]+1/(4*PASSIVE_DELAY));
+				s.modules[i].aux[1] = Math.min(1, s.modules[i].aux[1]+1/(TPS*PASSIVE_DELAY));
 
 				if(s.modules[i].aux[1] == 1)
-					s.modules[i].aux[0] = Math.min(1, s.modules[i].aux[0]+1/(4*PASSIVE_TIME));
+					s.modules[i].aux[0] = Math.min(1, s.modules[i].aux[0]+1/(TPS*PASSIVE_TIME));
 
 			}else if(T >= ALPHA && T <= ALLY){
 				if(s.modules[i].aux[0] <= 0){
@@ -642,7 +642,7 @@ class Game{
 					}
 				}
 
-				s.modules[i].aux[1] = Math.max(0, s.modules[i].aux[1]-1/(4*EFFECT_TIME[T]));
+				s.modules[i].aux[1] = Math.max(0, s.modules[i].aux[1]-1/(TPS*EFFECT_TIME[T]));
 				if(!s.modules[i].aux[1]) s.modules[i].aux[0] = 0;
 			}
 
@@ -715,9 +715,9 @@ class Game{
 		if(!this.alive()) this.lifetime = Math.max(0, this.lifetime-1);
 
 		for(let s of this.ships){
-			s.emp = Math.max(0, s.emp - 1/(4*EFFECT_TIME[EMP]));
-			s.fort = Math.max(0, s.fort - 1/(4*EFFECT_TIME[FORT]));
-			s.imp = Math.max(0, s.imp - 1/(4*EFFECT_TIME[DISRUPT]));
+			s.emp = Math.max(0, s.emp - 1/(TPS*EFFECT_TIME[EMP]));
+			s.fort = Math.max(0, s.fort - 1/(TPS*EFFECT_TIME[FORT]));
+			s.imp = Math.max(0, s.imp - 1/(TPS*EFFECT_TIME[DISRUPT]));
 		}
 
 		let locked = new Set();
@@ -846,7 +846,7 @@ class Game{
 
 						if(D != null)
 							for(let x of m.aux) if(M.has(x)){
-								this.ships[M.get(x)].hurt(D*amp[M.get(s.uid)]*sol[M.get(s.uid)]/4);
+								this.ships[M.get(x)].hurt(D*amp[M.get(s.uid)]*sol[M.get(s.uid)]/TPS);
 							}
 					}
 		}
@@ -915,7 +915,7 @@ class Game{
 
 		for(let s of this.ships){
 			if(s.type >= DECOY && s.type <= TURRET){
-				s.expire = Math.max(0, s.expire-1/(4*EXPIRE_TIME[s.type]));
+				s.expire = Math.max(0, s.expire-1/(TPS*EXPIRE_TIME[s.type]));
 			}
 
 			if(s.type == REPAIR && s.hp == 0){
@@ -964,4 +964,4 @@ class Game{
 	}
 }
 
-module.exports = { Ship, Game, COLS, ROWS };
+module.exports = { Ship, Game, COLS, ROWS, TPS };

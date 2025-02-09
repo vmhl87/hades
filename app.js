@@ -130,19 +130,7 @@ socket.on("end", () => {
 	gameID = null;
 });
 
-function draw(){
-	if(!staging && mouseIsPressed){
-		const dist = _dist([mouseX, mouseY], [lastMouseX, lastMouseY]);
-		if(dist > 0.5){
-			camera.x += (lastMouseX-mouseX)/camera.z;
-			camera.y += (lastMouseY-mouseY)/camera.z;
-		}
-		if(dist > 4) moved = true;
-	}
-
-	lastMouseX = mouseX;
-	lastMouseY = mouseY;
-
+function main(){
 	background(0, 10, 25);
 
 	if(staging){

@@ -26,6 +26,18 @@ const EMP = ++ct, SOL = ++ct, FORT = ++ct, TP = ++ct, AMP = ++ct, DESTINY = ++ct
 
 /* UNOBTAIN */ const VENG = ++ct;
 
+let ALLMODS = [], NORM = new Set();
+
+for(let i=LASER; i<=TURRETD; ++i) ALLMODS.push(i);
+for(let i=ALPHA; i<=ALLY; ++i) ALLMODS.push(i);
+for(let i=EMP; i<=VENG; ++i) ALLMODS.push(i);
+for(let i=DECOY; i<=TURRET; ++i) ALLMODS.push(i);
+
+for(let i=LASER; i<=DART; ++i) NORM.add(i);
+for(let i=ALPHA; i<=ALLY; ++i) NORM.add(i);
+for(let i=EMP; i<=DISRUPT; ++i) NORM.add(i);
+for(let i=DECOY; i<=TURRET; ++i) NORM.add(i);
+
 let NAME = new Array(ct), HP = new Array(ct), RANGE = new Array(ct).fill(null),
 	TIME = new Array(ct);
 
