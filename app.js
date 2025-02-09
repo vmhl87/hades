@@ -565,9 +565,9 @@ function draw(){
 					stroke(150, 200, 200, 150); strokeWeight(2); noFill();
 					arc(0, 0, RANGE[ALLY]*2, RANGE[ALLY]*2, -PI/2, -PI/2+PI*2*m.aux[0]);
 					strokeWeight(1.5);
-					if(-PI/2+PI*2*m.aux > -PI*0.08) arc(0, 0, RANGE[ALLY]*2-6, RANGE[ALLY]*2-6,
+					if(-PI/2+PI*2*m.aux[0] > -PI*0.08) arc(0, 0, RANGE[ALLY]*2-6, RANGE[ALLY]*2-6,
 						max(-PI/2, -PI*0.08), min(-PI/2+PI*2*m.aux[0], PI*0.08));
-					if(-PI/2+PI*2*m.aux > PI-PI*0.08) arc(0, 0, RANGE[ALLY]*2-6, RANGE[ALLY]*2-6,
+					if(-PI/2+PI*2*m.aux[0] > PI-PI*0.08) arc(0, 0, RANGE[ALLY]*2-6, RANGE[ALLY]*2-6,
 						max(-PI/2, PI-PI*0.08), min(-PI/2+PI*2*m.aux[0], PI*1.08));
 				}
 			}
