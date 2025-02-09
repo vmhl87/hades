@@ -1145,6 +1145,8 @@ function stagingUI(){
 				chooseModule = -1;
 			}
 		}
+
+		if(mouseIn(width/2, height/2-100, 100, 50)) chooseModule = -1;
 	}
 }
 
@@ -1250,7 +1252,7 @@ function click(){
 function keyReleased(){
 	if(!staging && connected){
 		if(focus && shipID != null && selectMove == null){
-			const keys = ['a', 's', 'd', 'f', 'g'];
+			const keys = "asdfghjkl;";
 
 			for(let i=0; i<ships[shipID].modules.length; ++i){
 				if(key == keys[i]){

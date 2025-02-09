@@ -1,4 +1,4 @@
-const COLS = 5, ROWS = 3, TPS = 16;
+const COLS = 5, ROWS = 3, TPS = 8;
 
 let ct = 0;
 
@@ -784,10 +784,14 @@ class Game{
 
 					const orig = m.aux.length ? m.aux[0] : null;
 
-					m.aux = m.aux.filter(x => {
+					const oldTargets = m.aux.filter(x => {
 						for(let y of targets)
 							if(y[1] == x) return true;
+						
+						return false;
+					});
 
+					const oldDecoys = m.aux.filter(x => {
 						for(let y of decoys)
 							if(y[1] == x) return true;
 						
@@ -800,21 +804,29 @@ class Game{
 					targets = targets.filter(x => !m.aux.includes(x[1]));
 					decoys = decoys.filter(x => !m.aux.includes(x[1]));
 
-					let old = [...m.aux];
 					m.aux = [];
 
-					for(let i=0; i<Math.min(decoys.length, TARGETS[m.type]); ++i)
-						m.aux.push(decoys[i][1]);
+					while(m.aux.length < TARGETS[m.type] && oldDecoys.length){
+						const R = Math.floor(Math.random()*oldDecoys.length);
+						m.aux.push(oldDecoys.splice(R, 1)[0]);
+					}
 
-					while(m.aux.length < TARGETS[m.type] && old.length){
-						const R = Math.floor(Math.random()*old.length);
-						m.aux.push(old.splice(R, 1)[0]);
+					while(m.aux.length < TARGETS[m.type] && decoys.length){
+						const R = Math.floor(Math.random()*decoys.length);
+						m.aux.push(decoys.splice(R, 1)[0][1]);
+					}
+
+					while(m.aux.length < TARGETS[m.type] && oldTargets.length){
+						const R = Math.floor(Math.random()*oldTargets.length);
+						m.aux.push(oldTargets.splice(R, 1)[0]);
 					}
 
 					while(m.aux.length < TARGETS[m.type] && targets.length){
 						m.aux.push(targets[0][1]);
 						targets = targets.slice(1);
 					}
+					
+					 console.log("res", m.aux);
 
 				if(orig != null && [LASER, COL, BATTERY].includes(m.type)
 					&& (!m.aux.length || m.aux[0] != orig)){
