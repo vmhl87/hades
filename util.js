@@ -205,12 +205,7 @@ function mobileClick(P){
 
 		stagingUI();
 
-	}else if(connected){
-		const s = selectedPos(P.last);
-		if(s == null && select == null) click();
-		else if(s == null || select == null) return;
-		else if(s[0] == select[0] && s[1] == select[1]) click();
-	}
+	}else if(connected) click();
 }
 
 function mouseReleased(){
@@ -246,10 +241,7 @@ function mouseReleased(){
 		stagingUI();
 
 	}else if(connected && !moved && _dist([mouseX, mouseY], [startMouseX, startMouseY]) < 20){
-		let s = selected();
-		if(!s || (s[0] == select[0] && s[1] == select[1])){
-			click();
-		}
+		click();
 	}
 }
 

@@ -1194,7 +1194,7 @@ function click(){
 				}
 			}
 
-		}else if(ships[shipID].modules[selectMove[1].i].type == RIPPLE && select[1] != selectMove[1].s){
+		}else if(ships[shipID].modules[selectMove[1].i].type == RIPPLE && select != null && select[1] != selectMove[1].s){
 			for(let s of ships) if(s.uid == select[1])
 				if(_dist(ships[shipID].vpos, s.vpos) < RANGE[RIPPLE]
 					// TODO modification to ripple
