@@ -283,6 +283,14 @@ class Ship{
 
 			if(m.type == INT) this.ai = Math.random();
 		}
+
+		if(type == BS && Number.isInteger(team) && team < 0){
+			this.ai = [Math.random(), 0];
+		}
+
+		if([SENTINEL, GUARD, COL].includes(type))
+			this.ai = [Math.random(), Math.floor((pos[0]+150*COLS)/300)
+				+COLS*Math.floor((pos[1]+300*ROWS*10+150*ROWS)/300)];
 	}
 
 	waitMoveTo(pos, i){
@@ -326,6 +334,9 @@ class Ship{
 	}
 	
 	hurt(x){
+		if(this.type == BS && this.ai != null)
+			this.ai[1] = true;
+
 		let dmg = x;
 
 		// TODO make ally functional
@@ -416,8 +427,12 @@ class Game{
 		this.rocks = [];
 		this.uid = ++UID;
 		this.ev = [];
-		this.lifetime = 4*6;
+		this.lifetime = TPS*6;
 		this.age = 0;
+		this.loneBSTimer = Math.random();
+		this.sectors = new Array(ROWS*COLS);
+		for(let i=0; i<ROWS*COLS; ++i)
+			this.sectors[i] = [];
 	}
 
 	addShip(type, team, modules, pos, move = []){
@@ -756,6 +771,7 @@ class Game{
 				Math.round(Math.random()*300) + 300*(b%COLS) - 300*COLS/2,
 				Math.round(Math.random()*300) + 300*Math.floor(b/COLS) - 300*ROWS/2
 			]);
+			this.sectors[b].push(i);
 		}
 
 		let m = [];
@@ -786,6 +802,46 @@ class Game{
 				for(let x of this.ships) if(x.team != s.team && x.type != DELTAP)
 					if(_dist(x.pos, s.pos) < RANGE[BARRIER])
 						locked.add(x.uid);
+		
+		// cerberus + lone BS AI
+
+		for(let s of this.ships)
+			if([SENTINEL, GUARD, COL].includes(s.type)){
+				if(s.wait == null && s.move.length == 0){
+					s.ai[0] += 1/(TPS*20);
+				}
+
+				if(s.ai[0] >= 1){
+					s.ai[0] = 0;
+
+					const I = this.sectors[s.ai[1]][Math.floor(Math.random()*this.sectors[s.ai[1]].length)];
+					s.waitMoveTo([this.rocks[I][0], this.rocks[I][1]+10], I);
+				}
+
+			}else if(s.type == BS && s.ai != null){
+				if(s.wait == null && s.move.length == 0){
+					s.ai[0] += 1/(TPS*30);
+					if(s.ai[1]) s.ai[0] += 5/(TPS*30);
+					s.ai[1] = false;
+
+				}else if(s.wait != null){
+					if(s.ai[1]) s.wait[2] -= 3/(10*TPS);
+				}
+
+				if(s.ai[0] >= 1){
+					s.ai[0] = 0;
+
+					let P = [];
+
+					for(let i=0; i<this.rocks.length; ++i)
+						if(_dist(this.rocks[i], s.pos) < 450)
+							P.push(i);
+
+					const I = P[Math.floor(Math.random()*P.length)];
+
+					s.waitMoveTo([this.rocks[I][0], this.rocks[I][1]+10], I);
+				}
+			}
 
 		for(let s of this.ships) if(!s.emp && !locked.has(s.uid) && !s.fort) s.travel();
 
@@ -1034,7 +1090,35 @@ class Game{
 				const I = idx[Math.floor(Math.random()*idx.length)];
 				const J = Math.floor(Math.random()*this.rocks.length);
 				const P = this.rocks[J];
-				this.addShip(SENTINEL+I, CERB, [SENTINEL+I], [P[0], P[1]+10-300*ROWS*10], []);
+				this.addShip(SENTINEL+I, CERB, [SENTINEL+I], [P[0], P[1]-300*ROWS*10], []);
+				this.ships[this.ships.length-1].dock = J;
+			}
+		}
+
+		// spawn lone BS
+
+		this.loneBSTimer += 1/(20*TPS);
+
+		if(this.loneBSTimer >= 1){
+			this.loneBSTimer = Math.random();
+
+			const OPTIMAL = 0.3;
+
+			if(this.ships.filter(x => x.type == BS).length < OPTIMAL*ROWS*COLS){
+				const J = Math.floor(Math.random()*this.rocks.length);
+				const P = this.rocks[J];
+
+				const MODS = [
+					[BATTERY, OMEGA, VENG],
+					[LASER, OMEGA, VENG],
+					[BATTERY, PASSIVE, VENG],
+					[LASER, PASSIVE, VENG],
+					[BATTERY, PASSIVE, SOL]
+				];
+
+				const I = Math.floor(Math.random()*MODS.length);
+				
+				this.addShip(BS, -(++UID), MODS[I], [P[0], P[1]+300*ROWS*10], []);
 				this.ships[this.ships.length-1].dock = J;
 			}
 		}

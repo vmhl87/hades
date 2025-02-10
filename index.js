@@ -191,8 +191,6 @@ io.on("connect", (socket) => {
 		const p = spawnBS();
 		g.addShip(BS, socket.id, modules,
 			[300*(p[0][0]-COLS/2+0.5), 300*(p[0][1]-ROWS/2+0.5)]);
-		g.addShip(BS, -1, [BATTERY, OMEGA, VENG],
-			[300*(p[1][0]-COLS/2+0.5), 300*(p[1][1]-ROWS/2+0.5)]);
 		g.start();
 		games.push(g);
 	});
