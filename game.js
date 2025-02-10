@@ -46,7 +46,7 @@ DAMAGE[MASS] = 210;
 DAMAGE[SENTINEL] = 200;
 DAMAGE[GUARD] = 50;
 DAMAGE[INT] = 90;
-DAMAGE[TURRETD] = 150;
+DAMAGE[TURRETD] = 200;
 
 DAMAGE[BARRIER] = 3000;
 DAMAGE[SOL] = 1.5;
@@ -63,9 +63,9 @@ LASER_DAMAGE[COL] = [60, 150, 500];
 EXPIRE_TIME[DECOY] = 40;
 EXPIRE_TIME[REPAIR] = 40;
 EXPIRE_TIME[ROCKET] = 100;
-EXPIRE_TIME[TURRET] = 40;
+EXPIRE_TIME[TURRET] = 120;
 
-RECHARGE_TIME[TURRETD] = 5;
+RECHARGE_TIME[TURRETD] = 3;
 
 EFFECT_TIME[BATTERY] = 0;
 RECHARGE_TIME[BATTERY] = 2;
@@ -809,7 +809,9 @@ class Game{
 		let using = new Array(this.rocks.length).fill(false);
 		
 		for(let s of this.ships) if(s.team != CERB && [BS, DECOY, REPAIR, ROCKET, TURRET].includes(s.type)){
-			if(!s.move.length) using[s.dock] = true;
+			if(s.tp != null){
+				if(s.tp[2] != null) using[s.tp[2]] = true;
+			}else if(!s.move.length) using[s.dock] = true;
 			else using[s.move[0][2]] = true;
 		}
 

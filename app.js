@@ -3,7 +3,7 @@ let font = null;
 let modules = [null, null, null, null, null];
 
 let searching = 0, staging = 1, chooseModule = -1,
-	open = 0, connected = 0;
+	open = 0, connected = 0, snapshot = 0, ID = null, now = null;
 
 function preload(){
 	font = loadFont('Ubuntu-Regular.ttf');
@@ -137,6 +137,21 @@ function main(){
 		fill(200); noStroke();
 		push(); translate(width/2, height/2-100);
 		scale(5); drawShip(BS, 0, 2);
+		pop();
+
+		push();
+		stroke(50, 200, 200, mouseIn(width-30, 30, 30, 30) ? 80 : 60); strokeWeight(3);
+		noFill();
+		beginShape();
+		vertex(width-27, 20);
+		vertex(width-27, 40);
+		vertex(width-20, 33);
+		endShape();
+		beginShape();
+		vertex(width-40, 27);
+		vertex(width-33, 20);
+		vertex(width-33, 40);
+		endShape();
 		pop();
 
 		if(ALLMODULE){
@@ -355,7 +370,7 @@ function main(){
 			
 		}else shipID = null;
 
-		for(let s of ships) s.travel();
+		if(!snapshot) for(let s of ships) s.travel();
 
 		const w = 5, h = 3;
 
@@ -573,12 +588,14 @@ function main(){
 			pop();
 		}
 
+		const NOW = snapshot ? now : Date.now();
+
 		push(); noStroke();
 		for(let e of emps){
-			fill(100, 150, 255, 50*min(1, (e[1]-Date.now())/800));
-			circle(...screenPos(e[0]), RANGE[EMP]*2*camera.z*min(1, (Date.now()-e[1]+2000)/300));
+			fill(100, 150, 255, 50*min(1, (e[1]-NOW)/800));
+			circle(...screenPos(e[0]), RANGE[EMP]*2*camera.z*min(1, (NOW-e[1]+2000)/300));
 			stroke(100, 150, 255, 100); noFill(); strokeWeight(2*sqrt(camera.z));
-			if(e[1]-Date.now() > 800){
+			if(e[1]-NOW > 800){
 				for(let j=0; j<3; ++j){
 					let a = noise(floor(Date.now()/100), j)*PI*2;
 					beginShape();
@@ -596,13 +613,13 @@ function main(){
 		}
 		pop();
 
-		emps = emps.filter(x => x[1] > Date.now());
+		if(!snapshot) emps = emps.filter(x => x[1] > NOW);
 		
 		push(); noStroke();
 		for(let i of imps){
-			fill(100, 255, 150, 50*min(1, (i[1]-Date.now())/800));
-			circle(...screenPos(i[0]), RANGE[DISRUPT]*2*camera.z*min(1, (Date.now()-i[1]+2000)/300));
-			stroke(100, 255, 150, 100*min(1, (i[1]-Date.now())/400)); noFill(); strokeWeight(2*sqrt(camera.z));
+			fill(100, 255, 150, 50*min(1, (i[1]-NOW)/800));
+			circle(...screenPos(i[0]), RANGE[DISRUPT]*2*camera.z*min(1, (NOW-i[1]+2000)/300));
+			stroke(100, 255, 150, 100*min(1, (i[1]-NOW)/400)); noFill(); strokeWeight(2*sqrt(camera.z));
 			for(let j=0; j<3; ++j){
 				let a = (1-Math.pow(noise(floor(Date.now()/100), j), 2))*
 						(2*(RANGE[DISRUPT]+20)*min(1, (Date.now()-i[1]+2000)/300)-40)+40,
@@ -613,25 +630,25 @@ function main(){
 		}
 		pop();
 
-		imps = imps.filter(x => x[1] > Date.now());
+		if(!snapshot) imps = imps.filter(x => x[1] > NOW);
 		
 		push(); noStroke();
 		for(let h of heals){
-			fill(50, 200, 50, 60*sin((h[1]-Date.now())/2000*PI));
+			fill(50, 200, 50, 60*sin((h[1]-NOW)/2000*PI));
 			circle(...screenPos(h[0]), 60*2*camera.z);
 		}
 		pop();
 
-		heals = heals.filter(x => x[1] > Date.now());
+		if(!snapshot) heals = heals.filter(x => x[1] > NOW);
 
 		push(); noFill(); strokeWeight(3*sqrt(camera.z));
 		for(let d of deaths){
-			stroke(0, 255, 255, 80*Math.min(1, (d[1]-Date.now())/800));
-			circle(...screenPos(d[0]), (3000-d[1]+Date.now())/50*sqrt(camera.z));
+			stroke(0, 255, 255, 80*Math.min(1, (d[1]-NOW)/800));
+			circle(...screenPos(d[0]), (3000-d[1]+NOW)/50*sqrt(camera.z));
 		}
 		pop();
 
-		deaths = deaths.filter(x => x[1] > Date.now());
+		if(!snapshot) deaths = deaths.filter(x => x[1] > NOW);
 
 		for(let s of ships){
 			for(let m of s.modules){
@@ -706,7 +723,7 @@ function main(){
 		for(let s of ships){
 			push(); translate(width/2+(s.vpos[0]-camera.x)*camera.z, height/2+(s.vpos[1]-camera.y)*camera.z);
 			rotate(s.rot); scale(sqrt(camera.z));
-			drawShip(s.type, s.team != socket.id ? (s.type == BS && Number.isInteger(s.team) ? 2 : 1) : 0, s.move.length && !s.emp ? 1 : 0);
+			drawShip(s.type, s.team != socket.id && s.team != ID ? (s.type == BS && Number.isInteger(s.team) ? 2 : 1) : 0, s.move.length && !s.emp ? 1 : 0);
 			rotate(-s.rot);
 			if(s.emp){
 				stroke(255, 50, 50); noFill(); strokeWeight(2);
@@ -858,7 +875,7 @@ function main(){
 
 			if(focus && focus[0] == "ship" && shipID != null){
 				for(let m of ships[shipID].modules)
-					if(m.type >= LASER && m.type <= TURRETD)
+					if((m.type >= LASER && m.type <= TURRETD) || (m.type >= SENTINEL && m.type <= COL))
 						for(let uid of m.aux){
 							let s = SH(uid);
 							if(s != null){
@@ -995,6 +1012,21 @@ function main(){
 		line(33, 27, 40, 20);
 		pop();
 
+		push();
+		stroke(50, 200, 200, mouseIn(width-30, 30, 30, 30) ? 80 : 60); strokeWeight(3);
+		noFill();
+		beginShape();
+		vertex(width-27, 20);
+		vertex(width-27, 40);
+		vertex(width-20, 33);
+		endShape();
+		beginShape();
+		vertex(width-40, 27);
+		vertex(width-33, 20);
+		vertex(width-33, 40);
+		endShape();
+		pop();
+
 	}else{
 		fill(200); textSize(25); noStroke();
 		text("CONNECTING", width/2, height/2);
@@ -1002,6 +1034,13 @@ function main(){
 }
 
 function stagingUI(){
+	if(mouseIn(width-30, 30, 30, 30) && !searching){
+		if(localStorage.getItem("save") != null){
+			loadState(localStorage.getItem("save"));
+		}
+		return;
+	}
+
 	if(!searching){
 		if(ALLMODULE){
 			for(let i=0; i<5; ++i)
@@ -1151,6 +1190,11 @@ function stagingUI(){
 }
 
 function click(){
+	if(mouseIn(width-30, 30, 30, 30) && !snapshot){
+		localStorage.setItem("save", saveState());
+		return;
+	}
+
 	if(mouseIn(30, 30, 30, 30)){
 		socket.emit("quit");
 		return;
@@ -1251,6 +1295,11 @@ function click(){
 
 function keyReleased(){
 	if(!staging && connected){
+		if(key == 'R' && !snapshot){
+			localStorage.setItem("save", saveState());
+			return;
+		}
+
 		if(focus && shipID != null && selectMove == null){
 			const keys = "asdfghjkl;";
 
@@ -1282,6 +1331,9 @@ function keyReleased(){
 					else selectMove = ["ship", focus[1]];
 				}
 			}
+
+		}else if(focus && selectMove != null){
+			if(key == 'x') selectMove = null;
 		}
 	}
 }

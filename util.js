@@ -319,7 +319,7 @@ function updateTouch(){
 			const D = _dist([touches[0].x, touches[0].y], [touches[1].x, touches[1].y]);
 
 			camera.z = offset[0]*D/offset[1];
-			camera.z = min(10, max(0.3, camera.z));
+			camera.z = min(20, max(0.15, camera.z));
 
 			const P = [(touches[0].x+touches[1].x)/2, (touches[0].y+touches[1].y)/2];
 
@@ -365,4 +365,33 @@ function touchEnded(){
 
 function windowResized(){
 	resizeCanvas(windowWidth, windowHeight);
+}
+
+function saveState(){
+	return JSON.stringify({
+		ships, rocks, blasts, deaths, heals,
+		emps, imps, ROWS, COLS, ID: socket.id, now: Date.now()
+	});
+}
+
+function loadState(STATE){
+	const S = JSON.parse(STATE);
+
+	ships = [];
+	for(let x of S.ships) ships.push(new Ship(x));
+
+	rocks = S.rocks;
+	blasts = S.blasts;
+	deaths = S.deaths;
+	heals = S.heals;
+	emps = S.emps;
+	imps = S.imps;
+	ROWS = S.ROWS;
+	COLS = S.COLS;
+	ID = S.ID;
+	now = S.now;
+
+	staging = 0;
+	connected = 1;
+	snapshot = 1;
 }
