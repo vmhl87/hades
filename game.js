@@ -289,8 +289,9 @@ class Ship{
 		}
 
 		if([SENTINEL, GUARD, COL].includes(type))
-			this.ai = [Math.random(), Math.floor((pos[0]+150*COLS)/300)
-				+COLS*Math.floor((pos[1]+300*ROWS*10+150*ROWS)/300)];
+			//this.ai = [Math.random(), Math.floor((pos[0]+150*COLS)/300)
+				//+COLS*Math.floor((pos[1]+300*ROWS*10+150*ROWS)/300)];
+			this.ai = [Math.random(), null];
 	}
 
 	waitMoveTo(pos, i){
@@ -807,12 +808,13 @@ class Game{
 
 		let using = new Array(this.rocks.length).fill(false);
 		
-		for(let s of this.ships) if(s.team != CERB){
+		for(let s of this.ships) if(s.team != CERB && [BS, DECOY, REPAIR, ROCKET, TURRET].includes(s.type)){
 			if(!s.move.length) using[s.dock] = true;
 			else using[s.move[0][2]] = true;
 		}
 
-		let occupied = new Array(ROWS*COLS).fill([]);
+		let occupied = new Array(ROWS*COLS);
+		for(let i=0; i<ROWS*COLS; ++i) occupied[i] = [];
 
 		for(let i=0; i<this.sectors.length; ++i) for(let x of this.sectors[i])
 			if(using[x]) occupied[i].push(x);
@@ -1119,8 +1121,8 @@ class Game{
 				const P = this.rocks[J];
 				this.addShip(SENTINEL+I, CERB, [SENTINEL+I], [P[0], P[1]-300*ROWS*10], []);
 				this.ships[this.ships.length-1].dock = J;
-				for(let i=0; i<this.sectors.length; ++i)
-					if(this.sectors[i].includes(J)) this.shps[this.ships.length-1].ai[1] = i;
+				if(SENTINEL+I != INT) for(let i=0; i<this.sectors.length; ++i)
+					if(this.sectors[i].includes(J)) this.ships[this.ships.length-1].ai[1] = i;
 			}
 		}
 
