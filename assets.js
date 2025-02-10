@@ -44,6 +44,7 @@ function drawShip(T, O, M){
 		}
 		if(O == 0) fill(60, 90, 90);
 		if(O == 1) fill(110, 30, 30);
+		if(O == 2) fill(115, 10, 10);
 		_symm([
 			[14, 3.7],
 			[4, 6]
@@ -54,6 +55,7 @@ function drawShip(T, O, M){
 		]);
 		if(O == 0) fill(70, 100, 100);
 		if(O == 1) fill(120, 40, 40);
+		if(O == 2) fill(125, 20, 20);
 		_symm([
 			[-20, 2.3],
 			[-18.5, 6],
@@ -62,6 +64,7 @@ function drawShip(T, O, M){
 		]);
 		if(O == 0) fill(90, 120, 120);
 		if(O == 1) fill(140, 60, 60);
+		if(O == 2) fill(145, 40, 40);
 		_symm([
 			[-19, 2],
 			[-15, 6.5],
@@ -69,6 +72,7 @@ function drawShip(T, O, M){
 		]);
 		if(O == 0) fill(80, 120, 120);
 		if(O == 1) fill(140, 50, 50);
+		if(O == 2) fill(145, 30, 30);
 		_symm([
 			[-6, 5],
 			[3, 6.2]
@@ -80,6 +84,7 @@ function drawShip(T, O, M){
 		]);
 		if(O == 0) fill(100, 150, 150);
 		if(O == 1) fill(170, 70, 70);
+		if(O == 2) fill(170, 40, 40);
 		_symm([
 			[-15, 2.5],
 			[-11, 8.5],
@@ -97,6 +102,7 @@ function drawShip(T, O, M){
 		]);
 		if(O == 0) fill(80, 120, 120);
 		if(O == 1) fill(140, 50, 50);
+		if(O == 2) fill(145, 30, 30);
 		_symm([
 			[8, 0],
 			[5, 3],
@@ -117,6 +123,7 @@ function drawShip(T, O, M){
 		]);
 		if(O == 0) fill(70, 105, 105);
 		if(O == 1) fill(125, 40, 40);
+		if(O == 2) fill(130, 20, 20);
 		_symm([
 			[-21, 2],
 			[-20.25, 3.5],

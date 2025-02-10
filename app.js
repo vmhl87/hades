@@ -706,7 +706,7 @@ function main(){
 		for(let s of ships){
 			push(); translate(width/2+(s.vpos[0]-camera.x)*camera.z, height/2+(s.vpos[1]-camera.y)*camera.z);
 			rotate(s.rot); scale(sqrt(camera.z));
-			drawShip(s.type, s.team != socket.id, s.move.length && !s.emp ? 1 : 0);
+			drawShip(s.type, s.team != socket.id ? (s.type == BS && Number.isInteger(s.team) ? 2 : 1) : 0, s.move.length && !s.emp ? 1 : 0);
 			rotate(-s.rot);
 			if(s.emp){
 				stroke(255, 50, 50); noFill(); strokeWeight(2);
