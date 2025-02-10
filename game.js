@@ -819,7 +819,9 @@ class Game{
 		for(let i=0; i<this.sectors.length; ++i) for(let x of this.sectors[i])
 			if(using[x]) occupied[i].push(x);
 
-		for(let s of this.ships)
+		for(let i=0; i<this.ships.length; ++i){
+			const s = this.ships[i];
+
 			if([SENTINEL, GUARD, COL].includes(s.type)){
 				if(s.pos[1] > -150*ROWS*2){
 					if(s.wait == null && s.move.length == 0){
@@ -847,6 +849,31 @@ class Game{
 
 			}else if(s.type == BS && s.ai != null){
 				if(s.pos[1] < 150*ROWS*2){
+					if(s.ai[1]){
+						let veng = false;
+						for(let m of s.modules) if(m.type == VENG) veng = true;
+
+						for(let j=0; j<s.modules.length; ++j) if(s.modules[j].state == 1){
+							const m = s.modules[j];
+
+							if(m.type >= ALPHA && m.type < ALLY && !veng)
+								this.activateModule(i, {i: j});
+
+							if(m.type == ALLY && s.modules[0].aux.length)
+								this.activateModule(i, {i: j});
+
+							if(m.type == EMP) this.activateModule(i, {i: j});
+
+							if(m.type == BARRIER) this.activateModule(i, {i: j});
+
+							if(m.type == AMP) this.activateModule(i, {i: j});
+
+							if(m.type == FORT) this.activateModule(i, {i: j});
+
+							if(m.type == TURRET) this.activateModule(i, {i: j});
+						}
+					}
+
 					if(s.wait == null && s.move.length == 0){
 						s.ai[0] += 1/(TPS*30);
 						if(s.ai[1]) s.ai[0] += 5/(TPS*30);
@@ -871,6 +898,7 @@ class Game{
 					}
 				}
 			}
+		}
 
 		for(let s of this.ships) if(!s.emp && !locked.has(s.uid) && !s.fort) s.travel();
 
@@ -1144,7 +1172,17 @@ class Game{
 					[LASER, OMEGA, VENG],
 					[BATTERY, PASSIVE, VENG],
 					[LASER, PASSIVE, VENG],
-					[BATTERY, PASSIVE, SOL]
+					[BATTERY, PASSIVE, SOL],
+					[MASS, PASSIVE, SOL],
+					[BATTERY, ALPHA, AMP],
+					[LASER, PASSIVE, EMP],
+					[DART, OMEGA, EMP],
+					[DART, ALLY, BARRIER],
+					[BATTERY, MIRROR, SOL],
+					[LASER, MIRROR, BARRIER],
+					[MASS, OMEGA, AMP, EMP],
+					[MASS, ALPHA, VENG, AMP],
+					[DART, PASSIVE, EMP, TURRET],
 				];
 
 				const I = Math.floor(Math.random()*MODS.length);
