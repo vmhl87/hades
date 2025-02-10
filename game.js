@@ -807,8 +807,10 @@ class Game{
 
 		let using = new Array(this.rocks.length).fill(false);
 		
-		for(let s of this.ships) if(s.team != CERB && s.dock != null)
-			using[s.dock] = true;
+		for(let s of this.ships) if(s.team != CERB){
+			if(!s.move.length) using[s.dock] = true;
+			else using[s.move[0][2]] = true;
+		}
 
 		let occupied = new Array(ROWS*COLS).fill([]);
 
@@ -1117,6 +1119,8 @@ class Game{
 				const P = this.rocks[J];
 				this.addShip(SENTINEL+I, CERB, [SENTINEL+I], [P[0], P[1]-300*ROWS*10], []);
 				this.ships[this.ships.length-1].dock = J;
+				for(let i=0; i<this.sectors.length; ++i)
+					if(this.sectors[i].includes(J)) this.shps[this.ships.length-1].ai[1] = i;
 			}
 		}
 
