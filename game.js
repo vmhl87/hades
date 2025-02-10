@@ -841,7 +841,7 @@ class Game{
 							}
 						}
 
-						s.moveTo([this.rocks[I][0], this.rocks[I][1]+10], I);
+						if(I != s.dock) s.moveTo([this.rocks[I][0], this.rocks[I][1]+10], I);
 					}
 				}
 
