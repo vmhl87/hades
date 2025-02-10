@@ -1178,6 +1178,7 @@ class Game{
 					[LASER, PASSIVE, EMP],
 					[DART, OMEGA, EMP],
 					[DART, ALLY, BARRIER],
+					[DART, ALLY, EMP],
 					[BATTERY, MIRROR, SOL],
 					[LASER, MIRROR, BARRIER],
 					[MASS, OMEGA, AMP, EMP],
