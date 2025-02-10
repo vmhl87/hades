@@ -307,7 +307,7 @@ function updateTouch(){
 
 				}else{
 					lockID = touches[0].id;
-					offset = [camera.x, camera.y];
+					offset = [camera.x, camera.y, 0, 0];
 				}
 			}
 		}
@@ -321,9 +321,16 @@ function updateTouch(){
 			camera.z = offset[0]*D/offset[1];
 			camera.z = min(10, max(0.3, camera.z));
 
+			const P = [(touches[0].x+touches[1].x)/2, (touches[0].y+touches[1].y)/2];
+
+			camera.x = offset[2][0] + (offset[3][0]-P[0])/camera.z;
+			camera.y = offset[2][1] + (offset[3][1]-P[1])/camera.z;
+
 		}else{
 			lockID = touches[0].id+touches[1].id;
-			offset = [camera.z, _dist([touches[0].x, touches[0].y], [touches[1].x, touches[1].y])];
+			offset = [camera.z, _dist([touches[0].x, touches[0].y], [touches[1].x, touches[1].y]),
+				[camera.x, camera.y], [(touches[0].x+touches[1].x)/2, (touches[0].y+touches[1].y)/2]
+			];
 		}
 	}
 

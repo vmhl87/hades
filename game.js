@@ -62,7 +62,7 @@ LASER_DAMAGE[COL] = [60, 150, 500];
 
 EXPIRE_TIME[DECOY] = 40;
 EXPIRE_TIME[REPAIR] = 40;
-EXPIRE_TIME[ROCKET] = 40;
+EXPIRE_TIME[ROCKET] = 100;
 EXPIRE_TIME[TURRET] = 40;
 
 RECHARGE_TIME[TURRETD] = 5;
@@ -74,7 +74,7 @@ EFFECT_TIME[DART] = 0;
 RECHARGE_TIME[DART] = 10;
 
 EFFECT_TIME[ROCKETD] = 0;
-RECHARGE_TIME[ROCKETD] = 15;
+RECHARGE_TIME[ROCKETD] = 12;
 
 EFFECT_TIME[EMP] = 6;
 RECHARGE_TIME[EMP] = 45;
@@ -112,7 +112,7 @@ EFFECT_TIME[REPAIR] = 0;
 RECHARGE_TIME[REPAIR] = 30;
 
 EFFECT_TIME[ROCKET] = 0;
-RECHARGE_TIME[ROCKET] = 60;
+RECHARGE_TIME[ROCKET] = 120;
 
 EFFECT_TIME[TURRET] = 0;
 RECHARGE_TIME[TURRET] = 60;
@@ -257,6 +257,8 @@ class Ship{
 		this.imp = 0;
 		this.ally = null;
 
+		this.ai = null;
+
 		for(let m of this.modules){
 			if(IS_WEAPON(m.type))
 				m.aux = [];
@@ -275,11 +277,16 @@ class Ship{
 
 			if(m.type == TURRETD)
 				m.state = 0;
+
+			if([LASER, LASER2, COL, BATTERY].includes(m.type))
+				m.state = 0;
+
+			if(m.type == INT) this.ai = Math.random();
 		}
 	}
 
 	waitMoveTo(pos, i){
-		this.wait = [...pos, 40, i];
+		this.wait = [...pos, 1, i];
 	}
 
 	moveTo(pos, i){
@@ -364,7 +371,10 @@ class Ship{
 
 		const now = Date.now();
 
-		if(this.wait && --this.wait[2] == 0) this.confirmMove();
+		if(this.wait != null){
+			this.wait[2] -= 1/(10*TPS);
+			if(this.wait[2] <= 0) this.confirmMove();
+		}
 
 		while(this.move.length && this.move[0][0] == this.pos[0] && this.move[0][1] == this.pos[1]){
 			this.dock = this.move[0][2];
@@ -708,6 +718,28 @@ class Game{
 									this.activateModule(i, {i: j});
 				}
 			}
+
+			if(T == INT){
+				if(s.wait == null && s.move.length == 0)
+					s.ai += 1/(TPS*20);
+
+				if(s.ai >= 1){
+					s.ai = 0;
+
+					const N = 3;
+					
+					let P = [];
+
+					for(let i=0; i<N; ++i){
+						const I = Math.floor(Math.random()*this.rocks.length);
+						P.push([_dist(s.pos, this.rocks[I]), I]);
+					}
+
+					P.sort((a, b) => a[0]-b[0]);
+
+					s.waitMoveTo(this.rocks[P[0][1]], P[0][1]);
+				}
+			}
 		}
 	}
 
@@ -782,12 +814,17 @@ class Game{
 					let targets = [], decoys = [];
 
 					for(let x of this.ships) if(x.team != s.team)
-						if(_dist(x.pos, s.pos) < RANGE[m.type] && (![DART, ROCKETP].includes(m.type)
+						if(_dist(x.pos, s.pos) < RANGE[m.type] && (![DART, ROCKETD].includes(m.type)
 							|| [BS, DECOY, REPAIR, ROCKET, TURRET].includes(x.type)))
 							if(m.type != ROCKETD || _dist(x.pos, s.pos) > 60){
 								if(x.type == DECOY) decoys.push([_dist(x.pos, s.pos), x.uid]);
 								else targets.push([_dist(x.pos, s.pos), x.uid]);
 							}
+
+					if([DART, ROCKETD].includes(m.type) && targets.length == 0)
+						for(let x of this.ships) if(x.type >= SENTINEL && x.type <= COL &&
+							_dist(x.pos, s.pos) < RANGE[m.type])
+								targets.push([_dist(x.pos, s.pos), x.uid]);
 
 					const orig = m.aux.length ? m.aux[0] : null;
 
@@ -811,16 +848,11 @@ class Game{
 					targets = targets.filter(x => !m.aux.includes(x[1]));
 					decoys = decoys.filter(x => !m.aux.includes(x[1]));
 
-					m.aux = [];
-
-					while(m.aux.length < TARGETS[m.type] && oldDecoys.length){
-						const R = Math.floor(Math.random()*oldDecoys.length);
-						m.aux.push(oldDecoys.splice(R, 1)[0]);
-					}
+					m.aux = oldDecoys;
 
 					while(m.aux.length < TARGETS[m.type] && decoys.length){
-						const R = Math.floor(Math.random()*decoys.length);
-						m.aux.push(decoys.splice(R, 1)[0][1]);
+						m.aux.push(decoys[0][1]);
+						decoys = decoys.slice(1);
 					}
 
 					while(m.aux.length < TARGETS[m.type] && oldTargets.length){
@@ -829,8 +861,8 @@ class Game{
 					}
 
 					while(m.aux.length < TARGETS[m.type] && targets.length){
-						const R = Math.floor(Math.random()*targets.length);
-						m.aux.push(targets.splice(R, 1)[0][1]);
+						m.aux.push(targets[0][1]);
+						targets = targets.slice(1);
 					}
 
 				if(orig != null && [LASER, COL, BATTERY].includes(m.type)
@@ -991,7 +1023,7 @@ class Game{
 				if(s.type >= SENTINEL && s.type <= COL)
 					++COUNT[s.type-SENTINEL];
 
-			const OPTIMAL = [0.75, 0.75, 0.5, 0.3];
+			const OPTIMAL = [0.3, 0.5, 0.4, 0.2];
 
 			let idx = [];
 

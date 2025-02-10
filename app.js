@@ -963,7 +963,7 @@ function main(){
 							if(mouseIn(width/2-117, height-50, 20, 20)) stroke(30, 90, 110);
 							else stroke(20, 70, 80);
 						}else stroke(10, 40, 60);
-						const wait = 25-floor(ships[shipID].wait[2]*25/40);
+						const wait = 25-floor(ships[shipID].wait[2]*25);
 						line(width/2-130, height-45, width/2-130+min(5, wait), height-45+min(5, wait));
 						if(wait >= 5)
 							line(width/2-125, height-40, width/2-125+wait-5, height-40-wait+5);
