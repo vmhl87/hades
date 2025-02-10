@@ -815,7 +815,7 @@ class Game{
 					s.ai[0] = 0;
 
 					const I = this.sectors[s.ai[1]][Math.floor(Math.random()*this.sectors[s.ai[1]].length)];
-					s.waitMoveTo([this.rocks[I][0], this.rocks[I][1]+10], I);
+					s.moveTo([this.rocks[I][0], this.rocks[I][1]+10], I);
 				}
 
 			}else if(s.type == BS && s.ai != null){
