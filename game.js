@@ -805,41 +805,66 @@ class Game{
 		
 		// cerberus + lone BS AI
 
+		let using = new Array(this.rocks.length).fill(false);
+		
+		for(let s of this.ships) if(s.team != CERB && s.dock != null)
+			using[s.dock] = true;
+
+		let occupied = new Array(ROWS*COLS).fill([]);
+
+		for(let i=0; i<this.sectors.length; ++i) for(let x of this.sectors[i])
+			if(using[x]) occupied[i].push(x);
+
 		for(let s of this.ships)
 			if([SENTINEL, GUARD, COL].includes(s.type)){
-				if(s.wait == null && s.move.length == 0){
-					s.ai[0] += 1/(TPS*20);
-				}
+				if(s.pos[1] > -150*ROWS*2){
+					if(s.wait == null && s.move.length == 0){
+						if(occupied[s.ai[1]].length) s.ai[0] += 1/(TPS*([3, 1, 0, 2])[s.type-SENTINEL]);
+						else s.ai[0] += 1/(TPS*20);
+					}
 
-				if(s.ai[0] >= 1){
-					s.ai[0] = 0;
+					if(s.ai[0] >= 1){
+						s.ai[0] = 0;
 
-					const I = this.sectors[s.ai[1]][Math.floor(Math.random()*this.sectors[s.ai[1]].length)];
-					s.moveTo([this.rocks[I][0], this.rocks[I][1]+10], I);
+						let I = this.sectors[s.ai[1]][Math.floor(Math.random()*this.sectors[s.ai[1]].length)];
+
+						let dist = 450;
+						for(let x of occupied[s.ai[1]]){
+							const D = _dist(this.rocks[x], s.pos);
+							if(D < dist){
+								dist = D;
+								I = x;
+							}
+						}
+
+						s.moveTo([this.rocks[I][0], this.rocks[I][1]+10], I);
+					}
 				}
 
 			}else if(s.type == BS && s.ai != null){
-				if(s.wait == null && s.move.length == 0){
-					s.ai[0] += 1/(TPS*30);
-					if(s.ai[1]) s.ai[0] += 5/(TPS*30);
-					s.ai[1] = false;
+				if(s.pos[1] < 150*ROWS*2){
+					if(s.wait == null && s.move.length == 0){
+						s.ai[0] += 1/(TPS*30);
+						if(s.ai[1]) s.ai[0] += 5/(TPS*30);
+						s.ai[1] = false;
 
-				}else if(s.wait != null){
-					if(s.ai[1]) s.wait[2] -= 3/(10*TPS);
-				}
+					}else if(s.wait != null){
+						if(s.ai[1]) s.wait[2] -= 3/(10*TPS);
+					}
 
-				if(s.ai[0] >= 1){
-					s.ai[0] = 0;
+					if(s.ai[0] >= 1){
+						s.ai[0] = 0;
 
-					let P = [];
+						let P = [];
 
-					for(let i=0; i<this.rocks.length; ++i)
-						if(_dist(this.rocks[i], s.pos) < 450)
-							P.push(i);
+						for(let i=0; i<this.rocks.length; ++i)
+							if(_dist(this.rocks[i], s.pos) < 450)
+								P.push(i);
 
-					const I = P[Math.floor(Math.random()*P.length)];
+						const I = P[Math.floor(Math.random()*P.length)];
 
-					s.waitMoveTo([this.rocks[I][0], this.rocks[I][1]+10], I);
+						s.waitMoveTo([this.rocks[I][0], this.rocks[I][1]+10], I);
+					}
 				}
 			}
 
