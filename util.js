@@ -136,14 +136,14 @@ function selectedPos(pos){
 	let opt = [];
 
 	if(selectMove == null || selectMove[0] != "module" ||
-	ships[shipID].modules[selectMove[1].i].type != RIPPLE)
+	(shipID != null && ships[shipID].modules[selectMove[1].i].type != RIPPLE))
 		for(let i=0; i<rocks.length; ++i){
 			const d = _dist(screenPos(rocks[i]), pos);
 			if(d < 50) opt.push([d, ["rock", i]]);
 		}
 
 	if(selectMove == null || (selectMove[0] == "module" &&
-	ships[shipID].modules[selectMove[1].i].type == RIPPLE))
+	shipID != null && ships[shipID].modules[selectMove[1].i].type == RIPPLE))
 		for(let i=0; i<ships.length; ++i){
 			const d = _dist(screenPos(ships[i].pos), pos);
 			if(d < 50) opt.push([d-20, ["ship", ships[i].uid]]);

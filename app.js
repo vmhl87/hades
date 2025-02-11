@@ -597,13 +597,11 @@ function main(){
 			stroke(100, 150, 255, 100); noFill(); strokeWeight(2*sqrt(camera.z));
 			if(e[1]-NOW > 800){
 				for(let j=0; j<3; ++j){
-					let a = noise(floor(Date.now()/100), j)*PI*2;
+					let a = noise(floor(Date.now()/100), j)*30;
 					beginShape();
 					for(let i=20; i<=RANGE[EMP]*min(1, (Date.now()-e[1]+2000)/300); i+=10){
 						const old = a;
 						a += (noise(floor(Date.now()/100+i), j)*2-1)*PI*0.1;
-						if(a > PI*2) a -= PI*2;
-						if(a < 0) a += PI*2;
 
 						vertex(...screenPos([e[0][0]+cos(a)*i, e[0][1]+sin(a)*i]));
 					}
@@ -623,7 +621,7 @@ function main(){
 			for(let j=0; j<3; ++j){
 				let a = (1-Math.pow(noise(floor(Date.now()/100), j), 2))*
 						(2*(RANGE[DISRUPT]+20)*min(1, (Date.now()-i[1]+2000)/300)-40)+40,
-					b = noise(floor(Date.now()/100)+100, j)*PI*2,
+					b = (noise(floor(Date.now()/100)+100, j)*30)%(PI*2),
 					c = (b+noise(floor(Date.now()/100)+200, j)*PI*2)%(PI*2);
 				arc(...screenPos(i[0]), a*camera.z, a*camera.z, b, c);
 			}
@@ -1196,7 +1194,11 @@ function click(){
 	}
 
 	if(mouseIn(30, 30, 30, 30)){
-		socket.emit("quit");
+		if(snapshot){
+			snapshot = 0;
+			connected = 0;
+			staging = 1;
+		}else socket.emit("quit");
 		return;
 	}
 
@@ -1215,7 +1217,7 @@ function click(){
 
 	if(focus && shipID != null && selectMove == null){
 		for(let i=0; i<ships[shipID].modules.length; ++i){
-			if(mouseIn(width/2+25-25*ships[shipID].modules.length+50*i, height-120-10-25, 20, 20)){
+			if(mouseIn(width/2+25-25*ships[shipID].modules.length+50*i, height-120-10-25, 25, 25)){
 				if(ships[shipID].team == socket.id && ships[shipID].modules[i].state == 1){
 					if(ships[shipID].tp != null && [TP, DESTINY, RIPPLE].includes(ships[shipID].modules[i].type))
 						return;
