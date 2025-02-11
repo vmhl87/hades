@@ -370,7 +370,7 @@ function main(){
 			
 		}else shipID = null;
 
-		if(!snapshot) for(let s of ships) s.travel();
+		for(let s of ships) s.travel();
 
 		const w = 5, h = 3;
 
