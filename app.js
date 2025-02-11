@@ -110,11 +110,11 @@ socket.on("state", data => {
 		}
 
 		if(T == "emp"){
-			emps.push([D, Date.now() + 2000]);
+			emps.push([D, Date.now() + 4000]);
 		}
 
 		if(T == "imp"){
-			imps.push([D, Date.now() + 2000]);
+			imps.push([D, Date.now() + 4000]);
 		}
 	}
 });
@@ -370,6 +370,17 @@ function main(){
 			
 		}else shipID = null;
 
+		let REV = new Map();
+
+		let bsID = [], cerbID = [], repairID = [];
+		for(let i=0; i<ships.length; ++i){
+			if(ships[i].type == BS) bsID.push(i);
+			if(ships[i].type >= SENTINEL && ships[i].type <= COL)
+				cerbID.push(i);
+			if(ships[i].type == REPAIR) repairID.push(i);
+			REV.set(ships[i].uid, i);
+		}
+
 		for(let s of ships) s.travel();
 
 		const w = 5, h = 3;
@@ -513,76 +524,79 @@ function main(){
 			}
 		}
 
-		for(let s of ships) if(s.imp == 0){
-			push(); translate(width/2+(s.vpos[0]-camera.x)*camera.z, height/2+(s.vpos[1]-camera.y)*camera.z);
-			scale(sqrt(camera.z));
+		for(let i of bsID){
+			const s = ships[i];
+			if(s.imp == 0){
+				push(); translate(width/2+(s.vpos[0]-camera.x)*camera.z, height/2+(s.vpos[1]-camera.y)*camera.z);
+				scale(sqrt(camera.z));
 
-			for(let m of s.modules) if(Array.isArray(m.aux) && m.aux.length && m.aux[0] &&
-				(m.aux[1] > 3/TIME[m.type] || (m.aux[1]*TIME[m.type])%1 < 0.5) || m.type == PASSIVE){
-				push();
+				for(let m of s.modules) if(Array.isArray(m.aux) && m.aux.length && m.aux[0] &&
+					(m.aux[1] > 3/TIME[m.type] || (m.aux[1]*TIME[m.type])%1 < 0.5) || m.type == PASSIVE){
+					push();
 
-				if(m.type == ALPHA){
-					stroke(50, 150, 150, 50); noFill(); strokeWeight(3);
-					arc(0, 0, 50-3, 50-3, -PI*0.25, PI*0.25);
-					arc(0, 0, 50-3, 50-3, PI-PI*0.25, PI+PI*0.25);
+					if(m.type == ALPHA){
+						stroke(50, 150, 150, 50); noFill(); strokeWeight(3);
+						arc(0, 0, 50-3, 50-3, -PI*0.25, PI*0.25);
+						arc(0, 0, 50-3, 50-3, PI-PI*0.25, PI+PI*0.25);
 
-					noStroke(); fill(50, 150, 150, 80);
-					circle(0, 0, 50);
-				}
-
-				if(m.type == IMPULSE){
-					if(m.aux[2]){
-						fill(200, 100, 50, 100); noStroke();
-						circle(0, 0, RANGE[IMPULSE]*2*sqrt(camera.z));
+						noStroke(); fill(50, 150, 150, 80);
+						circle(0, 0, 50);
 					}
 
-					stroke(50, 150, 150, 40); noFill(); strokeWeight(3);
-					arc(0, 0, 55-3, 55-3, -PI*0.25+frameCount/30, PI*0.25+frameCount/30);
-					arc(0, 0, 55-3, 55-3, PI-PI*0.25+frameCount/30, PI+PI*0.25+frameCount/30);
+					if(m.type == IMPULSE){
+						if(m.aux[2]){
+							fill(200, 100, 50, 100); noStroke();
+							circle(0, 0, RANGE[IMPULSE]*2*sqrt(camera.z));
+						}
 
-					noStroke(); fill(50, 150, 150, 40);
-					circle(0, 0, 55);
+						stroke(50, 150, 150, 40); noFill(); strokeWeight(3);
+						arc(0, 0, 55-3, 55-3, -PI*0.25+frameCount/30, PI*0.25+frameCount/30);
+						arc(0, 0, 55-3, 55-3, PI-PI*0.25+frameCount/30, PI+PI*0.25+frameCount/30);
+
+						noStroke(); fill(50, 150, 150, 40);
+						circle(0, 0, 55);
+					}
+
+					if(m.type == PASSIVE){
+						stroke(50, 150, 150, ceil(150*m.aux[0])); noFill(); strokeWeight(3);
+						arc(0, 0, 55, 53, -PI*0.25, PI*0.25);
+						arc(0, 0, 55, 53, PI-PI*0.25, PI+PI*0.25);
+
+						noStroke(); fill(50, 150, 150, ceil(40*m.aux[0]));
+						ellipse(0, 0, 55+2, 53+2);
+					}
+
+					if(m.type == OMEGA){
+						stroke(50, 150, 150, 70); noFill(); strokeWeight(3);
+						circle(0, 0, 70-3);
+
+						noStroke(); fill(50, 150, 150, 40);
+						circle(0, 0, 70);
+					}
+
+					if(m.type == MIRROR){
+						scale(sqrt(camera.z));
+						fill(200, 50, 50, 30); noStroke();
+						circle(0, 0, RANGE[MIRROR]*2);
+						stroke(200, 50, 50, 150); strokeWeight(2); noFill();
+						arc(0, 0, RANGE[MIRROR]*2, RANGE[MIRROR]*2, -PI/2, -PI/2+PI*2*m.aux[0]);
+					}
+
+					if(m.type == ALLY){
+						scale(sqrt(camera.z));
+						fill(150, 200, 200, 15); noStroke();
+						circle(0, 0, RANGE[ALLY]*2);
+						stroke(150, 200, 200, 150); strokeWeight(2); noFill();
+						arc(0, 0, RANGE[ALLY]*2, RANGE[ALLY]*2, -PI/2, -PI/2+PI*2*m.aux[0]);
+						strokeWeight(1.5);
+						if(-PI/2+PI*2*m.aux[0] > -PI*0.08) arc(0, 0, RANGE[ALLY]*2-6, RANGE[ALLY]*2-6,
+							max(-PI/2, -PI*0.08), min(-PI/2+PI*2*m.aux[0], PI*0.08));
+						if(-PI/2+PI*2*m.aux[0] > PI-PI*0.08) arc(0, 0, RANGE[ALLY]*2-6, RANGE[ALLY]*2-6,
+							max(-PI/2, PI-PI*0.08), min(-PI/2+PI*2*m.aux[0], PI*1.08));
+					}
+
+					pop();
 				}
-
-				if(m.type == PASSIVE){
-					stroke(50, 150, 150, ceil(150*m.aux[0])); noFill(); strokeWeight(3);
-					arc(0, 0, 55, 53, -PI*0.25, PI*0.25);
-					arc(0, 0, 55, 53, PI-PI*0.25, PI+PI*0.25);
-
-					noStroke(); fill(50, 150, 150, ceil(40*m.aux[0]));
-					ellipse(0, 0, 55+2, 53+2);
-				}
-
-				if(m.type == OMEGA){
-					stroke(50, 150, 150, 70); noFill(); strokeWeight(3);
-					circle(0, 0, 70-3);
-
-					noStroke(); fill(50, 150, 150, 40);
-					circle(0, 0, 70);
-				}
-
-				if(m.type == MIRROR){
-					scale(sqrt(camera.z));
-					fill(200, 50, 50, 30); noStroke();
-					circle(0, 0, RANGE[MIRROR]*2);
-					stroke(200, 50, 50, 150); strokeWeight(2); noFill();
-					arc(0, 0, RANGE[MIRROR]*2, RANGE[MIRROR]*2, -PI/2, -PI/2+PI*2*m.aux[0]);
-				}
-
-				if(m.type == ALLY){
-					scale(sqrt(camera.z));
-					fill(150, 200, 200, 15); noStroke();
-					circle(0, 0, RANGE[ALLY]*2);
-					stroke(150, 200, 200, 150); strokeWeight(2); noFill();
-					arc(0, 0, RANGE[ALLY]*2, RANGE[ALLY]*2, -PI/2, -PI/2+PI*2*m.aux[0]);
-					strokeWeight(1.5);
-					if(-PI/2+PI*2*m.aux[0] > -PI*0.08) arc(0, 0, RANGE[ALLY]*2-6, RANGE[ALLY]*2-6,
-						max(-PI/2, -PI*0.08), min(-PI/2+PI*2*m.aux[0], PI*0.08));
-					if(-PI/2+PI*2*m.aux[0] > PI-PI*0.08) arc(0, 0, RANGE[ALLY]*2-6, RANGE[ALLY]*2-6,
-						max(-PI/2, PI-PI*0.08), min(-PI/2+PI*2*m.aux[0], PI*1.08));
-				}
-
-				pop();
 			}
 
 			pop();
@@ -590,16 +604,18 @@ function main(){
 
 		const NOW = snapshot ? now : Date.now();
 
-		push(); noStroke();
+		push();
 		for(let e of emps){
-			fill(100, 150, 255, 50*min(1, (e[1]-NOW)/800));
-			circle(...screenPos(e[0]), RANGE[EMP]*2*camera.z*min(1, (NOW-e[1]+2000)/300));
-			stroke(100, 150, 255, 100); noFill(); strokeWeight(2*sqrt(camera.z));
+			noStroke();
+			fill(100, 150, 255, 50*min(1, (e[1]-NOW)/1600));
+			circle(...screenPos(e[0]), RANGE[EMP]*2*camera.z*min(1, (NOW-e[1]+4000)/600));
+			stroke(100, 150, 255, 100); strokeWeight(2*sqrt(camera.z));
+			noFill();
 			if(e[1]-NOW > 800){
 				for(let j=0; j<3; ++j){
 					let a = noise(floor(Date.now()/100), j)*30;
 					beginShape();
-					for(let i=20; i<=RANGE[EMP]*min(1, (Date.now()-e[1]+2000)/300); i+=10){
+					for(let i=20; i<=RANGE[EMP]*min(1, (Date.now()-e[1]+4000)/600); i+=10){
 						const old = a;
 						a += (noise(floor(Date.now()/100+i), j)*2-1)*PI*0.1;
 
@@ -613,14 +629,15 @@ function main(){
 
 		if(!snapshot) emps = emps.filter(x => x[1] > NOW);
 		
-		push(); noStroke();
+		push();
 		for(let i of imps){
-			fill(100, 255, 150, 50*min(1, (i[1]-NOW)/800));
-			circle(...screenPos(i[0]), RANGE[DISRUPT]*2*camera.z*min(1, (NOW-i[1]+2000)/300));
+			noStroke();
+			fill(100, 255, 150, 50*min(1, (i[1]-NOW)/1600));
+			circle(...screenPos(i[0]), RANGE[DISRUPT]*2*camera.z*min(1, (NOW-i[1]+4000)/600));
 			stroke(100, 255, 150, 100*min(1, (i[1]-NOW)/400)); noFill(); strokeWeight(2*sqrt(camera.z));
 			for(let j=0; j<3; ++j){
 				let a = (1-Math.pow(noise(floor(Date.now()/100), j), 2))*
-						(2*(RANGE[DISRUPT]+20)*min(1, (Date.now()-i[1]+2000)/300)-40)+40,
+						(2*(RANGE[DISRUPT]+20)*min(1, (Date.now()-i[1]+4000)/600)-40)+40,
 					b = (noise(floor(Date.now()/100)+100, j)*30)%(PI*2),
 					c = (b+noise(floor(Date.now()/100)+200, j)*PI*2)%(PI*2);
 				arc(...screenPos(i[0]), a*camera.z, a*camera.z, b, c);
@@ -648,7 +665,8 @@ function main(){
 
 		if(!snapshot) deaths = deaths.filter(x => x[1] > NOW);
 
-		for(let s of ships){
+		for(let i of bsID){
+			const s = ships[i];
 			for(let m of s.modules){
 				if(m.type == DESTINY && m.state < 0){
 					push(); fill(255, 100, 50, 20); noStroke();
@@ -701,12 +719,6 @@ function main(){
 				}
 			}
 
-			if(s.type == REPAIR){
-				push(); fill(50, 200, 50, 20); noStroke();
-				circle(...screenPos(s.vpos), 60*2*camera.z);
-				pop();
-			}
-
 			if(s.fort > 0){
 				push(); stroke(200, 100, 50, 255*min(1, (0.5-abs(s.fort-0.5))*3)); noFill(); strokeWeight(2);
 				translate(...screenPos(s.vpos)); scale(sqrt(camera.z));
@@ -717,6 +729,15 @@ function main(){
 				pop();
 			}
 		}
+
+		for(let i of repairID){
+			if(ships[i].type == REPAIR){
+				push(); fill(50, 200, 50, 20); noStroke();
+				circle(...screenPos(ships[i].vpos), 60*2*camera.z);
+				pop();
+			}
+		}
+
 
 		for(let s of ships){
 			push(); translate(width/2+(s.vpos[0]-camera.x)*camera.z, height/2+(s.vpos[1]-camera.y)*camera.z);
@@ -796,10 +817,6 @@ function main(){
 
 		{
 			const S = sqrt(camera.z);
-
-			let REV = new Map();
-			for(let i=0; i<ships.length; ++i)
-				REV.set(ships[i].uid, i);
 
 			function SH(uid){
 				return REV.has(uid) ? ships[REV.get(uid)] : null;

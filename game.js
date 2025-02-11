@@ -1,4 +1,4 @@
-const COLS = 5, ROWS = 3, TPS = 8;
+const COLS = 5, ROWS = 3, TPS = 4;
 
 let ct = 0;
 
