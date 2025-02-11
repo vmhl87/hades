@@ -176,12 +176,14 @@ function drawShip(T, O, M){
 	}
 
 	if(T == GUARD){
+		/*
 		fill(80, 50, 50);
 		_symm([
 			[7, 0],
 			[-1.5, 6],
 			[2, 0]
 		]);
+		*/
 		fill(150, 80, 80);
 		_symm([
 			[8, 0],
@@ -194,8 +196,8 @@ function drawShip(T, O, M){
 			[2, 3],
 			[1, 0]
 		]);
-		fill(130, 70, 70);
-		circle(4.5, 0, 4.5);
+		//fill(130, 70, 70);
+		//circle(4.5, 0, 4.5);
 		fill(80, 50, 50);
 		circle(4.5, 0, 3);
 		if(M){
@@ -242,6 +244,7 @@ function drawShip(T, O, M){
 			[-12, 3],
 			[-10.5, 1.5]
 		]);
+		/*
 		fill(130, 70, 70);
 		_symm([
 			[3.5, 0],
@@ -251,6 +254,7 @@ function drawShip(T, O, M){
 			[-8, 1.5],
 			[-8.5, 0]
 		]);
+		*/
 		fill(80, 50, 50);
 		_symm([
 			[3, 0],
@@ -299,9 +303,9 @@ function drawShip(T, O, M){
 			[-22, 2]
 		]);
 		fill(130, 70, 70);
-		circle(5, 0, 4.5);
-		circle(5+5.2, -3, 4.5);
-		circle(5+5.2, 3, 4.5);
+		//circle(5, 0, 4.5);
+		//circle(5+5.2, -3, 4.5);
+		//circle(5+5.2, 3, 4.5);
 		_symm([
 			[-22, 1.3],
 			[-8.7, 1.3],
@@ -311,15 +315,18 @@ function drawShip(T, O, M){
 		]);
 		fill(110, 60, 60);
 		rect(14, -0.3, 9, 0.6);
+		/*
 		push();
 		translate(5+3.5, 0); rotate(PI*2/3);
 		rect(5.5, -0.3, 2, 0.6); rotate(PI*2/3);
 		rect(5.5, -0.3, 2, 0.6);
 		pop();
+		*/
 		fill(80, 50, 50);
 		circle(5, 0, 3);
 		circle(5+5.2, -3, 3);
 		circle(5+5.2, 3, 3);
+		/*
 		_symm([
 			[-22, 0.3],
 			[-8, 0.3],
@@ -327,6 +334,7 @@ function drawShip(T, O, M){
 			[-2.4, 6],
 			[-7.4, 0]
 		]);
+		*/
 	}
 
 	if(T == DECOY){
@@ -341,9 +349,9 @@ function drawShip(T, O, M){
 			[-2, 2],
 			[-1.6, 0]
 		]);
-		if(O == 0) fill(80, 120, 120);
-		if(O == 1) fill(140, 50, 50);
-		circle(1.25, 0, 4);
+		//if(O == 0) fill(80, 120, 120);
+		//if(O == 1) fill(140, 50, 50);
+		//circle(1.25, 0, 4);
 		if(O == 0) fill(60, 100, 100);
 		if(O == 1) fill(120, 40, 40);
 		circle(1.25, 0, 2.5);
@@ -372,9 +380,9 @@ function drawShip(T, O, M){
 		ellipse(1.25, 0, 12, 10);
 		arc(3, 0, 18, 18, PI*0.7, PI*0.9);
 		arc(3, 0, 18, 18, PI*1.1, PI*1.3);
-		if(O == 0) fill(80, 120, 120);
-		if(O == 1) fill(140, 50, 50);
-		circle(1, 0, 4);
+		//if(O == 0) fill(80, 120, 120);
+		//if(O == 1) fill(140, 50, 50);
+		//circle(1, 0, 4);
 		if(O == 0) fill(60, 100, 100);
 		if(O == 1) fill(120, 40, 40);
 		circle(1, 0, 2.5);
@@ -409,11 +417,13 @@ function drawShip(T, O, M){
 		if(O == 0) fill(100, 150, 150);
 		if(O == 1) fill(170, 70, 70);
 		circle(0, 0, 13);
+		/*
 		if(O == 0) fill(80, 120, 120);
 		if(O == 1) fill(140, 50, 50);
 		circle(0, -3, 4);
 		circle(3*sin(PI*2/3), -3*cos(PI*2/3), 4);
 		circle(3*sin(PI*4/3), -3*cos(PI*4/3), 4);
+		*/
 		if(O == 0) fill(60, 100, 100);
 		if(O == 1) fill(120, 40, 40);
 		circle(0, -3, 2.5);
@@ -460,9 +470,9 @@ function drawShip(T, O, M){
 			[-9, 3],
 			[-12, 0]
 		]);
-		if(O == 0) fill(80, 120, 120);
-		if(O == 1) fill(140, 50, 50);
-		circle(3, 0, 4);
+		//if(O == 0) fill(80, 120, 120);
+		//if(O == 1) fill(140, 50, 50);
+		//circle(3, 0, 4);
 		if(O == 0) fill(60, 100, 100);
 		if(O == 1) fill(120, 40, 40);
 		circle(3, 0, 2.5);
