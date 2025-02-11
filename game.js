@@ -886,9 +886,9 @@ class Game{
 
 							if(m.type == FORT) this.activateModule(i, {i: j});
 
-							if(m.type == DECOY) this.activateModule(i, {i: j});
+							if(m.type == TURRET) this.activateModule(i, {i: j});
 
-							if(m.type == TURRET){
+							if(m.type == DECOY){
 								this.activateModule(i, {i: j, loc: [...s.pos],
 									dock: s.wait != null ? s.wait[3] : (s.move.length ? s.move[0][2] : s.dock)
 								});
