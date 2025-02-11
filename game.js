@@ -886,7 +886,13 @@ class Game{
 
 							if(m.type == FORT) this.activateModule(i, {i: j});
 
-							if(m.type == TURRET) this.activateModule(i, {i: j});
+							if(m.type == DECOY) this.activateModule(i, {i: j});
+
+							if(m.type == TURRET){
+								this.activateModule(i, {i: j, loc: [...s.pos],
+									dock: s.wait != null ? s.wait[3] : (s.move.length ? s.move[0][2] : s.dock)
+								});
+							}
 						}
 					}
 
@@ -1186,17 +1192,17 @@ class Game{
 				const MODS = [
 					[BATTERY, OMEGA, VENG],
 					[LASER, OMEGA, VENG],
-					[BATTERY, PASSIVE, VENG],
+					[BATTERY, PASSIVE, VENG, DECOY],
 					[LASER, PASSIVE, VENG],
 					[BATTERY, PASSIVE, SOL],
 					[MASS, PASSIVE, SOL],
 					[BATTERY, ALPHA, AMP],
-					[LASER, PASSIVE, EMP],
+					[LASER, PASSIVE, EMP, DECOY],
 					[DART, OMEGA, EMP],
-					[DART, ALLY, BARRIER],
+					[DART, ALLY, BARRIER, DECOY],
 					[DART, ALLY, EMP],
 					[BATTERY, MIRROR, SOL],
-					[LASER, MIRROR, BARRIER],
+					[LASER, MIRROR, BARRIER, DECOY],
 					[MASS, OMEGA, AMP, EMP],
 					[MASS, ALPHA, VENG, AMP],
 					[DART, PASSIVE, EMP, TURRET],
