@@ -806,9 +806,14 @@ class Game{
 		
 		// cerberus + lone BS AI
 
-		let using = new Array(this.rocks.length).fill(false);
+		let using = new Array(this.rocks.length).fill(false),
+			priority = new Array(this.rocks.length).fill(false);
 		
 		for(let s of this.ships) if(s.team != CERB && [BS, DECOY, REPAIR, ROCKET, TURRET].includes(s.type)){
+			if(s.type == DECOY){
+				if(s.move.length) priority[s.move[0][2]] = true;
+				else priority[s.dock] = true;
+			}
 			if(s.tp != null){
 				if(s.tp[2] != null) using[s.tp[2]] = true;
 			}else if(!s.move.length) using[s.dock] = true;
@@ -838,6 +843,15 @@ class Game{
 
 						let dist = 450;
 						for(let x of occupied[s.ai[1]]){
+							const D = _dist(this.rocks[x], s.pos);
+							if(D < dist){
+								dist = D;
+								I = x;
+							}
+						}
+
+						dist = 450;
+						for(let x of this.sectors[s.ai[1]]) if(priority[x]){
 							const D = _dist(this.rocks[x], s.pos);
 							if(D < dist){
 								dist = D;
