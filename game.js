@@ -753,7 +753,7 @@ class Game{
 
 					P.sort((a, b) => a[0]-b[0]);
 
-					s.waitMoveTo(this.rocks[P[0][1]], P[0][1]);
+					s.waitMoveTo([this.rocks[P[0][1]][0], this.rocks[P[0][1]][1]+10], P[0][1]);
 				}
 			}
 		}
