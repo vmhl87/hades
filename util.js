@@ -254,7 +254,7 @@ function echo(...x){
 function draw(){
 	if(touches.length && !MOBILE){
 		MOBILE = true;
-		// frameRate(40);
+		frameRate(40);
 	}
 
 	if(!staging){
