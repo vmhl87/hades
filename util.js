@@ -52,7 +52,7 @@ class Ship{
 		this.modules = dat.modules;
 		this.pos = dat.pos;
 		this.move = dat.move;
-		this.wait = dat.wait;
+		if(this.team != socket.id) this.wait = dat.wait;
 		this.tp = dat.tp;
 		this.dock = dat.dock;
 		this.expire = dat.expire;
@@ -68,6 +68,8 @@ class Ship{
 		else if(this.wait) target = atan2(this.wait[1]-this.pos[1], this.wait[0]-this.pos[0]);
 		else if(this.tp != null) target = PI*1.6;
 		else target = PI*1.85;
+
+		if(this.move.length) this.wait = null;
 
 		let diff = target - this.rot;
 		if(diff > PI) diff -= PI*2;
@@ -251,6 +253,8 @@ function echo(...x){
 	socket.emit("echo", x);
 }
 
+let scrollVel = [0, 0];
+
 function draw(){
 	if(touches.length && !MOBILE){
 		MOBILE = true;
@@ -264,12 +268,22 @@ function draw(){
 				camera.x += (lastMouseX-mouseX)/camera.z;
 				camera.y += (lastMouseY-mouseY)/camera.z;
 			}
+			scrollVel[0] = lastMouseX-mouseX;
+			scrollVel[1] = lastMouseY-mouseY;
 			if(dist > 4) moved = true;
 		}
 	}
 
 	lastMouseX = mouseX;
 	lastMouseY = mouseY;
+
+	if((MOBILE && !touches.length) || (!MOBILE && !mouseIsPressed)){
+		camera.x += scrollVel[0]/camera.z;
+		camera.y += scrollVel[1]/camera.z;
+
+		scrollVel[0] *= 0.8;
+		scrollVel[1] *= 0.8;
+	}
 
 	if(MOBILE) updateTouch();
 
@@ -281,14 +295,20 @@ let lockID = null, offset = [0, 0], ctlState = 0;
 function updateTouch(){
 	let S = new Set();
 
+	let V = [0, 0];
+
 	for(let t of touches){
 		S.add(t.id);
 
 		if(posTouches.has(t.id)){
 			const P = posTouches.get(t.id);
 
-			if(_dist(P.first, [t.x, t.y]) > 20)
+			if(_dist(P.first, [t.x, t.y]) > 10 && !movedTouches.has(t.id)){
 				movedTouches.add(t.id);
+				P.first = [t.x, t.y];
+			}
+
+			V = [P.last[0]-t.x, P.last[1]-t.y];
 
 			P.last = [t.x, t.y];
 
@@ -304,6 +324,9 @@ function updateTouch(){
 					const P = posTouches.get(touches[0].id);
 					camera.x = offset[0] + (P.first[0]-P.last[0])/camera.z;
 					camera.y = offset[1] + (P.first[1]-P.last[1])/camera.z;
+
+					scrollVel[0] = V[0];
+					scrollVel[1] = V[1];
 
 				}else{
 					lockID = touches[0].id;
@@ -369,7 +392,7 @@ function windowResized(){
 
 function saveState(){
 	return JSON.stringify({
-		ships, rocks, blasts, deaths, heals,
+		ships, rocks, blasts, deaths, heals, dead, sectorDeaths,
 		emps, imps, ROWS, COLS, ID: socket.id, now: Date.now()
 	});
 }
@@ -390,6 +413,8 @@ function loadState(STATE){
 	COLS = S.COLS;
 	ID = S.ID;
 	now = S.now;
+	dead = S.dead;
+	sectorDeaths = S.sectorDeaths;
 
 	staging = 0;
 	connected = 1;

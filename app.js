@@ -23,7 +23,7 @@ function setup(){
 }
 
 let ships = [], rocks = [], blasts = [], deaths = [], heals = [], emps = [],
-	imps = [], gameID = null, ROWS, COLS;
+	imps = [], sectorDeaths = [], gameID = null, ROWS, COLS, dead = [];
 
 socket.on("reset", () => {
 	searching = 0;
@@ -46,6 +46,7 @@ socket.on("start", data => {
 
 	ROWS = data.rows;
 	COLS = data.cols;
+	dead = new Array(ROWS*COLS).fill(0);
 
 	gameID = data.uid;
 
@@ -60,6 +61,7 @@ socket.on("start", data => {
 	heals = [];
 	emps = [];
 	imps = [];
+	sectorDeaths = [];
 
 	camera.x = 0;
 	camera.y = 0;
@@ -90,6 +92,9 @@ socket.on("state", data => {
 		uids.add(s.uid);
 	}
 
+	for(let i=0; i<ROWS*COLS; ++i)
+		dead[i] = data.dead[i];
+
 	for(let d of data.s) if(!uids.has(d.uid)){
 		ships.push(new Ship(d));
 	}
@@ -115,6 +120,10 @@ socket.on("state", data => {
 
 		if(T == "imp"){
 			imps.push([D, Date.now() + 4000]);
+		}
+
+		if(T == "deadSector"){
+			sectorDeaths.push([D, Date.now() + 3500]);
 		}
 	}
 });
@@ -383,7 +392,34 @@ function main(){
 
 		for(let s of ships) s.travel();
 
-		const w = 5, h = 3;
+		let warn = null;
+
+		push(); translate(width/2-camera.x*camera.z, height/2-camera.y*camera.z);
+		translate(-150*COLS*camera.z, -150*ROWS*camera.z); scale(camera.z);
+		for(let i=0; i<ROWS; ++i)
+			for(let j=0; j<COLS; ++j)
+				if(dead[i*COLS+j] > 0){
+					fill(200, 50, 50, 30 + 15*Math.sin(Date.now()/500));
+					if(dead[i*COLS+j] == 2)
+						fill(200, 50, 50, 100);
+					else warn = floor((2-dead[i*COLS+j])*SECTOR_COLLAPSE_TIME);
+					rect(300*j, 300*i, 300, 300);
+				}
+		rectMode(CENTER, CENTER);
+		for(let i of sectorDeaths){
+			stroke(255, 50, 50, 150); strokeWeight(2); noFill();
+			let m = min(1, ((Date.now()/2000)%1)*2);
+			if(m < 1) rect(300*(i[0]%COLS)+150, 300*floor(i[0]/COLS)+150, 300*m, 300*m);
+			strokeWeight(1.5);
+			m = min(1, ((Date.now()/2000-0.1)%1)*2);
+			if(m < 1) rect(300*(i[0]%COLS)+150, 300*floor(i[0]/COLS)+150, 300*m, 300*m);
+			strokeWeight(1);
+			m = min(1, ((Date.now()/2000-0.2)%1)*2);
+			if(m < 1) rect(300*(i[0]%COLS)+150, 300*floor(i[0]/COLS)+150, 300*m, 300*m);
+		}
+		pop();
+
+		if(!snapshot) sectorDeaths = sectorDeaths.filter(x => x[1] > Date.now());
 
 		push(); translate(width/2-camera.x*camera.z, height/2-camera.y*camera.z);
 		stroke(200, 30); strokeWeight(2*sqrt(camera.z));
@@ -393,6 +429,20 @@ function main(){
 		for(let i=0; i<=COLS; ++i)
 			line((-300*COLS/2+i*300)*camera.z, -300*ROWS/2*camera.z,
 				(-300*COLS/2+i*300)*camera.z, 300*ROWS/2*camera.z);
+		stroke(200, 50, 50);
+		translate(-150*COLS*camera.z, -150*ROWS*camera.z); scale(camera.z);
+		for(let i=0; i<ROWS; ++i) if(dead[i*COLS]) line(0, 300*i, 0, 300*i+300);
+		for(let i=0; i<ROWS; ++i) if(dead[i*COLS+COLS-1]) line(300*COLS, 300*i, 300*COLS, 300*i+300);
+		for(let i=0; i<COLS; ++i) if(dead[i]) line(300*i, 0, 300*i+300, 0);
+		for(let i=0; i<COLS; ++i) if(dead[i+(ROWS-1)*COLS]) line(300*i, 300*ROWS, 300*i+300, 300*ROWS);
+		for(let i=0; i<ROWS-1; ++i)
+			for(let j=0; j<COLS; ++j)
+				if(dead[i*COLS+j] != dead[i*COLS+j+COLS])
+					line(300*j, 300*i+300, 300*j+300, 300*i+300);
+		for(let i=0; i<ROWS; ++i)
+			for(let j=0; j<COLS-1; ++j)
+				if(dead[i*COLS+j] != dead[i*COLS+j+1])
+					line(300*j+300, 300*i, 300*j+300, 300*i+300);
 		pop();
 
 		if(selectMove != null && !MOBILE){
@@ -1020,6 +1070,14 @@ function main(){
 			}
 		}
 
+		if(warn != null){
+			push();
+			textAlign(CENTER, CENTER);
+			fill(50, 200, 200, 200); noStroke(); textSize(20);
+			text("SECTOR COLLAPSE IN " + warn.toString() + "s", width/2, 30);
+			pop();
+		}
+
 		push();
 		stroke(50, 200, 200, mouseIn(30, 30, 30, 30) ? 80 : 60); strokeWeight(3);
 		line(20, 20, 40, 40);
@@ -1256,6 +1314,7 @@ function click(){
 			if(canMove && (ships[shipID].move.length > 1 || canStop) &&
 				mouseIn(width/2-70, height-50, 20, 20)){
 				socket.emit("cancelMove", {gameID: gameID, shipID: focus[1]});
+				ships[shipID].wait = null;
 			}
 			if(canMove && mouseIn(width/2-117, height-50, 20, 20)){
 				if(canStop) socket.emit("confirmMove", {gameID: gameID, shipID: focus[1]});
@@ -1277,6 +1336,7 @@ function click(){
 					pos: [rocks[select[1]][0], rocks[select[1]][1]+10],
 					dock: select[1]
 				});
+				ships[shipID].wait = [rocks[select[1]][0], rocks[select[1]][1]+10, 1, select[1]];
 				selectMove = null;
 				
 			}else if(selectMove[0] == "module" && shipID != null){
@@ -1344,6 +1404,7 @@ function keyReleased(){
 				if(canMove && (ships[shipID].move.length > 1 || canStop) &&
 					key == 'x'){
 					socket.emit("cancelMove", {gameID: gameID, shipID: focus[1]});
+					ships[shipID].wait = null;
 				}
 				if(canMove && key == 'e'){
 					if(canStop) socket.emit("confirmMove", {gameID: gameID, shipID: focus[1]});

@@ -1,4 +1,4 @@
-const COLS = 5, ROWS = 3, TPS = 4;
+const COLS = 5, ROWS = 3, TPS = 4, SECTOR_COLLAPSE_TIME = 40;
 
 let ct = 0;
 
@@ -258,6 +258,7 @@ class Ship{
 		this.ally = null;
 
 		this.ai = null;
+		this.playerKill = false;
 
 		for(let m of this.modules){
 			if(IS_WEAPON(m.type))
@@ -280,8 +281,6 @@ class Ship{
 
 			if([LASER, LASER2, COL, BATTERY].includes(m.type))
 				m.state = 0;
-
-			if(m.type == INT) this.ai = Math.random();
 		}
 
 		if(type == BS && Number.isInteger(team) && team < 0){
@@ -292,6 +291,8 @@ class Ship{
 			//this.ai = [Math.random(), Math.floor((pos[0]+150*COLS)/300)
 				//+COLS*Math.floor((pos[1]+300*ROWS*10+150*ROWS)/300)];
 			this.ai = [Math.random(), null];
+
+		if(type == INT) this.ai = Math.random();
 	}
 
 	waitMoveTo(pos, i){
@@ -334,7 +335,7 @@ class Ship{
 		};
 	}
 	
-	hurt(x){
+	hurt(x, pkill=false){
 		if(this.type == BS && this.ai != null)
 			this.ai[1] = true;
 
@@ -367,6 +368,8 @@ class Ship{
 		}
 
 		if(dmg) this.hp = Math.max(0, this.hp-dmg);
+
+		if(this.hp == 0 && pkill) this.playerKill = true;
 	}
 
 	heal(x){
@@ -434,6 +437,8 @@ class Game{
 		this.sectors = new Array(ROWS*COLS);
 		for(let i=0; i<ROWS*COLS; ++i)
 			this.sectors[i] = [];
+		this.dead = new Array(ROWS*COLS).fill(0);
+		this.aliveCount = ROWS*COLS;
 	}
 
 	addShip(type, team, modules, pos, move = []){
@@ -599,7 +604,7 @@ class Game{
 				for(let x of this.ships)
 					if(x.team != s.team)
 						if(_dist(x.pos, s.pos) < RANGE[DESTINY])
-							x.hurt(5000);
+							x.hurt(5000, 1);
 
 				this.explode([...s.pos], RANGE[DESTINY], 9);
 				s.pos = s.tp.slice(0, 2);
@@ -668,7 +673,7 @@ class Game{
 					for(let x of this.ships)
 						if(x.team != s.team)
 							if(_dist(x.pos, s.pos) < RANGE[IMPULSE])
-								x.hurt(DAMAGE[IMPULSE]/TPS);
+								x.hurt(DAMAGE[IMPULSE]/TPS, 1);
 			}
 
 			if(T == ALLY && s.modules[i].aux[0] > 0 && s.imp == 0){
@@ -704,7 +709,7 @@ class Game{
 					for(let x of this.ships)
 						if(x.team != s.team)
 							if(_dist(x.pos, s.pos) < RANGE[MIRROR])
-								x.hurt(s.modules[i].blast[0]*DAMAGE[MIRROR]);
+								x.hurt(s.modules[i].blast[0]*DAMAGE[MIRROR], 1);
 
 					s.modules[i].blast[0] = 0;
 				}
@@ -718,7 +723,7 @@ class Game{
 					for(let x of this.ships)
 						if(x.team != s.team)
 							if(_dist(x.pos, s.pos) < RANGE[VENG])
-								x.hurt(DAMAGE[VENG]);
+								x.hurt(DAMAGE[VENG], 1);
 
 					this.explode([...s.pos], RANGE[VENG], 9);
 				}
@@ -732,28 +737,6 @@ class Game{
 								if(s.modules[j].type >= ALPHA && s.modules[j].type <= ALLY
 									&& s.modules[j].state == 1)
 									this.activateModule(i, {i: j});
-				}
-			}
-
-			if(T == INT){
-				if(s.wait == null && s.move.length == 0)
-					s.ai += 1/(TPS*20);
-
-				if(s.ai >= 1){
-					s.ai = 0;
-
-					const N = 3;
-					
-					let P = [];
-
-					for(let i=0; i<N; ++i){
-						const I = Math.floor(Math.random()*this.rocks.length);
-						P.push([_dist(s.pos, this.rocks[I]), I]);
-					}
-
-					P.sort((a, b) => a[0]-b[0]);
-
-					s.waitMoveTo([this.rocks[P[0][1]][0], this.rocks[P[0][1]][1]+10], P[0][1]);
 				}
 			}
 		}
@@ -826,101 +809,157 @@ class Game{
 		for(let i=0; i<this.sectors.length; ++i) for(let x of this.sectors[i])
 			if(using[x]) occupied[i].push(x);
 
-		for(let i=0; i<this.ships.length; ++i){
-			const s = this.ships[i];
+		{
+			let S = [];
 
-			if([SENTINEL, GUARD, COL].includes(s.type)){
-				if(s.pos[1] > -150*ROWS*2){
-					if(s.wait == null && s.move.length == 0){
-						if(occupied[s.ai[1]].length) s.ai[0] += 1/(TPS*([3, 1, 0, 2])[s.type-SENTINEL]);
-						else s.ai[0] += 1/(TPS*20);
-					}
+			for(let i=0; i<ROWS*COLS; ++i)
+				if(this.dead[i] == 0) S.push(i);
 
-					if(s.ai[0] >= 1){
-						s.ai[0] = 0;
+			for(let i=0; i<this.ships.length; ++i){
+				const s = this.ships[i];
 
-						let I = this.sectors[s.ai[1]][Math.floor(Math.random()*this.sectors[s.ai[1]].length)];
+				if(this.dead[Math.floor((s.pos[0]+150*COLS)/300)+Math.floor((s.pos[1]+150*ROWS)/300)*COLS] == 2)
+					s.hurt(150/TPS);
 
-						let dist = 450;
-						for(let x of occupied[s.ai[1]]){
-							const D = _dist(this.rocks[x], s.pos);
-							if(D < dist){
-								dist = D;
-								I = x;
-							}
+				if([SENTINEL, GUARD, COL].includes(s.type)){
+					if(s.pos[1] > -150*ROWS*2){
+						if(s.wait == null && s.move.length == 0){
+							if(occupied[s.ai[1]].length) s.ai[0] += 1/(TPS*([3, 1, 0, 2])[s.type-SENTINEL]);
+							else s.ai[0] += 1/(TPS*20);
 						}
 
-						dist = 450;
-						for(let x of this.sectors[s.ai[1]]) if(priority[x]){
-							const D = _dist(this.rocks[x], s.pos);
-							if(D < dist){
-								dist = D;
-								I = x;
+						if(s.ai[0] >= 1){
+							s.ai[0] = 0;
+
+							let I = this.sectors[s.ai[1]][Math.floor(Math.random()*this.sectors[s.ai[1]].length)];
+
+							let dist = 450;
+							for(let x of occupied[s.ai[1]]){
+								const D = _dist(this.rocks[x], s.pos);
+								if(D < dist){
+									dist = D;
+									I = x;
+								}
 							}
-						}
 
-						if(I != s.dock) s.moveTo([this.rocks[I][0], this.rocks[I][1]+10], I);
-					}
-				}
-
-			}else if(s.type == BS && s.ai != null){
-				if(s.pos[1] < 150*ROWS*2){
-					if(s.ai[1]){
-						let veng = false;
-						for(let m of s.modules) if(m.type == VENG) veng = true;
-
-						for(let j=0; j<s.modules.length; ++j) if(s.modules[j].state == 1){
-							const m = s.modules[j];
-
-							if(m.type >= ALPHA && m.type < ALLY && !veng)
-								this.activateModule(i, {i: j});
-
-							if(m.type == ALLY && s.modules[0].aux.length)
-								this.activateModule(i, {i: j});
-
-							if(m.type == EMP) this.activateModule(i, {i: j});
-
-							if(m.type == BARRIER) this.activateModule(i, {i: j});
-
-							if(m.type == AMP) this.activateModule(i, {i: j});
-
-							if(m.type == FORT) this.activateModule(i, {i: j});
-
-							if(m.type == TURRET) this.activateModule(i, {i: j});
-
-							if(m.type == DECOY){
-								this.activateModule(i, {i: j, loc: [...s.pos],
-									dock: s.wait != null ? s.wait[3] : (s.move.length ? s.move[0][2] : s.dock)
-								});
+							dist = 450;
+							for(let x of this.sectors[s.ai[1]]) if(priority[x]){
+								const D = _dist(this.rocks[x], s.pos);
+								if(D < dist){
+									dist = D;
+									I = x;
+								}
 							}
+
+							if(I != s.dock) s.moveTo([this.rocks[I][0], this.rocks[I][1]+10], I);
 						}
 					}
 
-					if(s.wait == null && s.move.length == 0){
-						s.ai[0] += 1/(TPS*30);
-						if(s.ai[1]) s.ai[0] += 5/(TPS*30);
-						s.ai[1] = false;
+				}else if(s.type == INT){
+					if(s.wait == null && s.move.length == 0)
+						s.ai += 1/(TPS*20);
 
-					}else if(s.wait != null){
-						if(s.ai[1]) s.wait[2] -= 3/(10*TPS);
-					}
+					if(s.ai >= 1 && S.length){
+						s.ai = 0;
 
-					if(s.ai[0] >= 1){
-						s.ai[0] = 0;
-
+						const N = 3;
+						
 						let P = [];
 
-						for(let i=0; i<this.rocks.length; ++i)
-							if(_dist(this.rocks[i], s.pos) < 450)
-								P.push(i);
+						for(let i=0; i<N; ++i){
+							const R = S[Math.floor(Math.random()*S.length)];
+							const I = this.sectors[R][Math.floor(Math.random()*this.sectors[R].length)];
+							P.push([_dist(s.pos, this.rocks[I]), I]);
+						}
 
-						const I = P[Math.floor(Math.random()*P.length)];
+						P.sort((a, b) => a[0]-b[0]);
 
-						s.waitMoveTo([this.rocks[I][0], this.rocks[I][1]+10], I);
+						s.waitMoveTo([this.rocks[P[0][1]][0], this.rocks[P[0][1]][1]+10], P[0][1]);
+					}
+
+				}else if(s.type == BS && s.ai != null){
+					if(s.pos[1] < 150*ROWS*2){
+						if(s.ai[1]){
+							let veng = false;
+							for(let m of s.modules) if(m.type == VENG) veng = true;
+
+							for(let j=0; j<s.modules.length; ++j) if(s.modules[j].state == 1){
+								const m = s.modules[j];
+
+								if(m.type >= ALPHA && m.type < ALLY && !veng)
+									this.activateModule(i, {i: j});
+
+								if(m.type == ALLY && s.modules[0].aux.length)
+									this.activateModule(i, {i: j});
+
+								if(m.type == EMP) this.activateModule(i, {i: j});
+
+								if(m.type == BARRIER) this.activateModule(i, {i: j});
+
+								if(m.type == AMP) this.activateModule(i, {i: j});
+
+								if(m.type == FORT) this.activateModule(i, {i: j});
+
+								if(m.type == TURRET) this.activateModule(i, {i: j});
+
+								if(m.type == DECOY){
+									this.activateModule(i, {i: j, loc: s.move.length ? s.move[0].slice(0, 2) :  [...s.pos],
+										dock: s.move.length ? s.move[0][2] : s.dock
+									});
+								}
+							}
+
+						}else{
+							for(let j=0; j<s.modules.length; ++j) if(s.modules[j].state == 1){
+								const m = s.modules[j];
+
+								if(m.type == ROCKET && !s.move.length){
+									let empty = true;
+
+									for(let x=0; x<this.sectors.length; ++x) if(this.sectors[x].includes(s.dock))
+										for(let y of this.ships) if((y.type >= SENTINEL && y.type <= GUARD) || y.type == COL)
+											if(y.ai[1] == x) empty = false;
+
+									if(empty) this.activateModule(i, {i: j, loc: [...s.pos], dock: s.dock});
+								}
+							}
+						}
+
+						if(s.wait == null && s.move.length == 0){
+							s.ai[0] += 1/(TPS*30);
+							if(s.ai[1]) s.ai[0] += 5/(TPS*30);
+							if(this.dead[Math.floor((s.pos[0]+150*COLS)/300)+Math.floor((s.pos[1]+150*ROWS)/300)*COLS] > 0)
+								s.ai[0] = 1;
+							s.ai[1] = false;
+
+						}else if(s.wait != null){
+							if(s.ai[1]) s.wait[2] -= 3/(10*TPS);
+							if(this.dead[Math.floor((s.pos[0]+150*COLS)/300)+Math.floor((s.pos[1]+150*ROWS)/300)*COLS] > 0)
+								s.wait[2] -= 5/(10*TPS);
+						}
+
+						if(s.ai[0] >= 1){
+							s.ai[0] = 0;
+
+							let S = [];
+							
+							const p = [Math.floor((s.pos[0]+150*COLS)/300), Math.floor((s.pos[1]+150*ROWS)/300)];
+
+							for(let i=p[0]-1; i<=p[0]+1; ++i)
+								for(let j=p[1]-1; j<=p[1]+1; ++j)
+									if(i >= 0 && j >= 0 && i < COLS && j < ROWS)
+										if(this.dead[i+j*COLS] == 0) S.push(i+j*COLS);
+
+							if(S.length){
+								const P = S[Math.floor(Math.random()*S.length)];
+								const I = this.sectors[P][Math.floor(Math.random()*this.sectors[P].length)];
+								s.waitMoveTo([this.rocks[I][0], this.rocks[I][1]+10], I);
+							}
+						}
 					}
 				}
 			}
-		}
+		};
 
 		for(let s of this.ships) if(!s.emp && !locked.has(s.uid) && !s.fort) s.travel();
 
@@ -1050,7 +1089,7 @@ class Game{
 
 						if(D != null)
 							for(let x of m.aux) if(M.has(x)){
-								this.ships[M.get(x)].hurt(D*amp[M.get(s.uid)]*sol[M.get(s.uid)]/TPS);
+								this.ships[M.get(x)].hurt(D*amp[M.get(s.uid)]*sol[M.get(s.uid)]/TPS, 1);
 							}
 					}
 		}
@@ -1080,7 +1119,7 @@ class Game{
 					for(let x of this.ships)
 						if(x.team != s.team)
 							if(_dist(x.pos, s.pos) < RANGE[DARTP])
-								x.hurt(4000);
+								x.hurt(4000, 1);
 				}
 
 				if(s.type == ROCKETP){
@@ -1089,7 +1128,7 @@ class Game{
 					for(let x of this.ships)
 						if(x.team != s.team)
 							if(_dist(x.pos, s.pos) < RANGE[ROCKETP])
-								x.hurt(1000);
+								x.hurt(1000, 1);
 				}
 
 				if(s.type == DELTAP){
@@ -1098,7 +1137,7 @@ class Game{
 					for(let x of this.ships)
 						if(x.team != s.team)
 							if(_dist(x.pos, s.pos) < RANGE[DELTAP])
-								x.hurt(2000);
+								x.hurt(2000, 1);
 				}
 			}
 		}
@@ -1109,7 +1148,7 @@ class Game{
 				for(let x of this.ships)
 					if(x.team != s.team)
 						if(_dist(x.pos, s.pos) < RANGE[DELTAP])
-							x.hurt(500);
+							x.hurt(500, 1);
 			}
 
 			if(s.type == ROCKETP){
@@ -1117,9 +1156,20 @@ class Game{
 				for(let x of this.ships)
 					if(x.team != s.team)
 						if(_dist(x.pos, s.pos) < RANGE[ROCKETP])
-							x.hurt(200);
+							x.hurt(200, 1);
 			}
 		}
+
+		for(let i=0; i<ROWS*COLS; ++i)
+			if(this.dead[i] > 0 && this.dead[i] != 2){
+				this.dead[i] = Math.min(2, this.dead[i]+1/(SECTOR_COLLAPSE_TIME*TPS));
+				if(this.dead[i] == 2){
+					for(let s of this.ships)
+						if(Math.floor((s.pos[0]+150*COLS)/300)+Math.floor((s.pos[1]+150*ROWS)/300)*COLS == i)
+							s.hp = 0;
+					this.ev.push(["deadSector", i]);
+				}
+			}
 
 		for(let s of this.ships){
 			if(s.type >= DECOY && s.type <= TURRET){
@@ -1147,90 +1197,158 @@ class Game{
 			}
 		}
 
-		// spawn cerberus
+		{
+			// spawn cerberus
 
-		if(this.age % (TPS*5) == 0){
-			let COUNT = new Array(4).fill(0);
+			let S = [];
 
-			// TODO not futureproof
+			for(let i=0; i<ROWS*COLS; ++i)
+				if(this.dead[i] == 0) S.push(i);
 
-			for(let s of this.ships)
-				if(s.type >= SENTINEL && s.type <= COL)
-					++COUNT[s.type-SENTINEL];
+			if(S.length){
+				if(this.age % (TPS*5) == 0){
+					let COUNT = new Array(4).fill(0);
 
-			const OPTIMAL = [0.3, 0.5, 0.4, 0.2];
+					// TODO not futureproof
 
-			let idx = [];
+					for(let s of this.ships)
+						if(s.type >= SENTINEL && s.type <= COL)
+							++COUNT[s.type-SENTINEL];
 
-			for(let i=0; i<4; ++i) if(COUNT[i] < OPTIMAL[i]*ROWS*COLS)
-				idx.push(i);
+					const OPTIMAL = [0.3, 0.5, 0.4, 0.2];
 
-			if(idx.length){
-				const I = idx[Math.floor(Math.random()*idx.length)];
-				const J = Math.floor(Math.random()*this.rocks.length);
-				const P = this.rocks[J];
-				this.addShip(SENTINEL+I, CERB, [SENTINEL+I], [P[0], P[1]-300*ROWS*10], []);
-				this.ships[this.ships.length-1].dock = J;
-				if(SENTINEL+I != INT) for(let i=0; i<this.sectors.length; ++i)
-					if(this.sectors[i].includes(J)) this.ships[this.ships.length-1].ai[1] = i;
+					let idx = [];
+
+					for(let i=0; i<4; ++i) if(COUNT[i] < OPTIMAL[i]*this.aliveCount)
+						idx.push(i);
+
+					if(idx.length){
+						const I = idx[Math.floor(Math.random()*idx.length)];
+						//const J = Math.floor(Math.random()*this.rocks.length);
+						const X = S[Math.floor(Math.random()*S.length)];
+						const J = this.sectors[X][Math.floor(Math.random()*this.sectors[X].length)];
+						const P = this.rocks[J];
+						this.addShip(SENTINEL+I, CERB, [SENTINEL+I], [P[0], P[1]-300*ROWS*10], []);
+						this.ships[this.ships.length-1].dock = J;
+						if(SENTINEL+I != INT) for(let i=0; i<this.sectors.length; ++i)
+							if(this.sectors[i].includes(J)) this.ships[this.ships.length-1].ai[1] = i;
+					}
+				}
+
+				// spawn lone BS
+
+				this.loneBSTimer += 1/(20*TPS);
+
+				if(this.loneBSTimer >= 1){
+					this.loneBSTimer = Math.random();
+
+					const OPTIMAL = 0.3;
+
+					if(this.ships.filter(x => x.type == BS).length < OPTIMAL*this.aliveCount){
+						//const J = Math.floor(Math.random()*this.rocks.length);
+						const X = S[Math.floor(Math.random()*S.length)];
+						const J = this.sectors[X][Math.floor(Math.random()*this.sectors[X].length)];
+						const P = this.rocks[J];
+
+						const MODS = [
+							[BATTERY, OMEGA, VENG],
+							[LASER, OMEGA, VENG],
+							[BATTERY, PASSIVE, VENG, DECOY],
+							[LASER, PASSIVE, VENG],
+							[BATTERY, PASSIVE, SOL, ROCKET],
+							[MASS, PASSIVE, SOL],
+							[BATTERY, ALPHA, AMP],
+							[LASER, PASSIVE, EMP, DECOY],
+							[DART, OMEGA, EMP, ROCKET],
+							[DART, ALLY, BARRIER, DECOY],
+							[DART, ALLY, EMP],
+							[BATTERY, MIRROR, SOL],
+							[LASER, MIRROR, BARRIER, DECOY],
+							[MASS, OMEGA, AMP, EMP],
+							[MASS, ALPHA, VENG, AMP, ROCKET],
+							[DART, PASSIVE, EMP, TURRET],
+						];
+
+						const I = Math.floor(Math.random()*MODS.length);
+						
+						this.addShip(BS, -(++UID), MODS[I], [P[0], P[1]+300*ROWS*10], []);
+						this.ships[this.ships.length-1].dock = J;
+					}
+				}
 			}
-		}
+		};
 
-		// spawn lone BS
-
-		this.loneBSTimer += 1/(20*TPS);
-
-		if(this.loneBSTimer >= 1){
-			this.loneBSTimer = Math.random();
-
-			const OPTIMAL = 0.3;
-
-			if(this.ships.filter(x => x.type == BS).length < OPTIMAL*ROWS*COLS){
-				const J = Math.floor(Math.random()*this.rocks.length);
-				const P = this.rocks[J];
-
-				const MODS = [
-					[BATTERY, OMEGA, VENG],
-					[LASER, OMEGA, VENG],
-					[BATTERY, PASSIVE, VENG, DECOY],
-					[LASER, PASSIVE, VENG],
-					[BATTERY, PASSIVE, SOL],
-					[MASS, PASSIVE, SOL],
-					[BATTERY, ALPHA, AMP],
-					[LASER, PASSIVE, EMP, DECOY],
-					[DART, OMEGA, EMP],
-					[DART, ALLY, BARRIER, DECOY],
-					[DART, ALLY, EMP],
-					[BATTERY, MIRROR, SOL],
-					[LASER, MIRROR, BARRIER, DECOY],
-					[MASS, OMEGA, AMP, EMP],
-					[MASS, ALPHA, VENG, AMP],
-					[DART, PASSIVE, EMP, TURRET],
-				];
-
-				const I = Math.floor(Math.random()*MODS.length);
-				
-				this.addShip(BS, -(++UID), MODS[I], [P[0], P[1]+300*ROWS*10], []);
-				this.ships[this.ships.length-1].dock = J;
-			}
-		}
-
-		// ---
+		let COLLAPSE = false;
 
 		let q = [];
 		for(let s of this.ships){
 			if(s.hp > 0) q.push(s.encode());
 			else if([BS, DECOY, REPAIR, ROCKET, TURRET].includes(s.type))
 				this.die(s.pos);
+			else if(s.type == COL && s.playerKill && Math.random() < 0.5) COLLAPSE = true;
 		}
 
 		this.ships = this.ships.filter(x => x.hp > 0);
 
-		for(let p of this.players) p.emit("state", {s: q, ev: [...this.ev]});
+		for(let p of this.players) p.emit("state", {s: q, ev: [...this.ev], dead: this.dead});
 
 		this.ev = [];
 		
 		++this.age;
+
+		if(COLLAPSE){
+			const REM = Math.ceil(this.aliveCount*0.2);
+
+			for(let i=0; i<REM; ++i){
+				const I = this.pickDyingSector();
+				--this.aliveCount;
+				this.dead[I] = 1;
+			}
+		}
+	}
+
+	pickDyingSector(){
+		let candidate = [];
+		for(let i=0; i<ROWS*COLS; ++i) if(this.dead[i] == 0) candidate.push(i);
+
+		if(candidate.length == 1) return candidate[0];
+
+		while(candidate.length){
+			const I = candidate.splice(Math.floor(Math.random()*candidate.length), 1);
+
+			let root = new Array(ROWS*COLS).fill(-1);
+
+			function find(i){
+				if(root[i] < 0) return i;
+				root[i] = find(root[i]);
+				return root[i];
+			}
+
+			function merge(a, b){
+				a = find(a); b = find(b);
+				if(a == b) return;
+				if(root[a] < root[b]) { root[a] += root[b]; root[b] = a; }
+				else { root[b] += root[a]; root[a] = b; }
+			}
+
+			this.dead[I] = 1;
+
+			for(let i=0; i<ROWS; ++i)
+				for(let j=0; j<COLS-1; ++j)
+					if(this.dead[i*COLS+j] == 0 && this.dead[i*COLS+j+1] == 0)
+						merge(i*COLS+j, i*COLS+j+1);
+
+			for(let i=0; i<COLS; ++i)
+				for(let j=0; j<ROWS-1; ++j)
+					if(this.dead[j*COLS+i] == 0 && this.dead[j*COLS+i+COLS] == 0)
+						merge(j*COLS+i, j*COLS+i+COLS);
+
+			this.dead[I] = 0;
+
+			if(root[find(candidate[0])] == -(this.aliveCount-1)) return I;
+		}
+
+		return null;
 	}
 
 	end(){

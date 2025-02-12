@@ -1,3 +1,5 @@
+const SECTOR_COLLAPSE_TIME = 40;
+
 let ct = 0;
 
 // SHIP TYPES

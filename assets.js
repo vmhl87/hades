@@ -1095,4 +1095,9 @@ function drawModule2(T, S){
 
 	fill(0, 100);
 	rect(-20, -20, 40, 40-40*abs(S));
+
+	fill(0, 40);
+	if(S != 1 && S >= 0)
+		if(!(T >= LASER && T <= ROCKETD) && (T != IMPULSE || S != 0.75))
+			rect(-20, 20-40*abs(S), 40, 40*abs(S));
 }
