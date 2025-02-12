@@ -123,7 +123,7 @@ socket.on("state", data => {
 		}
 
 		if(T == "deadSector"){
-			sectorDeaths.push([D, Date.now() + 3500]);
+			sectorDeaths.push([D, Date.now() + 4000]);
 		}
 	}
 });
@@ -402,7 +402,8 @@ function main(){
 					fill(200, 50, 50, 30 + 15*Math.sin(Date.now()/500));
 					if(dead[i*COLS+j] == 2)
 						fill(200, 50, 50, 100);
-					else warn = floor((2-dead[i*COLS+j])*SECTOR_COLLAPSE_TIME);
+					else warn = min(warn == null ? 1000 : warn,
+						floor((2-dead[i*COLS+j])*SECTOR_COLLAPSE_TIME));
 					rect(300*j, 300*i, 300, 300);
 				}
 		rectMode(CENTER, CENTER);
@@ -419,7 +420,8 @@ function main(){
 		}
 		pop();
 
-		if(!snapshot) sectorDeaths = sectorDeaths.filter(x => x[1] > Date.now());
+		if(!snapshot) sectorDeaths = sectorDeaths.filter(x => x[1] > Date.now() ||
+			(Date.now()/2000)%1 < 0.5 || (Date.now()/2000-0.2)%1 < 0.5);
 
 		push(); translate(width/2-camera.x*camera.z, height/2-camera.y*camera.z);
 		stroke(200, 30); strokeWeight(2*sqrt(camera.z));
@@ -1065,6 +1067,16 @@ function main(){
 					}else stroke(10, 40, 60);
 					line(width/2-80, height-60, width/2-60, height-40);
 					line(width/2-80, height-40, width/2-60, height-60);
+					if(GOD){
+						if(mouseIn(width/2-23, height-50, 20, 20)) stroke(30, 90, 110);
+						else stroke(20, 70, 80);
+						noFill();
+						arc(width/2-23, height-50, 20, 20, PI*-0.3, PI*0.3);
+						arc(width/2-23, height-50, 20, 20, PI*0.7, PI*1.3);
+						circle(width/2-23, height-50, 8);
+						line(width/2-23, height-50-4, width/2-23, height-50-12);
+						line(width/2-23, height-50+4, width/2-23, height-50+12);
+					}
 					pop();
 				}
 			}
@@ -1073,8 +1085,8 @@ function main(){
 		if(warn != null){
 			push();
 			textAlign(CENTER, CENTER);
-			fill(50, 200, 200, 200); noStroke(); textSize(20);
-			text("SECTOR COLLAPSE IN " + warn.toString() + "s", width/2, 30);
+			fill(50, 200, 200, 200); noStroke(); textSize(17);
+			text("SECTOR COLLAPSE IN " + warn.toString() + "s", width/2, 28);
 			pop();
 		}
 
@@ -1316,6 +1328,7 @@ function click(){
 				socket.emit("cancelMove", {gameID: gameID, shipID: focus[1]});
 				ships[shipID].wait = null;
 			}
+			if(GOD && mouseIn(width/2-23, height-50, 20, 20)) god();
 			if(canMove && mouseIn(width/2-117, height-50, 20, 20)){
 				if(canStop) socket.emit("confirmMove", {gameID: gameID, shipID: focus[1]});
 				else selectMove = ["ship", focus[1]];

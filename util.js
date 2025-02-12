@@ -177,7 +177,7 @@ function mousePressed(){
 	}
 }
 
-let lastMouse = [], ALLMODULE = false, SECDISP = [0];
+let lastMouse = [], ALLMODULE = false, SECDISP = [0], GOD = false;
 
 function mobileClick(P){
 	if(staging){
@@ -214,6 +214,11 @@ function mobileClick(P){
 
 function mouseReleased(){
 	if(MOBILE) return;
+
+	if(!staging && connected && abs(startMouseX-30) < 30 && abs(startMouseY-30) < 30 && mouseIn(width-30, 30, 30, 30)){
+		GOD = !GOD;
+		return;
+	}
 
 	if(staging){
 		lastMouse.push([Date.now(), [mouseX, mouseY]]);
@@ -287,6 +292,13 @@ function draw(){
 
 	if(MOBILE) updateTouch();
 
+	if(!staging && connected){
+		camera.x = min(150*COLS+(width/2-30)/camera.z, camera.x);
+		camera.x = max(-150*COLS-(width/2-30)/camera.z, camera.x);
+		camera.y = min(150*ROWS+(height/2-30)/camera.z, camera.y);
+		camera.y = max(-150*ROWS-(height/2-30)/camera.z, camera.y);
+	}
+
 	main();
 }
 
@@ -312,7 +324,7 @@ function updateTouch(){
 
 			P.last = [t.x, t.y];
 
-		}else posTouches.set(t.id, {first: [t.x, t.y], last: [t.x, t.y]});
+		}else posTouches.set(t.id, {first: [t.x, t.y], last: [t.x, t.y], orig: [t.x, t.y]});
 	}
 
 	if(!staging) if(touches.length == 1){
@@ -363,11 +375,16 @@ function updateTouch(){
 		if(!S.has(k)) rem.push(k);
 
 	for(let k of rem){
+		const P = posTouches.get(k);
+
 		if(movedTouches.has(k)) movedTouches.delete(k);
 		else if(touches.length == 0 && ctlState == 0){
-			const P = posTouches.get(k);
 			mobileClick({first: [...P.first], last: [...P.last]});
 		}
+
+		if(!staging && connected && abs(P.last[0]-30) < 30 && abs(P.last[1]-30) < 30
+			&& abs(P.orig[0]-(width-30)) < 30 && abs(P.orig[1]-3) < 30)
+			GOD = !GOD;
 
 		posTouches.delete(k);
 		movedTouches.delete(k);
@@ -419,4 +436,9 @@ function loadState(STATE){
 	staging = 0;
 	connected = 1;
 	snapshot = 1;
+}
+
+function god(){
+	if(!staging && connected && focus != null && focus[0] == "ship" && shipID != null)
+		socket.emit("spawn", {gameID: gameID, arg: [DARTP, socket.id, [], ships[shipID].pos]});
 }
