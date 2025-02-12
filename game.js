@@ -1285,7 +1285,7 @@ class Game{
 			if(s.hp > 0) q.push(s.encode());
 			else if([BS, DECOY, REPAIR, ROCKET, TURRET].includes(s.type))
 				this.die(s.pos);
-			else if(s.type == COL && s.playerKill && Math.random() < 0.5) COLLAPSE = true;
+			else if(s.type == COL && s.playerKill) COLLAPSE = true;
 		}
 
 		this.ships = this.ships.filter(x => x.hp > 0);
