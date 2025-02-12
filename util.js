@@ -267,7 +267,7 @@ function draw(){
 	}
 
 	if(!staging){
-		if(!MOBILE && mouseIsPressed){
+		if(!MOBILE && mouseIsPressed && !(abs(startMouseX-30) < 30 && abs(startMouseY-30) < 30)){
 			const dist = _dist([mouseX, mouseY], [lastMouseX, lastMouseY]);
 			if(dist > 0.5){
 				camera.x += (lastMouseX-mouseX)/camera.z;
@@ -334,11 +334,17 @@ function updateTouch(){
 
 				if(lockID == touches[0].id){
 					const P = posTouches.get(touches[0].id);
-					camera.x = offset[0] + (P.first[0]-P.last[0])/camera.z;
-					camera.y = offset[1] + (P.first[1]-P.last[1])/camera.z;
 
-					scrollVel[0] = V[0];
-					scrollVel[1] = V[1];
+					if(abs(P.orig[0]-(width-30)) < 30 && abs(P.orig[1]-30) < 30)
+						lockID = null;
+					
+					else{
+						camera.x = offset[0] + (P.first[0]-P.last[0])/camera.z;
+						camera.y = offset[1] + (P.first[1]-P.last[1])/camera.z;
+
+						scrollVel[0] = V[0];
+						scrollVel[1] = V[1];
+					}
 
 				}else{
 					lockID = touches[0].id;
