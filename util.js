@@ -53,6 +53,8 @@ class Ship{
 		this.pos = dat.pos;
 		this.move = dat.move;
 		if(this.team != socket.id) this.wait = dat.wait;
+		else if(this.wait != null && dat.wait != null)
+			this.wait[2] = dat.wait[2];
 		this.tp = dat.tp;
 		this.dock = dat.dock;
 		this.expire = dat.expire;
