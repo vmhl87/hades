@@ -1419,6 +1419,7 @@ function keyReleased(){
 					socket.emit("cancelMove", {gameID: gameID, shipID: focus[1]});
 					ships[shipID].wait = null;
 				}
+				if(GOD && key == 'w') god();
 				if(canMove && key == 'e'){
 					if(canStop) socket.emit("confirmMove", {gameID: gameID, shipID: focus[1]});
 					else selectMove = ["ship", focus[1]];

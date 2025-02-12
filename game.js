@@ -1197,6 +1197,8 @@ class Game{
 			}
 		}
 
+		let OVERLOADED = false;
+
 		{
 			// spawn cerberus
 
@@ -1221,6 +1223,9 @@ class Game{
 
 					for(let i=0; i<4; ++i) if(COUNT[i] < OPTIMAL[i]*this.aliveCount)
 						idx.push(i);
+
+					if(COUNT[COL-SENTINEL] > Math.floor(OPTIMAL[COL-SENTINEL]*this.aliveCount))
+						OVERLOADED = true;
 
 					if(idx.length){
 						const I = idx[Math.floor(Math.random()*idx.length)];
@@ -1296,7 +1301,7 @@ class Game{
 		
 		++this.age;
 
-		if(COLLAPSE){
+		if(COLLAPSE && !OVERLOADED){
 			const REM = Math.ceil(this.aliveCount*0.2);
 
 			for(let i=0; i<REM; ++i){
