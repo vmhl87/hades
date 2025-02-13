@@ -591,13 +591,19 @@ class Game{
 			const S = s.modules[i].state;
 
 			if(T == TP && S == 0){
+				for(let x of this.ships) if(x.team != s.team)
+					for(let m of x.modules) if(m.type == BARRIER && m.state < 0)
+						if(_dist(x.pos, s.pos) < RANGE[BARRIER])
+							s.hurt(DAMAGE[BARRIER]);
+
 				s.pos = s.tp.slice(0, 2);
 				s.dock = s.tp[2];
 				s.tp = null;
 
 				for(let x of this.ships) if(x.team != s.team)
 					for(let m of x.modules) if(m.type == BARRIER && m.state < 0)
-						s.hurt(DAMAGE[BARRIER]);
+						if(_dist(x.pos, s.pos) < RANGE[BARRIER])
+							s.hurt(DAMAGE[BARRIER]);
 			}
 
 			if(T == DESTINY && S == 0){
