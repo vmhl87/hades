@@ -546,6 +546,9 @@ class Game{
 				const P = [...this.ships[s].pos];
 				this.ships[s].pos = [...x.pos];
 				x.pos = [...P];
+
+				if(x.team == CERB && x.move.length > 1)
+					x.move = x.move.slice(0, 1);
 			}
 		}
 	}
