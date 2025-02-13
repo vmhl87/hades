@@ -97,7 +97,7 @@ RECHARGE_TIME[BARRIER] = 60;
 EFFECT_TIME[DELTA] = 0;
 RECHARGE_TIME[DELTA] = 45;
 
-RECHARGE_TIME[RIPPLE] = 30;
+RECHARGE_TIME[RIPPLE] = 60;
 
 EFFECT_TIME[VENG] = 10;
 RECHARGE_TIME[VENG] = 120;
@@ -616,6 +616,11 @@ class Game{
 				s.pos = s.tp.slice(0, 2);
 				s.dock = s.tp[2];
 				s.tp = null;
+
+				for(let x of this.ships) if(x.team != s.team)
+					for(let m of x.modules) if(m.type == BARRIER && m.state < 0)
+						if(_dist(x.pos, s.pos) < RANGE[BARRIER])
+							s.hurt(DAMAGE[BARRIER]);
 			}
 
 			if([LASER, LASER2, COL].includes(T)){
@@ -1143,7 +1148,7 @@ class Game{
 					for(let x of this.ships)
 						if(x.team != s.team)
 							if(_dist(x.pos, s.pos) < RANGE[DELTAP])
-								x.hurt(2000, 1);
+								x.hurt(3000, 1);
 				}
 			}
 		}
@@ -1185,7 +1190,7 @@ class Game{
 			if(s.type == REPAIR && s.hp == 0){
 				for(let x of this.ships) if(x.team == s.team && x.uid != s.uid)
 					if(_dist(x.pos, s.pos) < RANGE[REPAIR])
-						x.heal(2500);
+						x.heal(2000);
 
 				this.ev.push(["heal", [...s.pos]]);
 			}

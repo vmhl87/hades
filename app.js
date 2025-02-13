@@ -1395,7 +1395,7 @@ function click(){
 			for(let s of ships) if(s.uid == select[1])
 				if(_dist(ships[shipID].vpos, s.vpos) < RANGE[RIPPLE]
 					// TODO modification to ripple
-					&& ships[shipID].team == s.team){
+					&& (ships[shipID].team == s.team || ships[shipID].team == 3.14)){
 					socket.emit("activateModule", {gameID: gameID, shipID: selectMove[1].s,
 						i: selectMove[1].i, loc: select[1]});
 					selectMove = null;
