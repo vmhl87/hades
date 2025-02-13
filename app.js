@@ -1112,6 +1112,24 @@ function main(){
 		endShape();
 		pop();
 
+		{
+			let shipInArena = false;
+
+			for(let s of ships) if(s.team == socket.id && s.type == BS) shipInArena = true;
+
+			if(focus == null && shipInArena){
+				push();
+				stroke(50, 200, 200, mouseIn(width-30, height-30, 30, 30) ? 80 : 60); strokeWeight(3);
+				line(width-20, height-20, width-23, height-23);
+				line(width-20, height-40, width-23, height-37);
+				line(width-40, height-20, width-37, height-23);
+				line(width-40, height-40, width-37, height-37);
+				noFill(); strokeWeight(2);
+				circle(width-30, height-30, 6);
+				pop();
+			}
+		};
+
 	}else{
 		fill(200); textSize(25); noStroke();
 		text("CONNECTING", width/2, height/2);
@@ -1301,6 +1319,13 @@ function click(){
 		}
 		
 	}else shipID = null;
+
+	if(!focus && mouseIn(width-30, height-30, 30, 30))
+		for(let s of ships)
+			if(s.team == socket.id && s.type == BS){
+				focus = ["ship", s.uid];
+				return;
+			}
 
 	if(focus && shipID != null && selectMove == null){
 		for(let i=0; i<ships[shipID].modules.length; ++i){

@@ -77,12 +77,14 @@ class Ship{
 		if(diff > PI) diff -= PI*2;
 		if(diff < -PI) diff += PI*2;
 
-		this.rot += diff * 0.1;
+		let T = MOBILE ? 0.1 : 0.05;
+
+		this.rot += diff * T * 2;
 		if(this.rot > PI*2) this.rot -= PI*2;
 		if(this.rot < -PI*2) this.rot += PI*2;
 
-		this.vpos[0] = lerp(this.vpos[0], this.pos[0], 0.05);
-		this.vpos[1] = lerp(this.vpos[1], this.pos[1], 0.05);
+		this.vpos[0] = lerp(this.vpos[0], this.pos[0], T);
+		this.vpos[1] = lerp(this.vpos[1], this.pos[1], T);
 
 		// this.vpos = this.pos; this.rot = target;
 	}
@@ -265,7 +267,7 @@ let scrollVel = [0, 0];
 function draw(){
 	if(touches.length && !MOBILE){
 		MOBILE = true;
-		frameRate(40);
+		frameRate(30);
 	}
 
 	if(!staging){

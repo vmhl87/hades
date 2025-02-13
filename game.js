@@ -1,4 +1,4 @@
-const COLS = 5, ROWS = 3, TPS = 4, SECTOR_COLLAPSE_TIME = 40;
+const COLS = 5, ROWS = 5, TPS = 4, SECTOR_COLLAPSE_TIME = 40;
 
 let ct = 0;
 
@@ -1197,7 +1197,7 @@ class Game{
 			}
 		}
 
-		let OVERLOADED = false;
+		let COLLAPSING = this.dead.filter(x => x != 0 && x != 2).length != 0;
 
 		{
 			// spawn cerberus
@@ -1224,19 +1224,18 @@ class Game{
 					for(let i=0; i<4; ++i) if(COUNT[i] < OPTIMAL[i]*this.aliveCount)
 						idx.push(i);
 
-					if(COUNT[COL-SENTINEL] > Math.floor(OPTIMAL[COL-SENTINEL]*this.aliveCount))
-						OVERLOADED = true;
-
 					if(idx.length){
 						const I = idx[Math.floor(Math.random()*idx.length)];
-						//const J = Math.floor(Math.random()*this.rocks.length);
-						const X = S[Math.floor(Math.random()*S.length)];
-						const J = this.sectors[X][Math.floor(Math.random()*this.sectors[X].length)];
-						const P = this.rocks[J];
-						this.addShip(SENTINEL+I, CERB, [SENTINEL+I], [P[0], P[1]-300*ROWS*10], []);
-						this.ships[this.ships.length-1].dock = J;
-						if(SENTINEL+I != INT) for(let i=0; i<this.sectors.length; ++i)
-							if(this.sectors[i].includes(J)) this.ships[this.ships.length-1].ai[1] = i;
+						if(SENTINEL+I != COL || !COLLAPSING){
+							//const J = Math.floor(Math.random()*this.rocks.length);
+							const X = S[Math.floor(Math.random()*S.length)];
+							const J = this.sectors[X][Math.floor(Math.random()*this.sectors[X].length)];
+							const P = this.rocks[J];
+							this.addShip(SENTINEL+I, CERB, [SENTINEL+I], [P[0], P[1]-300*ROWS*10], []);
+							this.ships[this.ships.length-1].dock = J;
+							if(SENTINEL+I != INT) for(let i=0; i<this.sectors.length; ++i)
+								if(this.sectors[i].includes(J)) this.ships[this.ships.length-1].ai[1] = i;
+						}
 					}
 				}
 
@@ -1283,14 +1282,23 @@ class Game{
 			}
 		};
 
-		let COLLAPSE = false;
+		if(this.ships.filter(x => x.hp == 0 && x.type == COL && x.playerKill).length){
+			const REM = Math.ceil(this.aliveCount*0.2);
+
+			for(let i=0; i<REM; ++i){
+				const I = this.pickDyingSector();
+				--this.aliveCount;
+				this.dead[I] = 1;
+			}
+
+			for(let s of this.ships) if(s.type == COL) s.hp = 0;
+		}
 
 		let q = [];
 		for(let s of this.ships){
 			if(s.hp > 0) q.push(s.encode());
-			else if([BS, DECOY, REPAIR, ROCKET, TURRET].includes(s.type))
+			else if([BS, DECOY, REPAIR, ROCKET, TURRET, COL].includes(s.type))
 				this.die(s.pos);
-			else if(s.type == COL && s.playerKill) COLLAPSE = true;
 		}
 
 		this.ships = this.ships.filter(x => x.hp > 0);
@@ -1300,16 +1308,6 @@ class Game{
 		this.ev = [];
 		
 		++this.age;
-
-		if(COLLAPSE && !OVERLOADED){
-			const REM = Math.ceil(this.aliveCount*0.2);
-
-			for(let i=0; i<REM; ++i){
-				const I = this.pickDyingSector();
-				--this.aliveCount;
-				this.dead[I] = 1;
-			}
-		}
 	}
 
 	pickDyingSector(){
