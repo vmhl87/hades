@@ -26,7 +26,7 @@ const ALPHA = ++ct, IMPULSE = ++ct, PASSIVE = ++ct, OMEGA = ++ct, MIRROR = ++ct,
 
 const EMP = ++ct, SOL = ++ct, FORT = ++ct, TP = ++ct, AMP = ++ct, DESTINY = ++ct, BARRIER = ++ct, DELTA = ++ct, RIPPLE = ++ct, DISRUPT = ++ct;
 
-/* UNOBTAIN */ const VENG = ++ct;
+/* UNOBTAIN */ const VENG = ++ct, SECT = ++ct;
 
 let SPEED = new Array(ct), HP = new Array(ct),
 	EFFECT_TIME = new Array(ct), RECHARGE_TIME = new Array(ct),
@@ -52,7 +52,7 @@ DAMAGE[BARRIER] = 3000;
 DAMAGE[SOL] = 1.5;
 DAMAGE[AMP] = 2.2;
 DAMAGE[MIRROR] = 3;
-DAMAGE[FORT] = 1.15;
+DAMAGE[FORT] = 1.5;
 DAMAGE[VENG] = 7000;
 DAMAGE[IMPULSE] = 600;
 
@@ -222,7 +222,7 @@ LASER_CHARGE[LASER] = [6, 10];
 LASER_CHARGE[LASER2] = [3, 6];
 LASER_CHARGE[COL] = [10, 20];
 
-const PASSIVE_DELAY = 6, PASSIVE_TIME = 48;
+const PASSIVE_DELAY = 6, PASSIVE_TIME = 30;
 
 const CERB = 3.14;
 
@@ -516,9 +516,11 @@ class Game{
 		}
 
 		if(T == DISRUPT){
-			for(let x of this.ships)
+			for(let x of this.ships){
 				if(_dist(x.pos, this.ships[s].pos) < RANGE[DISRUPT])
 					x.imp = 1;
+				if(x.tp != null) x.tp = null;
+			}
 
 			this.ev.push(["imp", [...this.ships[s].pos]]);
 		}
@@ -882,13 +884,15 @@ class Game{
 
 						for(let i=0; i<N; ++i){
 							const R = S[Math.floor(Math.random()*S.length)];
-							const I = this.sectors[R][Math.floor(Math.random()*this.sectors[R].length)];
-							P.push([_dist(s.pos, this.rocks[I]), I]);
+							if(this.sectors[R].length){
+								const I = this.sectors[R][Math.floor(Math.random()*this.sectors[R].length)];
+								P.push([_dist(s.pos, this.rocks[I]), I]);
+							}
 						}
 
 						P.sort((a, b) => a[0]-b[0]);
 
-						s.waitMoveTo([this.rocks[P[0][1]][0], this.rocks[P[0][1]][1]+10], P[0][1]);
+						if(P.length) s.waitMoveTo([this.rocks[P[0][1]][0], this.rocks[P[0][1]][1]+10], P[0][1]);
 					}
 
 				}else if(s.type == BS && s.ai != null){
@@ -966,8 +970,10 @@ class Game{
 
 							if(S.length){
 								const P = S[Math.floor(Math.random()*S.length)];
-								const I = this.sectors[P][Math.floor(Math.random()*this.sectors[P].length)];
-								s.waitMoveTo([this.rocks[I][0], this.rocks[I][1]+10], I);
+								if(this.sectors[P].length){
+									const I = this.sectors[P][Math.floor(Math.random()*this.sectors[P].length)];
+									s.waitMoveTo([this.rocks[I][0], this.rocks[I][1]+10], I);
+								}
 							}
 						}
 					}
@@ -1243,12 +1249,14 @@ class Game{
 						if(SENTINEL+I != COL || !COLLAPSING){
 							//const J = Math.floor(Math.random()*this.rocks.length);
 							const X = S[Math.floor(Math.random()*S.length)];
-							const J = this.sectors[X][Math.floor(Math.random()*this.sectors[X].length)];
-							const P = this.rocks[J];
-							this.addShip(SENTINEL+I, CERB, [SENTINEL+I], [P[0], P[1]-300*ROWS*10], []);
-							this.ships[this.ships.length-1].dock = J;
-							if(SENTINEL+I != INT) for(let i=0; i<this.sectors.length; ++i)
-								if(this.sectors[i].includes(J)) this.ships[this.ships.length-1].ai[1] = i;
+							if(this.sectors[X].length){
+								const J = this.sectors[X][Math.floor(Math.random()*this.sectors[X].length)];
+								const P = this.rocks[J];
+								this.addShip(SENTINEL+I, CERB, [SENTINEL+I, SENTINEL+I == COL ? SECT : null], [P[0], P[1]-300*ROWS*10], []);
+								this.ships[this.ships.length-1].dock = J;
+								if(SENTINEL+I != INT) for(let i=0; i<this.sectors.length; ++i)
+									if(this.sectors[i].includes(J)) this.ships[this.ships.length-1].ai[1] = i;
+							}
 						}
 					}
 				}
@@ -1265,32 +1273,34 @@ class Game{
 					if(this.ships.filter(x => x.type == BS).length < OPTIMAL*this.aliveCount){
 						//const J = Math.floor(Math.random()*this.rocks.length);
 						const X = S[Math.floor(Math.random()*S.length)];
-						const J = this.sectors[X][Math.floor(Math.random()*this.sectors[X].length)];
-						const P = this.rocks[J];
+						if(this.sectors[X].length){
+							const J = this.sectors[X][Math.floor(Math.random()*this.sectors[X].length)];
+							const P = this.rocks[J];
 
-						const MODS = [
-							[BATTERY, OMEGA, VENG],
-							[LASER, OMEGA, VENG],
-							[BATTERY, PASSIVE, VENG, DECOY],
-							[LASER, PASSIVE, VENG],
-							[BATTERY, PASSIVE, SOL, ROCKET],
-							[MASS, PASSIVE, SOL],
-							[BATTERY, ALPHA, AMP],
-							[LASER, PASSIVE, EMP, DECOY],
-							[DART, OMEGA, EMP, ROCKET],
-							[DART, ALLY, BARRIER, DECOY],
-							[DART, ALLY, EMP],
-							[BATTERY, MIRROR, SOL],
-							[LASER, MIRROR, BARRIER, DECOY],
-							[MASS, OMEGA, AMP, EMP],
-							[MASS, ALPHA, VENG, AMP, ROCKET],
-							[DART, PASSIVE, EMP, TURRET],
-						];
+							const MODS = [
+								[BATTERY, OMEGA, VENG],
+								[LASER, OMEGA, VENG],
+								[BATTERY, PASSIVE, VENG, DECOY],
+								[LASER, PASSIVE, VENG],
+								[BATTERY, PASSIVE, SOL, ROCKET],
+								[MASS, PASSIVE, SOL],
+								[BATTERY, ALPHA, AMP],
+								[LASER, PASSIVE, EMP, DECOY],
+								[DART, OMEGA, EMP, ROCKET],
+								[DART, ALLY, BARRIER, DECOY],
+								[DART, ALLY, EMP],
+								[BATTERY, MIRROR, SOL],
+								[LASER, MIRROR, BARRIER, DECOY],
+								[MASS, OMEGA, AMP, EMP],
+								[MASS, ALPHA, VENG, AMP, ROCKET],
+								[DART, PASSIVE, EMP, TURRET],
+							];
 
-						const I = Math.floor(Math.random()*MODS.length);
-						
-						this.addShip(BS, -(++UID), MODS[I], [P[0], P[1]+300*ROWS*10], []);
-						this.ships[this.ships.length-1].dock = J;
+							const I = Math.floor(Math.random()*MODS.length);
+							
+							this.addShip(BS, -(++UID), MODS[I], [P[0], P[1]+300*ROWS*10], []);
+							this.ships[this.ships.length-1].dock = J;
+						}
 					}
 				}
 			}

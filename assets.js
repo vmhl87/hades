@@ -990,6 +990,16 @@ function drawModule(T){
 		line(8, -2, 9, -2.75);
 	}
 
+	if(T == SECT){
+		stroke(50, 150, 50); noFill();
+		rectMode(CENTER, CENTER);
+		rect(0, 0, 25, 25);
+		strokeWeight(1.5);
+		rect(0, 0, 17, 17);
+		strokeWeight(1);
+		rect(0, 0, 10, 10);
+	}
+
 	// DRONE
 	
 	if(T == DECOY){
@@ -1086,7 +1096,7 @@ function drawModule2(T, S){
 	if(T >= LASER && T <= TURRETD) fill(255, 50, 50, 60);
 	if(T >= SENTINEL && T <= COL) fill(255, 50, 50, 60);
 	if(T >= ALPHA && T <= ALLY) fill(0, 255, 255, 60);
-	if(T >= EMP && T <= VENG) fill(100, 255, 100, 60);
+	if(T >= EMP && T <= SECT) fill(100, 255, 100, 60);
 	if(T >= DECOY && T <= TURRET) fill(255, 100, 0, 60);
 
 	rect(-20, -20, 40, 40);

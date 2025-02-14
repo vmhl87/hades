@@ -26,7 +26,7 @@ const ALPHA = ++ct, IMPULSE = ++ct, PASSIVE = ++ct, OMEGA = ++ct, MIRROR = ++ct,
 
 const EMP = ++ct, SOL = ++ct, FORT = ++ct, TP = ++ct, AMP = ++ct, DESTINY = ++ct, BARRIER = ++ct, DELTA = ++ct, RIPPLE = ++ct, DISRUPT = ++ct;
 
-/* UNOBTAIN */ const VENG = ++ct;
+/* UNOBTAIN */ const VENG = ++ct, SECT = ++ct;
 
 let NAME = new Array(ct), HP = new Array(ct), RANGE = new Array(ct).fill(null),
 	TIME = new Array(ct);
@@ -61,7 +61,7 @@ HP[COL] = 15000;
 HP[DECOY] = 1000;
 HP[REPAIR] = 1000;
 HP[ROCKET] = 600;
-HP[TURRET] = 600;
+HP[TURRET] = 1500;
 HP[DARTP] = 250;
 HP[ROCKETP] = 400;
 HP[DELTAP] = 180;
