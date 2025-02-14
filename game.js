@@ -50,9 +50,9 @@ DAMAGE[TURRETD] = 200;
 
 DAMAGE[BARRIER] = 3000;
 DAMAGE[SOL] = 1.5;
-DAMAGE[AMP] = 2.2;
+DAMAGE[AMP] = 2.5;
 DAMAGE[MIRROR] = 3;
-DAMAGE[FORT] = 1.5;
+DAMAGE[FORT] = 0.6;
 DAMAGE[VENG] = 7000;
 DAMAGE[IMPULSE] = 600;
 
@@ -79,8 +79,8 @@ RECHARGE_TIME[ROCKETD] = 12;
 EFFECT_TIME[EMP] = 6;
 RECHARGE_TIME[EMP] = 45;
 
-EFFECT_TIME[FORT] = 12;
-RECHARGE_TIME[FORT] = 60;
+EFFECT_TIME[FORT] = 10;
+RECHARGE_TIME[FORT] = 30;
 
 EFFECT_TIME[TP] = 3;
 RECHARGE_TIME[TP] = 55;
@@ -114,7 +114,7 @@ RECHARGE_TIME[REPAIR] = 30;
 EFFECT_TIME[ROCKET] = 0;
 RECHARGE_TIME[ROCKET] = 120;
 
-EFFECT_TIME[TURRET] = 0;
+EFFECT_TIME[TURRET] = 3;
 RECHARGE_TIME[TURRET] = 60;
 
 // SHIELD
@@ -341,7 +341,8 @@ class Ship{
 
 		let dmg = x;
 
-		// TODO make ally functional
+		if(this.fort > 0)
+			dmg *= DAMAGE[FORT];
 
 		if(this.ally != null){
 			const rem = Math.min(Math.ceil(this.ally[0].modules[this.ally[1]].aux[0]*STRENGTH[ALLY]), dmg);
@@ -1095,8 +1096,7 @@ class Game{
 						//if(m.state) sol[M.get(s.uid)] = DAMAGE[SOL];
 						if(m.state) sol[M.get(s.uid)] *= DAMAGE[SOL];
 
-					}else if(m.type == FORT && m.state < 0)
-						sol[M.get(s.uid)] *= DAMAGE[FORT];
+					}
 
 			for(let s of this.ships) if(!s.emp)
 				for(let m of s.modules)
