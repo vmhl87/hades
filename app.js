@@ -3,7 +3,7 @@ let font = null;
 let modules = [null, null, null, null, null];
 
 let searching = 0, staging = 1, chooseModule = -1,
-	open = 0, connected = 0, snapshot = 0, ID = null, now = null;
+	connected = 0, snapshot = 0, ID = null, now = null;
 
 function preload(){
 	font = loadFont('Ubuntu-Regular.ttf');
@@ -28,7 +28,6 @@ let ships = [], rocks = [], blasts = [], deaths = [], heals = [], emps = [],
 socket.on("reset", () => {
 	searching = 0;
 	staging = 1;
-	open = 0;
 	connected = 0;
 	select = null;
 	selectMove = null;
@@ -39,7 +38,6 @@ socket.on("start", data => {
 	chooseModule = -1;
 	searching = 0;
 	staging = 0;
-	open = 0;
 	connected = 1;
 	select = null;
 	selectMove = null;
@@ -132,7 +130,6 @@ socket.on("end", () => {
 	chooseModule = -1;
 	searching = 0;
 	staging = 1;
-	open = 0;
 	connected = 0;
 	select = null;
 	selectMove = null;
@@ -1179,26 +1176,21 @@ function stagingUI(){
 		if(mouseIn(width/2, height/2+150, 60, 30)){
 			if(!searching){
 				searching = 1;
-				setTimeout(() => {
-					if(searching){
-						start();
-						open = 1;
-					}
-				}, 3000);
+				start();
 			}
 		}
 
 		if(mouseIn(width/2, height/2+200, 60, 15)){
 			if(searching){
 				searching = 0;
-				if(open) cancel();
+				cancel();
 			}
 		}
 
 		if(mouseIn(width/2, height/2+230, 60, 15)){
 			if(searching){
 				searching = 0;
-				if(open) cancel();
+				cancel();
 				solo();
 				staging = 0;
 			}

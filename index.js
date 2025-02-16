@@ -104,15 +104,52 @@ setInterval(tick, 1000/TPS, null);
 
 // -- client interconnect --
 
-function spawnBS(){
-	let res = [Math.floor(Math.random()*COLS*ROWS), -1];
+function spawnBS(n){
+	function shuffle(a){
+		for(let i=a.length-1; i>0; --i){
+			const j = Math.floor(Math.random()*(i+1));
+			const t = a[i];
+			a[i] = a[j];
+			a[j] = t;
+		}
 
-	do{
-		res[1] = Math.floor(Math.random()*COLS*ROWS);
-	}while(res[1] == res[0]);
+		return a;
+	}
 
-	return [[res[0]%COLS, Math.floor(res[0]/COLS)], [res[1]%COLS, Math.floor(res[1]/COLS)]];
+	let S = new Set();
+
+	while(S.size < n)
+		S.add(Math.floor(Math.random()*COLS*ROWS));
+
+	return shuffle(Array.from(S).map(x => [x%COLS, Math.floor(x/COLS)]));
 }
+
+function startGame(){
+	let m = [];
+	for(let q of queue) m.push(q.s.id);
+	console.log("starting new game:", m);
+	const g = new Game(queue.map(x => x.s));
+	const p = spawnBS(queue.length);
+	for(let i=0; i<queue.length; ++i)
+		g.addShip(BS, queue[i].s.id, queue[i].modules,
+			[300*(p[i][0]-COLS/2+0.5), 300*(p[i][1]-ROWS/2+0.5)]);
+	g.start();
+	games.push(g);
+	queue = [];
+}
+
+let roundStart = null;
+
+function checkStartGame(){
+	if(roundStart != null){
+		if(roundStart < Date.now()){
+			roundStart = null;
+			startGame();
+		}
+	}
+}
+
+setInterval(checkStartGame, 500, null);
 
 io.on("connect", (socket) => {
 	socket.on("error", e => {
@@ -132,6 +169,10 @@ io.on("connect", (socket) => {
 			let m = [];
 			for(let q of queue) m.push(q.s.id);
 			console.log(" =>", m);
+			if(queue.length >= 2){
+				roundStart = Date.now()+3000;
+				console.log("pushing back");
+			}else roundStart = null;
 		}
 
 		for(let g of games){
@@ -163,17 +204,9 @@ io.on("connect", (socket) => {
 		let m = [];
 		for(let q of queue) m.push(q.s.id);
 		console.log(" =>", m);
-		if(queue.length == 2){
-			console.log("starting new game:", m);
-			const g = new Game([queue[0].s, queue[1].s]);
-			const p = spawnBS();
-			g.addShip(BS, queue[0].s.id, queue[0].modules,
-				[300*(p[0][0]-COLS/2+0.5), 300*(p[0][1]-ROWS/2+0.5)]);
-			g.addShip(BS, queue[1].s.id, queue[1].modules,
-				[300*(p[1][0]-COLS/2+0.5), 300*(p[1][1]-ROWS/2+0.5)]);
-			g.start();
-			games.push(g);
-			queue = [];
+		if(queue.length >= 2){
+			roundStart = Date.now()+3000;
+			console.log("pushing back");
 		}
 	});
 
@@ -183,6 +216,10 @@ io.on("connect", (socket) => {
 		let m = [];
 		for(let q of queue) m.push(q.s.id);
 		console.log(" =>", m);
+		if(queue.length >= 2){
+			roundStart = Date.now()+3000;
+			console.log("pushing back");
+		}else roundStart = null;
 	});
 
 	socket.on("solo", modules => {
