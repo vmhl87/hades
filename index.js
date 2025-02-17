@@ -225,7 +225,7 @@ io.on("connect", (socket) => {
 	socket.on("solo", modules => {
 		console.log("solo match started by", socket.id, "with", modules);
 		const g = new Game([socket]);
-		const p = spawnBS();
+		const p = spawnBS(1);
 		g.addShip(BS, socket.id, modules,
 			[300*(p[0][0]-COLS/2+0.5), 300*(p[0][1]-ROWS/2+0.5)]);
 		g.start();

@@ -145,20 +145,55 @@ function main(){
 		scale(5); drawShip(BS, 0, 2);
 		pop();
 
-		push();
-		stroke(50, 200, 200, mouseIn(width-30, 30, 30, 30) ? 80 : 60); strokeWeight(3);
-		noFill();
-		beginShape();
-		vertex(width-27, 20);
-		vertex(width-27, 40);
-		vertex(width-20, 33);
-		endShape();
-		beginShape();
-		vertex(width-40, 27);
-		vertex(width-33, 20);
-		vertex(width-33, 40);
-		endShape();
-		pop();
+		if(localStorage.getItem("save") != null){
+			push();
+			stroke(50, 200, 200, mouseIn(width-30, 30, 30, 30) ? 80 : 60); strokeWeight(3);
+			noFill();
+			beginShape();
+			vertex(width-27, 20);
+			vertex(width-27, 40);
+			vertex(width-20, 33);
+			endShape();
+			beginShape();
+			vertex(width-40, 27);
+			vertex(width-33, 20);
+			vertex(width-33, 40);
+			endShape();
+			if(mouseIn(width-30, 30, 30, 30)){
+				textAlign(RIGHT, CENTER); textSize(17);
+				fill(50, 200, 200, 80); noStroke();
+				text("VIEW SNAPSHOT", width-60, 28);
+			}
+			pop();
+		}
+
+		if(chooseModule != -1){
+			const I = INFO[modules[chooseModule < 0 ? chooseModule+10 : chooseModule]];
+			const N = MODULE_NAME[modules[chooseModule < 0 ? chooseModule+10 : chooseModule]];
+
+			if(I != null){
+				push(); textSize(14);
+				const W = wrap(I, 220);
+				const H = font.textBounds(N+'\n\n'+W, 0, 0).h;
+				const P = width/2-100+50*(chooseModule < 0 ? chooseModule+10 : chooseModule);
+
+				fill(0, 20, 30); noStroke();
+				rect(width/2-120, height/2-20-H-10, 240, H+20);
+				triangle(P-10, height/2-20+10, P, height/2-20+27, P+10, height/2-20+10);
+				noFill(); stroke(20, 70, 80); strokeWeight(3);
+				line(width/2-120, height/2-20-H-10, width/2+120, height/2-20-H-10);
+				line(width/2-120, height/2-20-H-10, width/2-120, height/2-20+10);
+				line(width/2+120, height/2-20-H-10, width/2+120, height/2-20+10);
+				line(width/2-120, height/2-20+10, P-10, height/2-20+10);
+				line(P-10, height/2-20+10, P, height/2-20+27);
+				line(P, height/2-20+27, P+10, height/2-20+10);
+				line(P+10, height/2-20+10, width/2+120, height/2-20+10);
+				textAlign(LEFT, BOTTOM);
+				fill(150); noStroke();
+				text(N + '\n\n' + W, width/2-110, height/2-20);
+				pop();
+			}
+		}
 
 		if(ALLMODULE){
 			if(!MOBILE || chooseModule == -1) for(let i=0; i<5; ++i){
@@ -1025,6 +1060,34 @@ function main(){
 						push(); translate(width/2+25-25*ships[shipID].modules.length+50*i, height-120-10-25);
 						drawModule2(ships[shipID].modules[i].type, ships[shipID].modules[i].state);
 						pop();
+
+						if(!MOBILE && mouseIn(width/2+25-25*ships[shipID].modules.length+50*i, height-120-10-25, 20, 20)){
+							const I = INFO[ships[shipID].modules[i].type];
+							const N = MODULE_NAME[ships[shipID].modules[i].type];
+
+							if(I != null){
+								push(); textSize(14);
+								const W = wrap(I, 220);
+								const H = font.textBounds(N+'\n\n'+W, 0, 0).h;
+								const P = width/2+25-25*ships[shipID].modules.length+50*i;
+
+								fill(0, 20, 30); noStroke();
+								rect(width/2-120, height-225-H-10, 240, H+20);
+								triangle(P-10, height-225+10, P, height-225+27, P+10, height-225+10);
+								noFill(); stroke(20, 70, 80); strokeWeight(3);
+								line(width/2-120, height-225-H-10, width/2+120, height-225-H-10);
+								line(width/2-120, height-225-H-10, width/2-120, height-225+10);
+								line(width/2+120, height-225-H-10, width/2+120, height-225+10);
+								line(width/2-120, height-225+10, P-10, height-225+10);
+								line(P-10, height-225+10, P, height-225+27);
+								line(P, height-225+27, P+10, height-225+10);
+								line(P+10, height-225+10, width/2+120, height-225+10);
+								textAlign(LEFT, BOTTOM);
+								fill(150); noStroke();
+								text(N + '\n\n' + W, width/2-110, height-225);
+								pop();
+							}
+						}
 					}
 
 					let canMove = ships[shipID].team == socket.id &&
@@ -1092,22 +1155,34 @@ function main(){
 		line(20, 20, 40, 40);
 		line(20, 40, 27, 33);
 		line(33, 27, 40, 20);
+		if(mouseIn(30, 30, 30, 30)){
+			textAlign(LEFT, CENTER); textSize(17);
+			fill(50, 200, 200, 80); noStroke();
+			text(snapshot ? "EXIT SNAPSHOT" : "EXIT GAME", 60, 28);
+		}
 		pop();
 
-		push();
-		stroke(50, 200, 200, mouseIn(width-30, 30, 30, 30) ? 80 : 60); strokeWeight(3);
-		noFill();
-		beginShape();
-		vertex(width-27, 20);
-		vertex(width-27, 40);
-		vertex(width-20, 33);
-		endShape();
-		beginShape();
-		vertex(width-40, 27);
-		vertex(width-33, 20);
-		vertex(width-33, 40);
-		endShape();
-		pop();
+		if(!snapshot){
+			push();
+			stroke(50, 200, 200, mouseIn(width-30, 30, 30, 30) ? 80 : 60); strokeWeight(3);
+			noFill();
+			beginShape();
+			vertex(width-27, 20);
+			vertex(width-27, 40);
+			vertex(width-20, 33);
+			endShape();
+			beginShape();
+			vertex(width-40, 27);
+			vertex(width-33, 20);
+			vertex(width-33, 40);
+			endShape();
+			if(mouseIn(width-30, 30, 30, 30)){
+				textAlign(RIGHT, CENTER); textSize(17);
+				fill(50, 200, 200, 80); noStroke();
+				text("SAVE SNAPSHOT", width-60, 28);
+			}
+			pop();
+		}
 
 		{
 			let shipInArena = false;
@@ -1141,6 +1216,130 @@ function stagingUI(){
 		return;
 	}
 
+	if(chooseModule == -1){
+		if(mouseIn(width/2, height/2+150, 60, 30)){
+			if(!searching){
+				searching = 1;
+				start();
+			}
+		}
+
+		if(mouseIn(width/2, height/2+200, 60, 15)){
+			if(searching){
+				searching = 0;
+				cancel();
+			}
+		}
+
+		if(mouseIn(width/2, height/2+230, 60, 15)){
+			if(searching){
+				searching = 0;
+				cancel();
+				solo();
+				staging = 0;
+			}
+		}
+
+	}else if(chooseModule == 0){
+		let p = true;
+
+		for(let i=0; i<5; ++i){
+			if(mouseIn(width/2-100+i*50, height/2+150, 20, 20)){
+				modules[0] = modules[0] == LASER+i ? null : LASER+i;
+				localStorage.setItem("modules", JSON.stringify(modules));
+				p = false;
+			}
+		}
+
+		if(!mouseIn(width/2, height/2+50, 150, 20) && p) chooseModule = -1;
+
+	}else if(chooseModule == 1){
+		let p = true;
+
+		for(let i=0; i<6; ++i){
+			if(mouseIn(width/2-125+i*50, height/2+150, 20, 20)){
+				modules[1] = modules[1] == ALPHA+i ? null : ALPHA+i;
+				localStorage.setItem("modules", JSON.stringify(modules));
+				p = false;
+			}
+		}
+
+		if(!mouseIn(width/2, height/2+50, 150, 20) && p) chooseModule = -1;
+
+	}else if(chooseModule == 2 || chooseModule == 3){
+		let p = true;
+
+		for(let i=0; i<5; ++i){
+			if(mouseIn(width/2-100+i*50, height/2+125, 20, 20) &&
+				modules[5-chooseModule] != EMP+i){
+				modules[chooseModule] = modules[chooseModule] == EMP+i ? null : EMP+i;
+				localStorage.setItem("modules", JSON.stringify(modules));
+				p = false;
+			}
+		}
+
+		for(let i=0; i<5; ++i){
+			if(mouseIn(width/2-100+i*50, height/2+175, 20, 20) &&
+				modules[5-chooseModule] != EMP+5+i){
+				modules[chooseModule] = modules[chooseModule] == EMP+5+i ? null : EMP+5+i;
+				localStorage.setItem("modules", JSON.stringify(modules));
+				p = false;
+			}
+		}
+
+		if(!mouseIn(width/2, height/2+50, 150, 20) && p) chooseModule = -1;
+
+	}else if(chooseModule == 4){
+		let p = true;
+
+		for(let i=0; i<4; ++i){
+			if(mouseIn(width/2-75+i*50, height/2+150, 20, 20)){
+				modules[4] = modules[4] == DECOY+i ? null : DECOY+i;
+				localStorage.setItem("modules", JSON.stringify(modules));
+				p = false;
+			}
+		}
+
+		if(!mouseIn(width/2, height/2+50, 150, 20) && p) chooseModule = -1;
+
+	}else if(chooseModule < -1){
+		const OFFSET = MOBILE ? 100 : 0;
+
+		let p = true;
+
+		for(let i=0; i<6; ++i)
+			if(mouseIn(width/2-125+i*50, height/2+125-OFFSET, 20, 20)){
+				modules[chooseModule+10] = modules[chooseModule+10] == LASER+i ? null : LASER+i;
+				p = false;
+			}
+
+		for(let i=0; i<6; ++i)
+			if(mouseIn(width/2-125+i*50, height/2+175-OFFSET, 20, 20)){
+				modules[chooseModule+10] = modules[chooseModule+10] == ALPHA+i ? null : ALPHA+i;
+				p = false;
+			}
+
+		for(let i=0; i<5; ++i)
+			if(mouseIn(width/2-100+i*50, height/2+225-OFFSET, 20, 20)){
+				modules[chooseModule+10] = modules[chooseModule+10] == EMP+i ? null : EMP+i;
+				p = false;
+			}
+
+		for(let i=0; i<6; ++i)
+			if(mouseIn(width/2-125+i*50, height/2+275-OFFSET, 20, 20)){
+				modules[chooseModule+10] = modules[chooseModule+10] == EMP+5+i ? null : EMP+5+i;
+				p = false;
+			}
+
+		for(let i=0; i<4; ++i)
+			if(mouseIn(width/2-75+i*50, height/2+325-OFFSET, 20, 20)){
+				modules[chooseModule+10] = modules[chooseModule+10] == DECOY+i ? null : DECOY+i;
+				p = false;
+			}
+
+		if(!mouseIn(width/2, height/2+50, 150, 20) && p) chooseModule = -1;
+	}
+
 	if(!searching){
 		if(ALLMODULE){
 			for(let i=0; i<5; ++i)
@@ -1170,117 +1369,6 @@ function stagingUI(){
 				chooseModule = (chooseModule == 4 ? -1 : 4);
 			}
 		}
-	}
-
-	if(chooseModule == -1){
-		if(mouseIn(width/2, height/2+150, 60, 30)){
-			if(!searching){
-				searching = 1;
-				start();
-			}
-		}
-
-		if(mouseIn(width/2, height/2+200, 60, 15)){
-			if(searching){
-				searching = 0;
-				cancel();
-			}
-		}
-
-		if(mouseIn(width/2, height/2+230, 60, 15)){
-			if(searching){
-				searching = 0;
-				cancel();
-				solo();
-				staging = 0;
-			}
-		}
-
-	}else if(chooseModule == 0){
-		for(let i=0; i<5; ++i){
-			if(mouseIn(width/2-100+i*50, height/2+150, 20, 20)){
-				modules[0] = modules[0] == LASER+i ? null : LASER+i;
-				chooseModule = -1;
-				localStorage.setItem("modules", JSON.stringify(modules));
-			}
-		}
-
-	}else if(chooseModule == 1){
-		for(let i=0; i<6; ++i){
-			if(mouseIn(width/2-125+i*50, height/2+150, 20, 20)){
-				modules[1] = modules[1] == ALPHA+i ? null : ALPHA+i;
-				chooseModule = -1;
-				localStorage.setItem("modules", JSON.stringify(modules));
-			}
-		}
-
-	}else if(chooseModule == 2 || chooseModule == 3){
-		for(let i=0; i<5; ++i){
-			if(mouseIn(width/2-100+i*50, height/2+125, 20, 20) &&
-				modules[5-chooseModule] != EMP+i){
-				modules[chooseModule] = modules[chooseModule] == EMP+i ? null : EMP+i;
-				chooseModule = -1;
-				localStorage.setItem("modules", JSON.stringify(modules));
-			}
-		}
-
-		for(let i=0; i<5; ++i){
-			if(mouseIn(width/2-100+i*50, height/2+175, 20, 20) &&
-				modules[5-chooseModule] != EMP+5+i){
-				modules[chooseModule] = modules[chooseModule] == EMP+5+i ? null : EMP+5+i;
-				chooseModule = -1;
-				localStorage.setItem("modules", JSON.stringify(modules));
-			}
-		}
-
-	}else if(chooseModule == 4){
-		for(let i=0; i<4; ++i){
-			if(mouseIn(width/2-75+i*50, height/2+150, 20, 20)){
-				modules[4] = modules[4] == DECOY+i ? null : DECOY+i;
-				chooseModule = -1;
-				localStorage.setItem("modules", JSON.stringify(modules));
-			}
-		}
-
-	}else if(chooseModule < -1){
-		const OFFSET = MOBILE ? 100 : 0;
-
-		for(let i=0; i<6; ++i){
-			if(mouseIn(width/2-125+i*50, height/2+125-OFFSET, 20, 20)){
-				modules[chooseModule+10] = modules[chooseModule+10] == LASER+i ? null : LASER+i;
-				chooseModule = -1;
-			}
-		}
-
-		for(let i=0; i<6; ++i){
-			if(mouseIn(width/2-125+i*50, height/2+175-OFFSET, 20, 20)){
-				modules[chooseModule+10] = modules[chooseModule+10] == ALPHA+i ? null : ALPHA+i;
-				chooseModule = -1;
-			}
-		}
-
-		for(let i=0; i<5; ++i){
-			if(mouseIn(width/2-100+i*50, height/2+225-OFFSET, 20, 20)){
-				modules[chooseModule+10] = modules[chooseModule+10] == EMP+i ? null : EMP+i;
-				chooseModule = -1;
-			}
-		}
-
-		for(let i=0; i<6; ++i){
-			if(mouseIn(width/2-125+i*50, height/2+275-OFFSET, 20, 20)){
-				modules[chooseModule+10] = modules[chooseModule+10] == EMP+5+i ? null : EMP+5+i;
-				chooseModule = -1;
-			}
-		}
-
-		for(let i=0; i<4; ++i){
-			if(mouseIn(width/2-75+i*50, height/2+325-OFFSET, 20, 20)){
-				modules[chooseModule+10] = modules[chooseModule+10] == DECOY+i ? null : DECOY+i;
-				chooseModule = -1;
-			}
-		}
-
-		if(mouseIn(width/2, height/2-100, 100, 50)) chooseModule = -1;
 	}
 }
 

@@ -23,6 +23,44 @@ function mouseIn(x, y, w, h){
 	}else return abs(mouseX-x) < w && abs(mouseY-y) < h;
 }
 
+function wrap(T, W){
+	const S = T.split(' ');
+	let res = "", line = "", b = false;
+
+	for(let i=0; i<S.length; ++i){
+		const L = line + (b ? ' ' : '') + S[i];
+		b = true;
+		if(textWidth(L) > W){
+			res += (res.length ? '\n' : '') + line;
+			line = S[i];
+		}else line = L;
+	}
+
+	return res + (res.length ? '\n' : '') + line;
+}
+
+function textHeight(text, textSz, maxWidth) {
+	push(); textSize(15);
+	const words = text.split(' '), RT = font.textBounds('y', 0, 0, textSz).h;
+	let line = '';
+	let h = RT;
+	pop();
+
+	for(let i=0; i<words.length; ++i){
+		const testLine = line + words[i] + ' ';
+		const testWidth = textWidth(testLine);
+
+		if(testWidth > maxWidth && i > 0){
+			line = words[i] + ' ';
+			h += RT;
+		}else{
+			line = testLine;
+		}
+	}
+
+	return h;
+}
+
 class Ship{
 	constructor(dat){
 		this.type = dat.type;
