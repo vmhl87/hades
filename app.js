@@ -175,7 +175,7 @@ function main(){
 
 			if(chooseModule != -1) pick = chooseModule < 0 ? chooseModule+10 : chooseModule;
 
-			if(pick != null){
+			if(pick != null && (!MOBILE || !ALLMODULE)){
 				const I = INFO[modules[pick]];
 				const N = MODULE_NAME[modules[pick]];
 
