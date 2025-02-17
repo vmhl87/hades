@@ -167,31 +167,40 @@ function main(){
 			pop();
 		}
 
-		if(chooseModule != -1){
-			const I = INFO[modules[chooseModule < 0 ? chooseModule+10 : chooseModule]];
-			const N = MODULE_NAME[modules[chooseModule < 0 ? chooseModule+10 : chooseModule]];
+		{
+			let pick = null;
 
-			if(I != null){
-				push(); textSize(14);
-				const W = wrap(I, 220);
-				const H = font.textBounds(N+'\n\n'+W, 0, 0).h;
-				const P = width/2-100+50*(chooseModule < 0 ? chooseModule+10 : chooseModule);
+			for(let i=0; i<5; ++i) if(mouseIn(width/2-100+50*i, height/2+50, 20, 20))
+				pick = i;
 
-				fill(0, 20, 30); noStroke();
-				rect(width/2-120, height/2-20-H-10, 240, H+20);
-				triangle(P-10, height/2-20+10, P, height/2-20+27, P+10, height/2-20+10);
-				noFill(); stroke(20, 70, 80); strokeWeight(3);
-				line(width/2-120, height/2-20-H-10, width/2+120, height/2-20-H-10);
-				line(width/2-120, height/2-20-H-10, width/2-120, height/2-20+10);
-				line(width/2+120, height/2-20-H-10, width/2+120, height/2-20+10);
-				line(width/2-120, height/2-20+10, P-10, height/2-20+10);
-				line(P-10, height/2-20+10, P, height/2-20+27);
-				line(P, height/2-20+27, P+10, height/2-20+10);
-				line(P+10, height/2-20+10, width/2+120, height/2-20+10);
-				textAlign(LEFT, BOTTOM);
-				fill(150); noStroke();
-				text(N + '\n\n' + W, width/2-110, height/2-20);
-				pop();
+			if(chooseModule != -1) pick = chooseModule < 0 ? chooseModule+10 : chooseModule;
+
+			if(pick != null){
+				const I = INFO[modules[pick]];
+				const N = MODULE_NAME[modules[pick]];
+
+				if(I != null){
+					push(); textSize(14);
+					const W = wrap(I, 220);
+					const H = font.textBounds(N+'\n\n'+W, 0, 0).h;
+					const P = width/2-100+50*pick;
+
+					fill(0, 20, 30); noStroke();
+					rect(width/2-120, height/2-20-H-10, 240, H+20);
+					triangle(P-10, height/2-20+10, P, height/2-20+27, P+10, height/2-20+10);
+					noFill(); stroke(20, 70, 80); strokeWeight(3);
+					line(width/2-120, height/2-20-H-10, width/2+120, height/2-20-H-10);
+					line(width/2-120, height/2-20-H-10, width/2-120, height/2-20+10);
+					line(width/2+120, height/2-20-H-10, width/2+120, height/2-20+10);
+					line(width/2-120, height/2-20+10, P-10, height/2-20+10);
+					line(P-10, height/2-20+10, P, height/2-20+27);
+					line(P, height/2-20+27, P+10, height/2-20+10);
+					line(P+10, height/2-20+10, width/2+120, height/2-20+10);
+					textAlign(LEFT, BOTTOM);
+					fill(150); noStroke();
+					text(N + '\n\n' + W, width/2-110, height/2-20);
+					pop();
+				}
 			}
 		}
 
