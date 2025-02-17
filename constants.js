@@ -138,7 +138,7 @@ INFO[DISRUPT] = "Nullifies all shields within range for a short time. Additional
 
 INFO[VENG] = "When the Battleship's health falls below a critical threshold, this Module begins an activation countdown. When the countdown finishes, a massive explosion deals damage to all enemies within a large range.";
 
-INFO[SECT] = "When the ship's health reaches zero, all vessels equipped with APOCALYPSE warp out of the system, and sector collapse initiates. After a countdown, one to five sectors implode, instantly destroying all vessels within them. The resulting sectors eal constant damage to any ships within them for the rest of the round.";
+INFO[SECT] = "When the ship's health reaches zero, all vessels equipped with APOCALYPSE warp out of the system, and sector collapse initiates. After a countdown, one to five sectors implode, instantly destroying all vessels within them. The resulting sectors deal constant damage to any ships within them for the rest of the round.";
 
 INFO[DECOY] = "A drone that attracts fire. All enemy ships within range will immediately switch target to this drone.";
 INFO[REPAIR] = "A drone that once destroyed repairs allied ships within range by a high amount. If the drone's lifetime expires before being destroyed, it repairs nearby allies by a small amount.";
