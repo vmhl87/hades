@@ -257,6 +257,8 @@ function mobileClick(P){
 function mouseReleased(){
 	if(MOBILE) return;
 
+	if(mouseButton == RIGHT) return;
+
 	if(!staging && connected && abs(startMouseX-30) < 30 && abs(startMouseY-30) < 30 && mouseIn(width-30, 30, 30, 30)){
 		GOD = !GOD;
 		return;

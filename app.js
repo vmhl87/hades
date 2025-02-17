@@ -1061,7 +1061,7 @@ function main(){
 						drawModule2(ships[shipID].modules[i].type, ships[shipID].modules[i].state);
 						pop();
 
-						if(!MOBILE && mouseIn(width/2+25-25*ships[shipID].modules.length+50*i, height-120-10-25, 20, 20)){
+						if(!MOBILE && mouseIn(width/2+25-25*ships[shipID].modules.length+50*i, height-120-10-25, 20, 20) && mouseIsPressed && mouseButton == RIGHT){
 							const I = INFO[ships[shipID].modules[i].type];
 							const N = MODULE_NAME[ships[shipID].modules[i].type];
 
