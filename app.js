@@ -509,7 +509,7 @@ function main(){
 				push();
 				stroke(90, 100); fill(90, 30);
 				if(selectMove == null) for(let i=0; i<ships[shipID].modules.length; ++i)
-					if(mouseIn(width/2+25-25*ships[shipID].modules.length+50*i, height-120-10-25, 20, 20))
+					if(mouseIn(width/2+25-25*ships[shipID].modules.length+50*i, height-120-10-25, 25, 20))
 						if(RANGE[ships[shipID].modules[i].type] != null)
 							circle(...screenPos(ships[shipID].vpos), RANGE[ships[shipID].modules[i].type]*2*camera.z);
 				if(selectMove != null && selectMove[0] == "module" && RANGE[ships[shipID].modules[selectMove[1].i].type])
@@ -1070,7 +1070,7 @@ function main(){
 						drawModule2(ships[shipID].modules[i].type, ships[shipID].modules[i].state);
 						pop();
 
-						if(!MOBILE && mouseIn(width/2+25-25*ships[shipID].modules.length+50*i, height-120-10-25, 20, 20) && mouseIsPressed && mouseButton == RIGHT){
+						if(!MOBILE && mouseIn(width/2+25-25*ships[shipID].modules.length+50*i, height-120-10-25, 25, 20) && mouseIsPressed && mouseButton == RIGHT){
 							const I = INFO[ships[shipID].modules[i].type];
 							const N = MODULE_NAME[ships[shipID].modules[i].type];
 
