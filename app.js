@@ -145,7 +145,7 @@ function main(){
 		scale(5); drawShip(BS, 0, 2);
 		pop();
 
-		if(localStorage.getItem("save") != null){
+		if(localStorage.getItem("save") != null && !searching){
 			push();
 			stroke(50, 200, 200, mouseIn(width-30, 30, 30, 30) ? 80 : 60); strokeWeight(3);
 			noFill();
