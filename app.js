@@ -320,10 +320,10 @@ function main(){
 			}
 
 			if(chooseModule == 4){
-				for(let i=0; i<4; ++i){
-					fill(255, 100, 0, mouseIn(width/2-75+i*50, height/2+150, 20, 20) ? 80 : 60);
-					rect(width/2-95+i*50, height/2+130, 40, 40);
-					push(); translate(width/2-75+i*50, height/2+150);
+				for(let i=0; i<5; ++i){
+					fill(255, 100, 0, mouseIn(width/2-100+i*50, height/2+150, 20, 20) ? 80 : 60);
+					rect(width/2-120+i*50, height/2+130, 40, 40);
+					push(); translate(width/2-100+i*50, height/2+150);
 					drawModule(DECOY+i);
 					pop();
 				}
@@ -376,10 +376,10 @@ function main(){
 					if(modules[5-chooseModule] == EMP+5+i) rect(width/2-145+i*50, height/2+255, 40, 40);
 				}
 
-				for(let i=0; i<4; ++i){
-					fill(255, 100, 0, mouseIn(width/2-75+i*50, height/2+325, 20, 20) ? 80 : 60);
-					rect(width/2-95+i*50, height/2+305, 40, 40);
-					push(); translate(width/2-75+i*50, height/2+325);
+				for(let i=0; i<5; ++i){
+					fill(255, 100, 0, mouseIn(width/2-100+i*50, height/2+325, 20, 20) ? 80 : 60);
+					rect(width/2-120+i*50, height/2+305, 40, 40);
+					push(); translate(width/2-100+i*50, height/2+325);
 					drawModule(DECOY+i);
 					pop();
 				}
@@ -422,12 +422,16 @@ function main(){
 
 		let REV = new Map();
 
-		let bsID = [], cerbID = [], repairID = [];
+		let bsID = [], cerbID = [], repairID = [], shieldID = [];
 		for(let i=0; i<ships.length; ++i){
-			if(ships[i].type == BS) bsID.push(i);
+			if(ships[i].type == BS){
+				bsID.push(i);
+				shieldID.push(i);
+			}
 			if(ships[i].type >= SENTINEL && ships[i].type <= COL)
 				cerbID.push(i);
 			if(ships[i].type == REPAIR) repairID.push(i);
+			if(ships[i].type == SHIELD) shieldID.push(i);
 			REV.set(ships[i].uid, i);
 		}
 
@@ -617,7 +621,7 @@ function main(){
 			}
 		}
 
-		for(let i of bsID){
+		for(let i of shieldID){
 			const s = ships[i];
 			if(s.imp == 0){
 				push(); translate(width/2+(s.vpos[0]-camera.x)*camera.z, height/2+(s.vpos[1]-camera.y)*camera.z);
@@ -1301,8 +1305,8 @@ function stagingUI(){
 	}else if(chooseModule == 4){
 		let p = true;
 
-		for(let i=0; i<4; ++i){
-			if(mouseIn(width/2-75+i*50, height/2+150, 20, 20)){
+		for(let i=0; i<5; ++i){
+			if(mouseIn(width/2-100+i*50, height/2+150, 20, 20)){
 				modules[4] = modules[4] == DECOY+i ? null : DECOY+i;
 				localStorage.setItem("modules", JSON.stringify(modules));
 				p = false;
@@ -1340,8 +1344,8 @@ function stagingUI(){
 				p = false;
 			}
 
-		for(let i=0; i<4; ++i)
-			if(mouseIn(width/2-75+i*50, height/2+325-OFFSET, 20, 20)){
+		for(let i=0; i<5; ++i)
+			if(mouseIn(width/2-100+i*50, height/2+325-OFFSET, 20, 20)){
 				modules[chooseModule+10] = modules[chooseModule+10] == DECOY+i ? null : DECOY+i;
 				p = false;
 			}

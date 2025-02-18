@@ -10,7 +10,7 @@ const DARTP = ++ct, ROCKETP = ++ct, DELTAP = ++ct;
 
 // DRONE TYPES
 
-const DECOY = ++ct, REPAIR = ++ct, ROCKET = ++ct, TURRET = ++ct;
+const DECOY = ++ct, REPAIR = ++ct, ROCKET = ++ct, TURRET = ++ct, SHIELD = ++ct;
 
 // WEAPON TYPES
 
@@ -64,6 +64,7 @@ EXPIRE_TIME[DECOY] = 40;
 EXPIRE_TIME[REPAIR] = 40;
 EXPIRE_TIME[ROCKET] = 100;
 EXPIRE_TIME[TURRET] = 120;
+EXPIRE_TIME[SHIELD] = 45;
 
 RECHARGE_TIME[TURRETD] = 3;
 
@@ -117,6 +118,9 @@ RECHARGE_TIME[ROCKET] = 120;
 EFFECT_TIME[TURRET] = 3;
 RECHARGE_TIME[TURRET] = 60;
 
+EFFECT_TIME[SHIELD] = 0;
+RECHARGE_TIME[SHIELD] = 90;
+
 // SHIELD
 
 EFFECT_TIME[ALPHA] = 8;
@@ -155,6 +159,7 @@ ACTIVATED[DECOY] = true;
 ACTIVATED[REPAIR] = true;
 ACTIVATED[ROCKET] = true;
 ACTIVATED[TURRET] = true;
+ACTIVATED[SHIELD] = true;
 
 SPEED[BS] = 20;
 SPEED[SENTINEL] = 10;
@@ -179,6 +184,7 @@ HP[DECOY] = 1000;
 HP[REPAIR] = 1000;
 HP[ROCKET] = 600;
 HP[TURRET] = 1500;
+HP[SHIELD] = 1000;
 HP[DARTP] = 250;
 HP[ROCKETP] = 400;
 HP[DELTAP] = 180;
@@ -473,6 +479,15 @@ class Game{
 				this.ships[s].pos[0]+10*Math.cos(R),
 				this.ships[s].pos[1]+10*Math.sin(R)
 			]);
+		}
+
+		if(T == SHIELD){
+			const R = Math.random()*Math.PI*2;
+			this.addShip(SHIELD, this.ships[s].team, [ALLY], [
+				this.ships[s].pos[0]+10*Math.cos(R),
+				this.ships[s].pos[1]+10*Math.sin(R)
+			]);
+			this.activateModule(this.ships.length-1, {i: 0});
 		}
 
 		if(T == TP){
@@ -1284,7 +1299,9 @@ class Game{
 								[LASER, PASSIVE, VENG],
 								[BATTERY, PASSIVE, SOL, ROCKET],
 								[MASS, PASSIVE, SOL],
+								[MASS, PASSIVE, FORT, SOL],
 								[BATTERY, ALPHA, AMP],
+								[BATTERY, PASSIVE, FORT, SHIELD],
 								[LASER, PASSIVE, EMP, DECOY],
 								[DART, OMEGA, EMP, ROCKET],
 								[DART, ALLY, BARRIER, DECOY],
@@ -1294,6 +1311,7 @@ class Game{
 								[MASS, OMEGA, AMP, EMP],
 								[MASS, ALPHA, VENG, AMP, ROCKET],
 								[DART, PASSIVE, EMP, TURRET],
+								[LASER, PASSIVE, BARRIER, SHIELD],
 							];
 
 							const I = Math.floor(Math.random()*MODS.length);

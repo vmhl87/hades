@@ -10,7 +10,7 @@ const DARTP = ++ct, ROCKETP = ++ct, DELTAP = ++ct;
 
 // DRONE TYPES
 
-const DECOY = ++ct, REPAIR = ++ct, ROCKET = ++ct, TURRET = ++ct;
+const DECOY = ++ct, REPAIR = ++ct, ROCKET = ++ct, TURRET = ++ct, SHIELD = ++ct;
 
 // WEAPON TYPES
 
@@ -52,6 +52,7 @@ NAME[DECOY] = "DECOY DRONE";
 NAME[REPAIR] = "REPAIR DRONE";
 NAME[ROCKET] = "ROCKET DRONE";
 NAME[TURRET] = "TURRET DRONE";
+NAME[SHIELD] = "SHIELD DRONE";
 
 HP[BS] = 7000;
 HP[SENTINEL] = 1200;
@@ -62,6 +63,7 @@ HP[DECOY] = 1000;
 HP[REPAIR] = 1000;
 HP[ROCKET] = 600;
 HP[TURRET] = 1500;
+HP[SHIELD] = 1000;
 HP[DARTP] = 250;
 HP[ROCKETP] = 400;
 HP[DELTAP] = 180;
@@ -145,6 +147,7 @@ INFO[DECOY] = "A drone that attracts fire. All enemy ships within range will imm
 INFO[REPAIR] = "A drone that once destroyed repairs allied ships within range by a high amount. If the drone's lifetime expires before being destroyed, it repairs nearby allies by a small amount.";
 INFO[ROCKET] = "A drone that periodically fires rockets at enemy vessels within range. Battleships are preferred over Cerberus.";
 INFO[TURRET] = "A drone that after a small setup time applies constant damage to three enemies within range.";
+INFO[SHIELD] = "A drone that projects a floating shield, protecting all allied vessels within range. The drone itself is not covered by the shield.";
 
 let MODULE_NAME = new Array(ct);
 
@@ -188,3 +191,4 @@ MODULE_NAME[DECOY] = "DECOY DRONE";
 MODULE_NAME[REPAIR] = "REPAIR DRONE";
 MODULE_NAME[ROCKET] = "ROCKET DRONE";
 MODULE_NAME[TURRET] = "TURRET DRONE";
+MODULE_NAME[SHIELD] = "SHIELD DRONE";

@@ -431,6 +431,26 @@ function drawShip(T, O, M){
 		circle(3*sin(PI*4/3), -3*cos(PI*4/3), 2.5);
 	}
 
+	if(T == SHIELD){
+		if(O == 0) fill(100, 150, 150);
+		if(O == 1) fill(170, 70, 70);
+		circle(0, 0, 15);
+		if(O == 0) fill(70, 110, 110);
+		if(O == 1) fill(120, 40, 40);
+		arc(0, 0, 15, 15, -PI/6, PI/6);
+		arc(0, 0, 15, 15, PI/2-PI/6, PI/2+PI/6);
+		arc(0, 0, 15, 15, PI-PI/6, PI+PI/6);
+		arc(0, 0, 15, 15, PI*1.5-PI/6, PI*1.5+PI/6);
+		if(O == 0) fill(100, 150, 150);
+		if(O == 1) fill(170, 70, 70);
+		circle(0, 0, 13);
+		if(O == 0) stroke(60, 100, 100);
+		if(O == 1) stroke(120, 40, 40);
+		noFill(); strokeWeight(2);
+		line(0, -3, 0, 3);
+		line(-3, 0, 3, 0);
+	}
+
 	if(T == ROCKET){
 		if(M){
 			fill(60, 180, 180);
@@ -1085,6 +1105,16 @@ function drawModule(T){
 		arc(0, 0, 22, 22, PI/2+PI*4/3-PI/4, PI/2+PI*4/3+PI/4);
 	}
 
+	if(T == SHIELD){
+		stroke(150, 100, 50); noFill();
+		line(0, -5, 0, 5);
+		line(-5, 0, 5, 0);
+		arc(0, 0, 22, 22, -PI/6, PI/6);
+		arc(0, 0, 22, 22, PI/2-PI/6, PI/2+PI/6);
+		arc(0, 0, 22, 22, PI-PI/6, PI+PI/6);
+		arc(0, 0, 22, 22, PI*1.5-PI/6, PI*1.5+PI/6);
+	}
+
 	pop();
 }
 
@@ -1097,7 +1127,7 @@ function drawModule2(T, S){
 	if(T >= SENTINEL && T <= COL) fill(255, 50, 50, 60);
 	if(T >= ALPHA && T <= ALLY) fill(0, 255, 255, 60);
 	if(T >= EMP && T <= SECT) fill(100, 255, 100, 60);
-	if(T >= DECOY && T <= TURRET) fill(255, 100, 0, 60);
+	if(T >= DECOY && T <= SHIELD) fill(255, 100, 0, 60);
 
 	rect(-20, -20, 40, 40);
 
