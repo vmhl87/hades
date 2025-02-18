@@ -54,10 +54,10 @@ NAME[ROCKET] = "ROCKET DRONE";
 NAME[TURRET] = "TURRET DRONE";
 
 HP[BS] = 7000;
-HP[SENTINEL] = 600;
-HP[GUARD] = 5600;
-HP[INT] = 4500;
-HP[COL] = 15000;
+HP[SENTINEL] = 1200;
+HP[GUARD] = 8000;
+HP[INT] = 9000;
+HP[COL] = 20000;
 HP[DECOY] = 1000;
 HP[REPAIR] = 1000;
 HP[ROCKET] = 600;
@@ -112,6 +112,7 @@ INFO[LASER2] = "A multi-target weapon that deals damage to two enemies within ra
 INFO[DART] = "A single-target weapon that periodically launches powerful rockets towards enemies in range. Projectiles deal damage in a large area when they reach their destination. Battleships are preferred over Cerberus.";
 
 INFO[ROCKETD] = "A single-target weapon that periodically launches rockets towards enemies in range. Projectiles deal a small amount of damage if destroyed before they reach their destination. Battleships are preferred over Cerberus.";
+INFO[TURRETD] = "A multi-target weapon that deals constant damage to three enemies within range.";
 
 INFO[SENTINEL] = "A single-target weapon that deals high damage to one enemy.";
 INFO[GUARD] = "A single-target weapon that deals low damage to one enemy.";
@@ -154,6 +155,7 @@ MODULE_NAME[LASER2] = "DUAL LASER";
 MODULE_NAME[DART] = "ROCKET LAUNCHER";
 
 MODULE_NAME[ROCKETD] = "ROCKET LAUNCHER";
+MODULE_NAME[TURRETD] = "TRIPLE LASER";
 
 MODULE_NAME[SENTINEL] = "CANNON";
 MODULE_NAME[GUARD] = "WEAK CANNON";
@@ -172,7 +174,7 @@ MODULE_NAME[SOL] = "DUEL";
 MODULE_NAME[FORT] = "FORTIFY";
 MODULE_NAME[TP] = "TELEPORT";
 MODULE_NAME[AMP] = "AMPLIFY";
-MODULE_NAME[DESTINY] = "GAMBIT";
+MODULE_NAME[DESTINY] = "LEAP";
 MODULE_NAME[BARRIER] = "BARRIER";
 MODULE_NAME[DELTA] = "STRIKE";
 MODULE_NAME[RIPPLE] = "SWAP";

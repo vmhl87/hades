@@ -1347,6 +1347,7 @@ function stagingUI(){
 			}
 
 		if(!mouseIn(width/2, height/2+50, 150, 20) && p) chooseModule = -1;
+		if(MOBILE) chooseModule = -1;
 	}
 
 	if(!searching){
