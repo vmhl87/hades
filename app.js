@@ -841,15 +841,20 @@ function main(){
 			rotate(s.rot); scale(sqrt(camera.z));
 			drawShip(s.type, s.team != socket.id && s.team != ID ? (s.type == BS && Number.isInteger(s.team) ? 2 : 1) : 0, s.move.length && !s.emp ? 1 : 0);
 			rotate(-s.rot);
-			if(s.emp){
-				stroke(255, 50, 50); noFill(); strokeWeight(2);
+			if(s.imp){
+				stroke(50, 200, 50); noFill(); strokeWeight(2);
 				arc(0, 0, 35, 35, -PI*0.25, PI*0.25);
 				arc(0, 0, 35, 35, PI-PI*0.25, PI+PI*0.25);
 			}
-			if(s.ally){
-				stroke(50, 200, 200); noFill(); strokeWeight(2);
+			if(s.emp){
+				stroke(255, 50, 50); noFill(); strokeWeight(2);
 				arc(0, 0, 40, 40, -PI*0.25, PI*0.25);
 				arc(0, 0, 40, 40, PI-PI*0.25, PI+PI*0.25);
+			}
+			if(s.ally){
+				stroke(50, 200, 200); noFill(); strokeWeight(2);
+				arc(0, 0, 45, 45, -PI*0.25, PI*0.25);
+				arc(0, 0, 45, 45, PI-PI*0.25, PI+PI*0.25);
 			}
 			if(s.type == TURRET && s.modules[0].state < 1){
 				stroke(50, 150, 200, 150*(1-s.modules[0].state)); noFill(); strokeWeight(2);
@@ -879,10 +884,10 @@ function main(){
 				if(m.type >= ALPHA && m.type <= ALLY)
 					if(m.aux[0]){
 						fill(100, 80); noStroke();
-						rect(-15, -25, 30, 3);
+						rect(-15, s.type == SHIELD ? -30 : -25, 30, 3);
 
 						fill(50, 150, 150);
-						rect(-15, -25, ceil(30*m.aux[0]), 3);
+						rect(-15, s.type == SHIELD ? -30 : -25, ceil(30*m.aux[0]), 3);
 					}
 
 
@@ -1149,6 +1154,16 @@ function main(){
 						circle(width/2-23, height-50, 8);
 						line(width/2-23, height-50-4, width/2-23, height-50-12);
 						line(width/2-23, height-50+4, width/2-23, height-50+12);
+					}
+					if(GOD){
+						if(mouseIn(width/2+117, height-95, 20, 20)) stroke(20, 70, 80);
+						else stroke(10, 40, 60);
+						noFill();
+						arc(width/2+125, height-95, 10, 10, -PI*0.75, PI*0.75);
+						arc(width/2+110, height-95, 10, 10, PI-PI*0.75, PI+PI*0.75);
+						line(width/2+117.5-15/4, height-95-15/4, width/2+117.5+15/4, height-95+15/4);
+						line(width/2+117.5+15/4, height-95-15/4, width/2+117.5+15/6, height-95-15/6);
+						line(width/2+117.5-15/4, height-95+15/4, width/2+117.5-15/6, height-95+15/6);
 					}
 					pop();
 				}
@@ -1448,6 +1463,7 @@ function click(){
 				ships[shipID].wait = null;
 			}
 			if(GOD && mouseIn(width/2-23, height-50, 20, 20)) god();
+			if(GOD && mouseIn(width/2+117, height-95, 20, 20)) ascend();
 			if(canMove && mouseIn(width/2-117, height-50, 20, 20)){
 				if(canStop) socket.emit("confirmMove", {gameID: gameID, shipID: focus[1]});
 				else selectMove = ["ship", focus[1]];

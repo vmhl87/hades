@@ -351,6 +351,8 @@ class Ship{
 			dmg *= DAMAGE[FORT];
 
 		if(this.ally != null){
+			if(this.ally[0] == null) return;
+
 			const rem = Math.min(Math.ceil(this.ally[0].modules[this.ally[1]].aux[0]*STRENGTH[ALLY]), dmg);
 
 			this.ally[0].modules[this.ally[1]].aux[0] = Math.max(0,
@@ -384,7 +386,7 @@ class Ship{
 	}
 
 	travel(){
-		if(this.type == TURRET){
+		if([TURRET, SHIELD].includes(this.type)){
 			this.move = [];
 			this.wait = null;
 			this.dock = null;
@@ -532,11 +534,9 @@ class Game{
 		}
 
 		if(T == DISRUPT){
-			for(let x of this.ships){
+			for(let x of this.ships)
 				if(_dist(x.pos, this.ships[s].pos) < RANGE[DISRUPT])
 					x.imp = 1;
-				if(x.tp != null) x.tp = null;
-			}
 
 			this.ev.push(["imp", [...this.ships[s].pos]]);
 		}
@@ -712,7 +712,7 @@ class Game{
 				for(let x of this.ships)
 					if(x.team == s.team && x.uid != s.uid)
 						if(_dist(x.pos, s.pos) < RANGE[ALLY])
-							if(x.ally == null || x.ally[0].modules[x.ally[1]].aux[0] < s.modules[i].aux[0])
+							if(x.ally == null || x.ally[0] == null || x.ally[0].modules[x.ally[1]].aux[0] < s.modules[i].aux[0])
 								x.ally = [s, i];
 			}
 
@@ -824,7 +824,7 @@ class Game{
 		let using = new Array(this.rocks.length).fill(false),
 			priority = new Array(this.rocks.length).fill(false);
 		
-		for(let s of this.ships) if(s.team != CERB && [BS, DECOY, REPAIR, ROCKET, TURRET].includes(s.type)){
+		for(let s of this.ships) if(s.team != CERB && [BS, DECOY, REPAIR, ROCKET, TURRET, SHIELD].includes(s.type)){
 			if(s.type == DECOY){
 				if(s.move.length) priority[s.move[0][2]] = true;
 				else priority[s.dock] = true;
@@ -936,6 +936,8 @@ class Game{
 
 								if(m.type == TURRET) this.activateModule(i, {i: j});
 
+								if(m.type == SHIELD) this.activateModule(i, {i: j});
+
 								if(m.type == DECOY){
 									this.activateModule(i, {i: j, loc: s.move.length ? s.move[0].slice(0, 2) :  [...s.pos],
 										dock: s.move.length ? s.move[0][2] : s.dock
@@ -964,13 +966,14 @@ class Game{
 							if(s.ai[1]) s.ai[0] += 5/(TPS*30);
 							if(this.dead[Math.floor((s.pos[0]+150*COLS)/300)+Math.floor((s.pos[1]+150*ROWS)/300)*COLS] > 0)
 								s.ai[0] = 1;
-							s.ai[1] = false;
 
 						}else if(s.wait != null){
 							if(s.ai[1]) s.wait[2] -= 3/(10*TPS);
 							if(this.dead[Math.floor((s.pos[0]+150*COLS)/300)+Math.floor((s.pos[1]+150*ROWS)/300)*COLS] > 0)
 								s.wait[2] -= 5/(10*TPS);
 						}
+
+						s.ai[1] = false;
 
 						if(s.ai[0] >= 1){
 							s.ai[0] = 0;
@@ -1025,7 +1028,7 @@ class Game{
 
 					for(let x of this.ships) if(x.team != s.team)
 						if(_dist(x.pos, s.pos) < RANGE[m.type] && (![DART, ROCKETD].includes(m.type)
-							|| [BS, DECOY, REPAIR, ROCKET, TURRET].includes(x.type)))
+							|| [BS, DECOY, REPAIR, ROCKET, TURRET, SHIELD].includes(x.type)))
 							if(m.type != ROCKETD || _dist(x.pos, s.pos) > 60){
 								if(x.type == DECOY) decoys.push([_dist(x.pos, s.pos), x.uid]);
 								else targets.push([_dist(x.pos, s.pos), x.uid]);
@@ -1129,7 +1132,7 @@ class Game{
 					}
 		}
 
-		for(let s of this.ships) if(s.ally)
+		for(let s of this.ships) if(s.ally != null && s.ally[0] != null)
 			if(s.ally[0].modules[s.ally[1]].type != ALLY || s.ally[0].modules[s.ally[1]].aux[0] <= 0
 				|| _dist(s.ally[0].pos, s.pos) > RANGE[ALLY] || s.ally[0].imp > 0) s.ally = null;
 
@@ -1207,7 +1210,7 @@ class Game{
 			}
 
 		for(let s of this.ships){
-			if(s.type >= DECOY && s.type <= TURRET){
+			if(s.type >= DECOY && s.type <= SHIELD){
 				s.expire = Math.max(0, s.expire-1/(TPS*EXPIRE_TIME[s.type]));
 			}
 
@@ -1339,8 +1342,10 @@ class Game{
 		let q = [];
 		for(let s of this.ships){
 			if(s.hp > 0) q.push(s.encode());
-			else if([BS, DECOY, REPAIR, ROCKET, TURRET, COL].includes(s.type))
+			else if([BS, DECOY, REPAIR, ROCKET, TURRET, SHIELD, COL].includes(s.type))
 				this.die(s.pos);
+
+			if(s.ally != null && s.ally[0] != null && s.ally[0].hp <= 0) s.ally = null;
 		}
 
 		this.ships = this.ships.filter(x => x.hp > 0);

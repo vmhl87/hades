@@ -468,3 +468,8 @@ function god(){
 	if(!staging && connected && focus != null && focus[0] == "ship" && shipID != null)
 		socket.emit("spawn", {gameID: gameID, arg: [DARTP, socket.id, [], ships[shipID].pos]});
 }
+
+function ascend(){
+	if(!staging && connected && focus != null && focus[0] == "ship" && shipID != null)
+		socket.emit("ascend", {gameID: gameID, shipID: focus[1]});
+}

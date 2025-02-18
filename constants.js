@@ -137,7 +137,7 @@ INFO[DESTINY] = "After a short delay, the Battleship applies massive blast damag
 INFO[BARRIER] = "Prevents enemy ships, drones, and most rockets within range from moving. Enemy ships which teleport into or out of the field take damage.";
 INFO[DELTA] = "Launches a fast rocket that deals high damage to enemy vessels within range. Can pass through Barrier. A small amount of damage is applied if the rocket is destroyed before reaching its destination.";
 INFO[RIPPLE] = "Instantaneously swaps the Battleship with an allied drone, rocket, or Cerberus ship within range.";
-INFO[DISRUPT] = "Nullifies all shields within range for a short time. Additionally, all enemy Teleport countdowns cancel when this module is activated.";
+INFO[DISRUPT] = "Nullifies all shields within range for a short time, both on enemy and allied vessels.";
 
 INFO[VENG] = "When the Battleship's health falls below a critical threshold, this Module begins an activation countdown. When the countdown finishes, a massive explosion deals damage to all enemies within a large range.";
 

@@ -298,5 +298,18 @@ io.on("connect", (socket) => {
 		}
 	});
 
+	socket.on("ascend", data => {
+		for(let g of games){
+			if(g.uid == data.gameID){
+				for(let s of g.ships){
+					if(s.uid == data.shipID){
+						if(s.ally == null) s.ally = [null];
+						else s.ally = null;
+					}
+				}
+			}
+		}
+	});
+
 	socket.on("echo", e => console.log("echo", ...e));
 });
