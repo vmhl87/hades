@@ -62,6 +62,11 @@ app.get("/assets.js", (req, res) => {
 	res.sendFile(path.join(__dirname, "assets.js"));
 });
 
+app.get("/p5.min.js", (req, res) => {
+	res.set("Content-Type", "application/javascript");
+	res.sendFile(path.join(__dirname, "p5.min.js"));
+});
+
 app.get("/style.css", (req, res) => {
 	res.set("Content-Type", "text/css");
 	res.sendFile(path.join(__dirname, "style.css"));
