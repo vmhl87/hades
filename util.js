@@ -39,28 +39,6 @@ function wrap(T, W){
 	return res + (res.length ? '\n' : '') + line;
 }
 
-function textHeight(text, textSz, maxWidth) {
-	push(); textSize(15);
-	const words = text.split(' '), RT = font.textBounds('y', 0, 0, textSz).h;
-	let line = '';
-	let h = RT;
-	pop();
-
-	for(let i=0; i<words.length; ++i){
-		const testLine = line + words[i] + ' ';
-		const testWidth = textWidth(testLine);
-
-		if(testWidth > maxWidth && i > 0){
-			line = words[i] + ' ';
-			h += RT;
-		}else{
-			line = testLine;
-		}
-	}
-
-	return h;
-}
-
 class Ship{
 	constructor(dat){
 		this.type = dat.type;
@@ -123,8 +101,6 @@ class Ship{
 
 		this.vpos[0] = lerp(this.vpos[0], this.pos[0], T);
 		this.vpos[1] = lerp(this.vpos[1], this.pos[1], T);
-
-		// this.vpos = this.pos; this.rot = target;
 	}
 }
 
