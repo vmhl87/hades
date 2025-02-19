@@ -147,7 +147,7 @@ INFO[DECOY] = "A drone that attracts fire. All enemy ships within range will imm
 INFO[REPAIR] = "A drone that once destroyed repairs allied ships within range by a high amount. If the drone's lifetime expires before being destroyed, it repairs nearby allies by a small amount.";
 INFO[ROCKET] = "A drone that periodically fires rockets at enemy vessels within range. Battleships are preferred over Cerberus.";
 INFO[TURRET] = "A drone that after a small setup time applies constant damage to three enemies within range.";
-INFO[SHIELD] = "A drone that projects a floating shield, protecting all allied vessels within range. The drone itself is not covered by the shield.";
+INFO[SHIELD] = "A drone that projects a floating shield, over all allied vessels within range. The drone itself is not protected by the shield.";
 
 let MODULE_NAME = new Array(ct);
 
