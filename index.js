@@ -6,38 +6,6 @@ const path = require("path");
 
 const io = require("socket.io")(server, {pingTimeout: 300000});
 
-// -- constants --
-
-let ct = 0;
-
-// SHIP TYPES
-
-const BS = ++ct, SENTINEL = ++ct, GUARD = ++ct, INT = ++ct, COL = ++ct;
-
-const DARTP = ++ct, ROCKETP = ++ct, DELTAP = ++ct;
-
-// DRONE TYPES
-
-const DECOY = ++ct, REPAIR = ++ct, ROCKET = ++ct, TURRET = ++ct;
-
-// WEAPON TYPES
-
-const LASER = ++ct, BATTERY = ++ct, MASS = ++ct, LASER2 = ++ct, DART = ++ct;
-
-/* UNOBTAIN */ const ROCKETD = ++ct, TURRETD = ++ct;
-
-// SHIELD TYPES
-
-const ALPHA = ++ct, IMPULSE = ++ct, PASSIVE = ++ct, OMEGA = ++ct, MIRROR = ++ct, ALLY = ++ct;
-
-// MODULE TYPES
-
-const EMP = ++ct, SOL = ++ct, FORT = ++ct, TP = ++ct, AMP = ++ct, DESTINY = ++ct, BARRIER = ++ct, DELTA = ++ct, RIPPLE = ++ct, DISRUPT = ++ct;
-
-/* UNOBTAIN */ const VENG = ++ct;
-
-// -- file xfer --
-
 app.get("/", (x, res) => {
 	res.sendFile(path.join(__dirname, "index.html"));
 });
@@ -136,7 +104,7 @@ function startGame(){
 	const g = new Game(queue.map(x => x.s));
 	const p = spawnBS(queue.length);
 	for(let i=0; i<queue.length; ++i)
-		g.addShip(BS, queue[i].s.id, queue[i].modules,
+		g.addShip(1, queue[i].s.id, queue[i].modules,
 			[300*(p[i][0]-COLS/2+0.5), 300*(p[i][1]-ROWS/2+0.5)]);
 	g.start();
 	games.push(g);
@@ -182,7 +150,7 @@ io.on("connect", (socket) => {
 
 		for(let g of games){
 			for(let s of g.ships){
-				if(s.type == BS && s.team == socket.id){
+				if(s.type == 1 && s.team == socket.id){
 					console.log(" => killing ships");
 					s.hp = 0;
 				}
@@ -195,7 +163,7 @@ io.on("connect", (socket) => {
 
 		for(let g of games){
 			for(let s of g.ships){
-				if(s.type == BS && s.team == socket.id){
+				if(s.type == 1 && s.team == socket.id){
 					console.log(" => killing ships");
 					s.hp = 0;
 				}
@@ -231,7 +199,7 @@ io.on("connect", (socket) => {
 		console.log("solo match started by", socket.id, "with", modules);
 		const g = new Game([socket]);
 		const p = spawnBS(1);
-		g.addShip(BS, socket.id, modules,
+		g.addShip(1, socket.id, modules,
 			[300*(p[0][0]-COLS/2+0.5), 300*(p[0][1]-ROWS/2+0.5)]);
 		g.start();
 		games.push(g);

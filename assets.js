@@ -337,6 +337,77 @@ function drawShip(T, O, M){
 		*/
 	}
 
+	if(T == BOMBER){
+		if(M){
+			fill(60, 180, 180);
+			_symm([
+				[-28-2*0.5, 0],
+				[-20, 3]
+			]);
+			fill(100, 255, 255);
+			_symm([
+				[-24-0.5, 0],
+				[-20, 2]
+			]);
+		}
+		fill(80, 50, 50);
+		rect(4, -3, 10, 6);
+		_symm([
+			[-21, 3],
+			[-17, 6],
+			[-11, 4]
+		]);
+		_symm([
+			[-15, 8],
+			[-10, 10],
+			[-6, 8.5],
+			[-2, 6],
+			[-9.5, 8],
+			[-15, 8]
+		]);
+		fill(150, 80, 80);
+		_symm([
+			[-15, 0.5],
+			[-22, 1.5],
+			[-21, 3],
+			[-11, 4],
+			[5, 4],
+			[7, 0]
+		]);
+		_symm([
+			[12, 0],
+			[14, 9],
+			[17, 8],
+			[20, 0]
+		]);
+		_symm([
+			[-13, 9],
+			[-10, 10],
+			[-6, 8.5],
+			[-2, 6],
+			[-9.5, 9],
+			[-13, 9]
+		]);
+		fill(80, 50, 50);
+		_symm([
+			[-3, 0],
+			[-5, 4],
+			[-7, 4],
+			[-5, 0]
+		]);
+		_symm([
+			[3, 0],
+			[1, 4],
+			[-1, 4],
+			[1, 0]
+		]);
+		fill(130, 70, 70);
+		fill(80, 50, 50);
+		circle(16, 0, 4);
+		circle(15.5, -5, 2);
+		circle(15.5, 5, 2);
+	}
+
 	if(T == DECOY){
 		if(O == 0) fill(100, 150, 150);
 		if(O == 1) fill(170, 70, 70);
@@ -607,6 +678,38 @@ function drawShip(T, O, M){
 		]);
 	}
 
+	if(T == BOMBERP){
+		if(M){
+			fill(60, 180, 180);
+			_symm([
+				[-16-0.5, 0],
+				[-9, 1.8],
+				[-8, 1.8],
+				[-7, 0.9],
+				[-6.5, 0]
+			]);
+			fill(100, 255, 255);
+			_symm([
+				[-12-0.7*0.5, 0],
+				[-9, 0.9],
+				[-8, 0.9],
+				[-7.5, 0]
+			]);
+		}
+		fill(110, 60, 60);
+		_symm([
+			[2, 0],
+			[-2, 2],
+			[-5, 1]
+		]);
+		fill(150, 80, 80);
+		_symm([
+			[6, 0],
+			[4, 1],
+			[-5, 1]
+		]);
+	}
+
 	pop();
 }
 
@@ -693,29 +796,6 @@ function drawModule(T){
 
 	// DRONE
 
-	if(T == ROCKETD){
-		stroke(200, 50, 50); fill(200, 50, 50);
-		beginShape();
-		vertex(10, -10);
-		vertex(10, -8);
-		vertex(8, -6);
-		vertex(6, -8);
-		vertex(8, -10);
-		endShape(CLOSE);
-		beginShape();
-		vertex(4, -6);
-		vertex(-4, 2);
-		vertex(-11, 9);
-		vertex(-11, 11);
-		vertex(-9, 11);
-		vertex(-2, 4);
-		vertex(6, -4);
-		endShape();
-		strokeWeight(2);
-		line(-11, 5, -2, -4);
-		line(-5, 11, 4, 2);
-	}
-
 	if(T == TURRETD){
 		stroke(200, 50, 50);
 		line(4, -10, 4, 10);
@@ -753,6 +833,29 @@ function drawModule(T){
 		line(-8.7, -5, 0, -9);
 		line(5, -1.3, 0, -9);
 		line(-5, -1.3, 0, -9);
+	}
+
+	if(T == BOMBER){
+		stroke(200, 50, 50); fill(200, 50, 50);
+		beginShape();
+		vertex(10, -10);
+		vertex(10, -8);
+		vertex(8, -6);
+		vertex(6, -8);
+		vertex(8, -10);
+		endShape(CLOSE);
+		beginShape();
+		vertex(4, -6);
+		vertex(-4, 2);
+		vertex(-11, 9);
+		vertex(-11, 11);
+		vertex(-9, 11);
+		vertex(-2, 4);
+		vertex(6, -4);
+		endShape();
+		strokeWeight(2);
+		line(-11, 5, -2, -4);
+		line(-5, 11, 4, 2);
 	}
 
 	// SHIELD
@@ -1124,7 +1227,7 @@ function drawModule2(T, S){
 
 	fill(255, 40);
 	if(T >= LASER && T <= TURRETD) fill(255, 50, 50, 60);
-	if(T >= SENTINEL && T <= COL) fill(255, 50, 50, 60);
+	if(T >= SENTINEL && T <= BOMBER) fill(255, 50, 50, 60);
 	if(T >= ALPHA && T <= ALLY) fill(0, 255, 255, 60);
 	if(T >= EMP && T <= SECT) fill(100, 255, 100, 60);
 	if(T >= DECOY && T <= SHIELD) fill(255, 100, 0, 60);

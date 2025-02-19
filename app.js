@@ -72,6 +72,8 @@ socket.on("start", data => {
 		}
 
 	focus = null;
+
+	ID = socket.id;
 });
 
 socket.on("state", data => {
@@ -435,7 +437,27 @@ function main(){
 			REV.set(ships[i].uid, i);
 		}
 
-		for(let s of ships) s.travel();
+		push(); fill(200, 50, 50, 20); stroke(255, 50, 50); strokeWeight(1.5*camera.z);
+
+		for(let s of ships){
+			s.travel();
+
+			if(s.type == BOMBER){
+				const X = floor(rocks[s.dock][0]/300+COLS/2);
+				const Y = floor(rocks[s.dock][1]/300+ROWS/2);
+
+				const LX = max(0, X-1);
+				const RX = min(COLS-1, X+1);
+
+				const LY = max(0, Y-1);
+				const RY = min(ROWS-1, Y+1);
+
+				rect(...screenPos([300*LX-150*COLS+15, 300*LY-150*ROWS+15]),
+					(RX-LX+1-0.1)*300*camera.z, (RY-LY+1-0.1)*300*camera.z);
+			}
+		}
+
+		pop();
 
 		let warn = null;
 
@@ -521,7 +543,7 @@ function main(){
 				pop();
 
 				push();
-				noFill(); stroke(...(ships[shipID].team == socket.id ? [70, 90, 90] : [90, 70, 70]), 100);
+				noFill(); stroke(...(ships[shipID].team == ID ? [70, 90, 90] : [90, 70, 70]), 100);
 				let shade = true;
 				for(let i=0; i<ships[shipID].modules.length; ++i){
 					if(weaponRange(ships[shipID].modules[i].type) != null){
@@ -531,7 +553,7 @@ function main(){
 					if(ships[shipID].modules[i].type == ROCKETD)
 						circle(...screenPos(ships[shipID].vpos), 60*2*camera.z);
 				}
-				if([DARTP, ROCKETP, DELTAP].includes(ships[shipID].type))
+				if([DARTP, ROCKETP, DELTAP, BOMBERP].includes(ships[shipID].type))
 					circle(...screenPos(ships[shipID].move[ships[shipID].move.length-1]),
 						RANGE[ships[shipID].type]*2*camera.z);
 				if(shade){
@@ -544,26 +566,26 @@ function main(){
 				noFill(); stroke(90, 70, 70, 100);
 				for(let s of ships) if(s.team != ships[shipID].team){
 					let near = _dist(ships[shipID].vpos, s.vpos) < 130;
-					if([DARTP, ROCKETP, DELTAP].includes(s.type))
+					if([DARTP, ROCKETP, DELTAP, BOMBERP].includes(s.type))
 						if(_dist(ships[shipID].vpos, s.move[s.move.length-1]) < RANGE[s.type]+20)
 							circle(...screenPos(s.move[s.move.length-1]), RANGE[s.type]*2*camera.z);
 					if(ships[shipID].wait){
 						if(_linedist(ships[shipID].vpos, ships[shipID].wait, s.vpos) < 130) near = true;
-						if([DARTP, ROCKETP, DELTAP].includes(s.type))
+						if([DARTP, ROCKETP, DELTAP, BOMBERP].includes(s.type))
 							if(_linedist(ships[shipID].vpos, ships[shipID].wait,
 								s.move[s.move.length-1]) < RANGE[s.type]+20)
 								circle(...screenPos(s.move[s.move.length-1]), RANGE[s.type]*2*camera.z);
 					}
 					if(ships[shipID].move.length){
 						if(_linedist(ships[shipID].vpos, ships[shipID].move[0], s.vpos) < 130) near = true;
-						if([DARTP, ROCKETP, DELTAP].includes(s.type))
+						if([DARTP, ROCKETP, DELTAP, BOMBERP].includes(s.type))
 							if(_linedist(ships[shipID].vpos, ships[shipID].move[0],
 								s.move[s.move.length-1]) < RANGE[s.type]+20)
 								circle(...screenPos(s.move[s.move.length-1]), RANGE[s.type]*2*camera.z);
 					}
 					for(let i=0; i<ships[shipID].move.length-1; ++i){
 						if(_linedist(ships[shipID].move[i], ships[shipID].move[i+1], s.vpos) < 130) near = true;
-						if([DARTP, ROCKETP, DELTAP].includes(s.type))
+						if([DARTP, ROCKETP, DELTAP, BOMBERP].includes(s.type))
 							if(_linedist(ships[shipID].move[i], ships[shipID].move[i+1],
 								s.move[s.move.length-1]) < RANGE[s.type]+20)
 								circle(...screenPos(s.move[s.move.length-1]), RANGE[s.type]*2*camera.z);
@@ -839,7 +861,7 @@ function main(){
 		for(let s of ships){
 			push(); translate(width/2+(s.vpos[0]-camera.x)*camera.z, height/2+(s.vpos[1]-camera.y)*camera.z);
 			rotate(s.rot); scale(sqrt(camera.z));
-			drawShip(s.type, s.team != socket.id && s.team != ID ? (s.type == BS && Number.isInteger(s.team) ? 2 : 1) : 0, s.move.length && !s.emp ? 1 : 0);
+			drawShip(s.type, s.team != ID ? (s.type == BS && Number.isInteger(s.team) ? 2 : 1) : 0, s.move.length && !s.emp ? 1 : 0);
 			rotate(-s.rot);
 			if(s.imp){
 				stroke(50, 200, 50); noFill(); strokeWeight(2);
@@ -1108,7 +1130,7 @@ function main(){
 						}
 					}
 
-					let canMove = ships[shipID].team == socket.id &&
+					let canMove = ships[shipID].team == ID && !snapshot &&
 						ships[shipID].type == BS && ships[shipID].tp == null,
 						canStop = ships[shipID].wait;
 
@@ -1215,7 +1237,7 @@ function main(){
 		{
 			let shipInArena = false;
 
-			for(let s of ships) if(s.team == socket.id && s.type == BS) shipInArena = true;
+			for(let s of ships) if(s.team == ID && s.type == BS) shipInArena = true;
 
 			if(focus == null && shipInArena){
 				push();
@@ -1431,15 +1453,15 @@ function click(){
 
 	if(!focus && mouseIn(width-30, height-30, 30, 30))
 		for(let s of ships)
-			if(s.team == socket.id && s.type == BS){
+			if(s.team == ID && s.type == BS){
 				focus = ["ship", s.uid];
 				return;
 			}
 
-	if(focus && shipID != null && selectMove == null){
+	if(focus && shipID != null && selectMove == null && !snapshot){
 		for(let i=0; i<ships[shipID].modules.length; ++i){
 			if(mouseIn(width/2+25-25*ships[shipID].modules.length+50*i, height-120-10-25, 25, 25)){
-				if(ships[shipID].team == socket.id && ships[shipID].modules[i].state == 1){
+				if(ships[shipID].team == ID && ships[shipID].modules[i].state == 1){
 					if(ships[shipID].tp != null && [TP, DESTINY, RIPPLE].includes(ships[shipID].modules[i].type))
 						return;
 					if(LOCMOD.includes(ships[shipID].modules[i].type))
@@ -1454,7 +1476,7 @@ function click(){
 	if(focus && selectMove == null &&
 		(focus[0] == "rock" ? mouseIn(width/2, height-40, 55, 20) : mouseIn(width/2, height-70, 150, 50))){
 		if(shipID != null){
-			let canMove = ships[shipID].team == socket.id &&
+			let canMove = ships[shipID].team == ID &&
 				ships[shipID].type == BS && ships[shipID].tp == null,
 				canStop = canMove && ships[shipID].wait;
 			if(canMove && (ships[shipID].move.length > 1 || canStop) &&
@@ -1532,7 +1554,7 @@ function keyReleased(){
 
 			for(let i=0; i<ships[shipID].modules.length; ++i){
 				if(key == keys[i]){
-					if(ships[shipID].team == socket.id && ships[shipID].modules[i].state == 1){
+					if(ships[shipID].team == ID && !snapshot && ships[shipID].modules[i].state == 1){
 						if(ships[shipID].tp != null && [TP, DESTINY, RIPPLE].includes(ships[shipID].modules[i].type))
 							return;
 						if(LOCMOD.includes(ships[shipID].modules[i].type))
@@ -1544,9 +1566,9 @@ function keyReleased(){
 			}
 		}
 
-		if(focus && selectMove == null){
+		if(focus && selectMove == null && !snapshot){
 			if(shipID != null){
-				let canMove = ships[shipID].team == socket.id &&
+				let canMove = ships[shipID].team == ID &&
 					ships[shipID].type == BS && ships[shipID].tp == null,
 					canStop = canMove && ships[shipID].wait;
 				if(canMove && (ships[shipID].move.length > 1 || canStop) &&

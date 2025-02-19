@@ -4,9 +4,9 @@ let ct = 0;
 
 // SHIP TYPES
 
-const BS = ++ct, SENTINEL = ++ct, GUARD = ++ct, INT = ++ct, COL = ++ct;
+const BS = ++ct, SENTINEL = ++ct, GUARD = ++ct, INT = ++ct, COL = ++ct, BOMBER = ++ct;
 
-const DARTP = ++ct, ROCKETP = ++ct, DELTAP = ++ct;
+const DARTP = ++ct, ROCKETP = ++ct, DELTAP = ++ct, BOMBERP = ++ct;
 
 // DRONE TYPES
 
@@ -45,9 +45,11 @@ NAME[SENTINEL] = "CERBERUS SENTINEL";
 NAME[GUARD] = "CERBERUS GUARDIAN";
 NAME[INT] = "CERBERUS INTERCEPTOR";
 NAME[COL] = "CERBERUS COLOSSUS";
+NAME[BOMBER] = "CERBERUS BOMBER";
 NAME[DARTP] = "ROCKET";
 NAME[ROCKETP] = "DRONE ROCKET";
 NAME[DELTAP] = "STRIKE ROCKET";
+NAME[BOMBERP] = "BOMBER ROCKET";
 NAME[DECOY] = "DECOY DRONE";
 NAME[REPAIR] = "REPAIR DRONE";
 NAME[ROCKET] = "ROCKET DRONE";
@@ -59,6 +61,7 @@ HP[SENTINEL] = 1200;
 HP[GUARD] = 8000;
 HP[INT] = 9000;
 HP[COL] = 20000;
+HP[BOMBER] = 16000;
 HP[DECOY] = 1000;
 HP[REPAIR] = 1000;
 HP[ROCKET] = 600;
@@ -67,6 +70,7 @@ HP[SHIELD] = 1000;
 HP[DARTP] = 250;
 HP[ROCKETP] = 400;
 HP[DELTAP] = 180;
+HP[BOMBERP] = 900;
 
 for(let i=LASER; i<=LASER2; ++i) RANGE[i] = 80;
 RANGE[DART] = 100;
@@ -100,6 +104,7 @@ RANGE[RIPPLE] = 300;
 RANGE[DARTP] = 40;
 RANGE[ROCKETP] = 70;
 RANGE[DELTAP] = 70;
+RANGE[BOMBERP] = 100;
 
 const LOCMOD = [DECOY, REPAIR, ROCKET, TP, DELTA, RIPPLE];
 
@@ -120,6 +125,7 @@ INFO[SENTINEL] = "A single-target weapon that deals high damage to one enemy.";
 INFO[GUARD] = "A single-target weapon that deals low damage to one enemy.";
 INFO[INT] = "A multi-target weapon that deals damage to four enemies within range.";
 INFO[COL] = "A single-target weapon that slowly increases in damage the longer it fires. Damage resets with the weapon switches targets.";
+INFO[BOMBER] = "A multi-target weapon that regularly launches a rocket towards every enemy in the Bomber's sector or any adjacent sectors. Projectiles deal a small amount of damage if destroyed before they reach their destination.";
 
 INFO[ALPHA] = "A shield that absorbs all damage taken for a short period of time.";
 INFO[IMPULSE] = "A weak shield that increases the speed of the Battleship and applies constant damage to enemies within range. This effect ends after a short time, or when the Battleship stops moving. Can only be activated while in motion.";
@@ -164,6 +170,7 @@ STATS[SENTINEL] = "DPS: 200\nRange: 80m";
 STATS[GUARD] = "DPS: 60\nRange: 80m";
 STATS[INT] = "DPS: 100\nRange: 80m";
 STATS[COL] = "DPS: 80-600, Charge time: 20s\nRange: 80m";
+STATS[BOMBER] = "Damage: 2000, Recharge time: 24s";
 
 STATS[ALPHA] = "Effect time: 6s";
 STATS[IMPULSE] = "HP: 2250, DPS: 900\nRange: 55m";
@@ -208,6 +215,7 @@ MODULE_NAME[SENTINEL] = "CANNON";
 MODULE_NAME[GUARD] = "WEAK CANNON";
 MODULE_NAME[INT] = "SPREAD CANNON";
 MODULE_NAME[COL] = "LASER";
+MODULE_NAME[BOMBER] = "ROCKET BARRAGE";
 
 MODULE_NAME[ALPHA] = "ALPHA SHIELD";
 MODULE_NAME[IMPULSE] = "DELTA SHIELD";

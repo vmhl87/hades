@@ -4,9 +4,9 @@ let ct = 0;
 
 // SHIP TYPES
 
-const BS = ++ct, SENTINEL = ++ct, GUARD = ++ct, INT = ++ct, COL = ++ct;
+const BS = ++ct, SENTINEL = ++ct, GUARD = ++ct, INT = ++ct, COL = ++ct, BOMBER = ++ct;
 
-const DARTP = ++ct, ROCKETP = ++ct, DELTAP = ++ct;
+const DARTP = ++ct, ROCKETP = ++ct, DELTAP = ++ct, BOMBERP = ++ct;
 
 // DRONE TYPES
 
@@ -76,6 +76,9 @@ RECHARGE_TIME[DART] = 10;
 
 EFFECT_TIME[ROCKETD] = 0;
 RECHARGE_TIME[ROCKETD] = 12;
+
+EFFECT_TIME[BOMBER] = 0;
+RECHARGE_TIME[BOMBER] = 24;
 
 EFFECT_TIME[EMP] = 6;
 RECHARGE_TIME[EMP] = 45;
@@ -166,12 +169,14 @@ SPEED[SENTINEL] = 10;
 SPEED[GUARD] = 11;
 SPEED[INT] = 26;
 SPEED[COL] = 12;
+SPEED[BOMBER] = 8;
 SPEED[DECOY] = 20;
 SPEED[REPAIR] = 20;
 SPEED[ROCKET] = 15;
 SPEED[DARTP] = 25;
 SPEED[ROCKETP] = 70;
 SPEED[DELTAP] = 110;
+SPEED[BOMBERP] = 25;
 
 SPEED[IMPULSE] = 2;
 
@@ -180,6 +185,7 @@ HP[SENTINEL] = 1200;
 HP[GUARD] = 8000;
 HP[INT] = 9000;
 HP[COL] = 20000;
+HP[BOMBER] = 16000;
 HP[DECOY] = 1000;
 HP[REPAIR] = 1000;
 HP[ROCKET] = 600;
@@ -188,12 +194,14 @@ HP[SHIELD] = 1000;
 HP[DARTP] = 250;
 HP[ROCKETP] = 400;
 HP[DELTAP] = 180;
+HP[BOMBERP] = 900;
 
 RANGE[DESTINY] = 65;
 RANGE[BARRIER] = 100;
 RANGE[DARTP] = 40;
 RANGE[ROCKETP] = 70;
 RANGE[DELTAP] = 70;
+RANGE[BOMBERP] = 100;
 
 RANGE[REPAIR] = 60;
 RANGE[EMP] = 80;
@@ -293,7 +301,7 @@ class Ship{
 			this.ai = [Math.random(), 0];
 		}
 
-		if([SENTINEL, GUARD, COL].includes(type))
+		if([SENTINEL, GUARD, COL, BOMBER].includes(type))
 			//this.ai = [Math.random(), Math.floor((pos[0]+150*COLS)/300)
 				//+COLS*Math.floor((pos[1]+300*ROWS*10+150*ROWS)/300)];
 			this.ai = [Math.random(), null];
@@ -661,6 +669,23 @@ class Game{
 				}else s.modules[i].state = 0.3;
 			}
 
+			if(T == BOMBER){
+				if(S == 1 && s.dock != null){
+					let P = null;
+					for(let i=0; i<this.sectors.length; ++i) if(this.sectors[i].includes(s.dock))
+						P = i;
+
+					const X = P%COLS, Y = Math.floor(P/COLS);
+
+					for(let x of this.ships) if(x.team != s.team){
+						if(Math.abs(300*X-150*COLS+150 - x.pos[0]) < 450 && Math.abs(300*Y-150*ROWS+150 - x.pos[1]) < 450){
+							this.addShip(BOMBERP, s.team, [], [...s.pos], [[...x.pos, null]]);
+							s.modules[i].state = 0;
+						}
+					}
+				}
+			}
+
 			if(T == DART){
 				if(s.modules[i].aux.length){
 					if(S == 1){
@@ -887,6 +912,36 @@ class Game{
 						}
 					}
 
+				}else if(s.type == BOMBER){
+					if(s.pos[1] > -150*ROWS*2){
+						if(s.wait == null && s.move.length == 0){
+							if(occupied[s.ai[1]].length) s.ai[0] = 1;
+							else s.ai[0] += 1/(TPS*20);
+						}
+
+						if(s.ai[0] >= 1){
+							s.ai[0] = 0;
+
+							let I = this.sectors[s.ai[1]][Math.floor(Math.random()*this.sectors[s.ai[1]].length)];
+							let dist = 0;
+
+							for(let i of this.sectors[s.ai[1]]){
+								let worst = 450;
+								for(let x of occupied[s.ai[1]]){
+									const D = _dist(this.rocks[x], this.rocks[i]);
+									worst = Math.min(worst, D);
+								}
+
+								if(worst > dist){
+									dist = worst;
+									I = i;
+								}
+							}
+
+							if(I != s.dock) s.moveTo([this.rocks[I][0], this.rocks[I][1]+10], I);
+						}
+					}
+
 				}else if(s.type == INT){
 					if(s.wait == null && s.move.length == 0)
 						s.ai += 1/(TPS*20);
@@ -1035,7 +1090,7 @@ class Game{
 							}
 
 					if([DART, ROCKETD].includes(m.type) && targets.length == 0)
-						for(let x of this.ships) if(x.type >= SENTINEL && x.type <= COL &&
+						for(let x of this.ships) if(x.type >= SENTINEL && x.type <= BOMBER &&
 							_dist(x.pos, s.pos) < RANGE[m.type])
 								targets.push([_dist(x.pos, s.pos), x.uid]);
 
@@ -1177,6 +1232,16 @@ class Game{
 							if(_dist(x.pos, s.pos) < RANGE[DELTAP])
 								x.hurt(3000, 1);
 				}
+
+				if(s.type == BOMBERP){
+					s.hp = -1;
+					this.explode(s.pos, RANGE[BOMBERP], 5);
+					for(let x of this.ships)
+						if(x.team != s.team)
+							if(_dist(x.pos, s.pos) < RANGE[BOMBERP])
+								x.hurt(2000, 0);
+				}
+
 			}
 		}
 
@@ -1195,6 +1260,14 @@ class Game{
 					if(x.team != s.team)
 						if(_dist(x.pos, s.pos) < RANGE[ROCKETP])
 							x.hurt(200, 1);
+			}
+
+			if(s.type == BOMBERP){
+				this.explode(s.pos, 40, 3);
+				for(let x of this.ships)
+					if(x.team != s.team)
+						if(_dist(x.pos, s.pos) < 40)
+							x.hurt(500, 0);
 			}
 		}
 
@@ -1247,19 +1320,19 @@ class Game{
 
 			if(S.length){
 				if(this.age % (TPS*5) == 0){
-					let COUNT = new Array(4).fill(0);
+					let COUNT = new Array(BOMBER-SENTINEL+1).fill(0);
 
 					// TODO not futureproof
 
 					for(let s of this.ships)
-						if(s.type >= SENTINEL && s.type <= COL)
+						if(s.type >= SENTINEL && s.type <= BOMBER)
 							++COUNT[s.type-SENTINEL];
 
-					const OPTIMAL = [0.3, 0.5, 0.4, 0.2];
+					const OPTIMAL = [0.3, 0.5, 0.4, 0.2, 0.05];
 
 					let idx = [];
 
-					for(let i=0; i<4; ++i) if(COUNT[i] < OPTIMAL[i]*this.aliveCount)
+					for(let i=0; i<BOMBER-SENTINEL+1; ++i) if(COUNT[i] < OPTIMAL[i]*this.aliveCount)
 						idx.push(i);
 
 					if(idx.length){
