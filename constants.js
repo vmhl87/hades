@@ -147,7 +147,51 @@ INFO[DECOY] = "A drone that attracts fire. All enemy ships within range will imm
 INFO[REPAIR] = "A drone that once destroyed repairs allied ships within range by a high amount. If the drone's lifetime expires before being destroyed, it repairs nearby allies by a small amount.";
 INFO[ROCKET] = "A drone that periodically fires rockets at enemy vessels within range. Battleships are preferred over Cerberus.";
 INFO[TURRET] = "A drone that after a small setup time applies constant damage to three enemies within range.";
-INFO[SHIELD] = "A drone that projects a floating shield, over all allied vessels within range. The drone itself is not protected by the shield.";
+INFO[SHIELD] = "A drone that projects a floating shield over all allied vessels within range. The drone itself is not protected by the shield.";
+
+let STATS = new Array(ct);
+
+STATS[LASER] = "DPS: 160-600, Charge time: 10s\nRange: 80m";
+STATS[BATTERY] = "DPS: 284\nRange: 80m";
+STATS[MASS] = "DPS: 220\nRange: 80m";
+STATS[LASER2] = "DPS: 184-800, Charge time: 6s\nRange: 80m";
+STATS[DART] = "Damage: 4000, Recharge time: 10s\nRange: 100m";
+
+STATS[ROCKETD] = "Damage: 1000, Recharge time: 12s\nRange: 400m";
+STATS[TURRETD] = "DPS: 200\nRange: 80m";
+
+STATS[SENTINEL] = "DPS: 200\nRange: 80m";
+STATS[GUARD] = "DPS: 60\nRange: 80m";
+STATS[INT] = "DPS: 100\nRange: 80m";
+STATS[COL] = "DPS: 80-600, Charge time: 20s\nRange: 80m";
+
+STATS[ALPHA] = "Effect time: 6s";
+STATS[IMPULSE] = "HP: 2250, DPS: 900\nRange: 55m";
+STATS[PASSIVE] = "HP: 3500, Recharge time: 30s";
+STATS[OMEGA] = "HP: 4700";
+STATS[MIRROR] = "HP: 1000, Multiplier: 300%\nRange: 90m";
+STATS[ALLY] = "HP: 1500\nRange: 90m";
+
+STATS[EMP] = "Effect time: 6s\nRange: 80m";
+STATS[SOL] = "Multiplier: 150%";
+STATS[FORT] = "Effect time: 12s, Reduction: 40%";
+STATS[TP] = "Delay: 3s\nRange: 400m";
+STATS[AMP] = "Multiplier: 300%\nRange: 100m";
+STATS[DESTINY] = "Damage: 5000, Delay: 6s\nRange: 65m";
+STATS[BARRIER] = "Effect time: 10s\nRange: 100m";
+STATS[DELTA] = "Damage: 3000, HP: 180\nRange: Unlimited";
+STATS[RIPPLE] = "Range: 300m";
+STATS[DISRUPT] = "Effect time: 6s\nRange: 70m";
+
+STATS[VENG] = "Damage: 7000, Delay: 10s\nRange: 160m";
+
+STATS[SECT] = "Delay: 40s";
+
+STATS[DECOY] = "HP: 1000, Deploy range: 250m\nLifetime: 40s";
+STATS[REPAIR] = "HP: 1000, Heal amount: 500-2000\nDeploy range: 200m, Lifetime: 40s";
+STATS[ROCKET] = "HP: 600, Deploy range: 250m\nLifetime: 100s";
+STATS[TURRET] = "HP: 1500, Setup time: 3s\nLifetime: 120s";
+STATS[SHIELD] = "HP: 1000, Shield HP: 1500\nLifetime: 45s";
 
 let MODULE_NAME = new Array(ct);
 

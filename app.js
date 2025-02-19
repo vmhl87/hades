@@ -177,12 +177,12 @@ function main(){
 
 			if(pick != null && (!MOBILE || !ALLMODULE)){
 				const I = INFO[modules[pick]];
-				const N = MODULE_NAME[modules[pick]];
 
 				if(I != null){
 					push(); textSize(14);
-					const W = wrap(I, 220);
-					const H = font.textBounds(N+'\n\n'+W, 0, 0).h;
+					const W = MODULE_NAME[modules[pick]]+"\n\n"+
+						wrap(I, 220)+"\n\n"+STATS[modules[pick]];
+					const H = font.textBounds(W, 0, 0).h;
 					const P = width/2-100+50*pick;
 
 					fill(0, 20, 30); noStroke();
@@ -198,7 +198,7 @@ function main(){
 					line(P+10, height/2-20+10, width/2+120, height/2-20+10);
 					textAlign(LEFT, BOTTOM);
 					fill(150); noStroke();
-					text(N + '\n\n' + W, width/2-110, height/2-20);
+					text(W, width/2-110, height/2-20);
 					pop();
 				}
 			}
@@ -1079,14 +1079,14 @@ function main(){
 						drawModule2(ships[shipID].modules[i].type, ships[shipID].modules[i].state);
 						pop();
 
-						if(!MOBILE && mouseIn(width/2+25-25*ships[shipID].modules.length+50*i, height-120-10-25, 25, 20) && mouseIsPressed && mouseButton == RIGHT){
+						if(!MOBILE && mouseIn(width/2+25-25*ships[shipID].modules.length+50*i, height-120-10-25, 25, 20) && mouseIsPressed){
 							const I = INFO[ships[shipID].modules[i].type];
 							const N = MODULE_NAME[ships[shipID].modules[i].type];
 
 							if(I != null){
 								push(); textSize(14);
-								const W = wrap(I, 220);
-								const H = font.textBounds(N+'\n\n'+W, 0, 0).h;
+								const W = N+"\n\n"+wrap(I, 220)+"\n\n"+STATS[ships[shipID].modules[i].type];
+								const H = font.textBounds(W, 0, 0).h;
 								const P = width/2+25-25*ships[shipID].modules.length+50*i;
 
 								fill(0, 20, 30); noStroke();
@@ -1102,7 +1102,7 @@ function main(){
 								line(P+10, height-225+10, width/2+120, height-225+10);
 								textAlign(LEFT, BOTTOM);
 								fill(150); noStroke();
-								text(N + '\n\n' + W, width/2-110, height-225);
+								text(W, width/2-110, height-225);
 								pop();
 							}
 						}
