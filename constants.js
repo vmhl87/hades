@@ -125,7 +125,7 @@ INFO[SENTINEL] = "A single-target weapon that deals high damage to one enemy.";
 INFO[GUARD] = "A single-target weapon that deals low damage to one enemy.";
 INFO[INT] = "A multi-target weapon that deals damage to four enemies within range.";
 INFO[COL] = "A single-target weapon that slowly increases in damage the longer it fires. Damage resets with the weapon switches targets.";
-INFO[BOMBER] = "A multi-target weapon that regularly launches a rocket towards every enemy in the Bomber's sector or any adjacent sectors. Projectiles deal a small amount of damage if destroyed before they reach their destination.";
+INFO[BOMBER] = "A multi-target weapon that regularly launches a rocket towards every enemy within range. Projectiles deal a small amount of damage if destroyed before they reach their destination.";
 
 INFO[ALPHA] = "A shield that absorbs all damage taken for a short period of time.";
 INFO[IMPULSE] = "A weak shield that increases the speed of the Battleship and applies constant damage to enemies within range. This effect ends after a short time, or when the Battleship stops moving. Can only be activated while in motion.";
@@ -170,7 +170,7 @@ STATS[SENTINEL] = "DPS: 200\nRange: 80m";
 STATS[GUARD] = "DPS: 60\nRange: 80m";
 STATS[INT] = "DPS: 100\nRange: 80m";
 STATS[COL] = "DPS: 80-600, Charge time: 20s\nRange: 80m";
-STATS[BOMBER] = "Damage: 2000, Recharge time: 24s";
+STATS[BOMBER] = "Damage: 2000, Recharge time: 24s\nRange: 300m";
 
 STATS[ALPHA] = "Effect time: 6s";
 STATS[IMPULSE] = "HP: 2250, DPS: 900\nRange: 55m";

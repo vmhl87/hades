@@ -678,7 +678,7 @@ class Game{
 					const X = P%COLS, Y = Math.floor(P/COLS);
 
 					for(let x of this.ships) if(x.team != s.team){
-						if(Math.abs(300*X-150*COLS+150 - x.pos[0]) < 450 && Math.abs(300*Y-150*ROWS+150 - x.pos[1]) < 450){
+						if(Math.abs(300*X-150*COLS+150 - x.pos[0]) < 300 && Math.abs(300*Y-150*ROWS+150 - x.pos[1]) < 300){
 							this.addShip(BOMBERP, s.team, [], [...s.pos], [[...x.pos, null]]);
 							s.modules[i].state = 0;
 						}

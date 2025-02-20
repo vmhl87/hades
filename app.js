@@ -446,11 +446,11 @@ function main(){
 				const X = floor(rocks[s.dock][0]/300+COLS/2);
 				const Y = floor(rocks[s.dock][1]/300+ROWS/2);
 
-				const LX = max(0, X-1);
-				const RX = min(COLS-1, X+1);
+				const LX = max(0, X-0.5);
+				const RX = min(COLS-1, X+0.5);
 
-				const LY = max(0, Y-1);
-				const RY = min(ROWS-1, Y+1);
+				const LY = max(0, Y-0.5);
+				const RY = min(ROWS-1, Y+0.5);
 
 				rect(...screenPos([300*LX-150*COLS+15, 300*LY-150*ROWS+15]),
 					(RX-LX+1-0.1)*300*camera.z, (RY-LY+1-0.1)*300*camera.z);
