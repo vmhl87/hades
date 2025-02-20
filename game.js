@@ -1328,7 +1328,7 @@ class Game{
 						if(s.type >= SENTINEL && s.type <= BOMBER)
 							++COUNT[s.type-SENTINEL];
 
-					const OPTIMAL = [0.3, 0.5, 0.4, 0.2, 0.05];
+					const OPTIMAL = [0.3, 0.5, 0.4, 0.2, 0.001];
 
 					let idx = [];
 
