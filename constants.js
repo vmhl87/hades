@@ -116,7 +116,7 @@ INFO[LASER] = "A single-target weapon that increases in damage the longer it fir
 INFO[BATTERY] = "A single-target weapon that deals high damage to one enemy. Two second delay when switching targets.";
 INFO[MASS] = "A multi-target weapon that deals constant damage to three enemies within range.";
 INFO[LASER2] = "A multi-target weapon that deals damage to two enemies within range. Damage increases while both beams are active, and resets when there are less than two enemies in range.";
-INFO[DART] = "A single-target weapon that periodically launches powerful rockets towards enemies in range. Projectiles deal damage in a large area when they reach their destination. Battleships are preferred over Cerberus.";
+INFO[DART] = "A single-target weapon that periodically launches powerful rockets towards one enemy in range. When projectiles reach their destination, damage is dealt to only the targeted enemy, if it is still within the blast radius. Battleships are preferred over Cerberus.";
 
 INFO[ROCKETD] = "A single-target weapon that periodically launches rockets towards enemies in range. Projectiles deal a small amount of damage if destroyed before they reach their destination. Battleships are preferred over Cerberus.";
 INFO[TURRETD] = "A multi-target weapon that deals constant damage to three enemies within range.";

@@ -698,6 +698,7 @@ class Game{
 						if(I != null){
 							this.addShip(DARTP, s.team, [], [...s.pos], [[...this.ships[I].pos,
 								this.ships[I].move.length ? null : this.ships[I].dock]]);
+							this.ships[this.ships.length-1].ai = s.modules[i].aux[0];
 							s.modules[i].state = 0;
 						}
 					}
@@ -1209,8 +1210,9 @@ class Game{
 				if(s.type == DARTP){
 					s.hp = -1;
 					this.explode(s.pos, RANGE[DARTP], 9);
+
 					for(let x of this.ships)
-						if(x.team != s.team)
+						if(x.uid == s.ai)
 							if(_dist(x.pos, s.pos) < RANGE[DARTP])
 								x.hurt(4000, 1);
 				}
