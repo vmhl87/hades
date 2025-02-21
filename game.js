@@ -543,8 +543,9 @@ class Game{
 
 		if(T == DISRUPT){
 			for(let x of this.ships)
-				if(_dist(x.pos, this.ships[s].pos) < RANGE[DISRUPT])
-					x.imp = 1;
+				if(x.team != this.ships[s].team)
+					if(_dist(x.pos, this.ships[s].pos) < RANGE[DISRUPT])
+						x.imp = 1;
 
 			this.ev.push(["imp", [...this.ships[s].pos]]);
 		}
