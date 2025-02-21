@@ -68,7 +68,7 @@ class Ship{
 		this.modules = dat.modules;
 		this.pos = dat.pos;
 		this.move = dat.move;
-		if(this.team != socket.id) this.wait = dat.wait;
+		if(this.team != ID) this.wait = dat.wait;
 		else if(this.wait != null && dat.wait != null)
 			this.wait[2] = dat.wait[2];
 		this.tp = dat.tp;
@@ -155,18 +155,20 @@ function selected(){
 function selectedPos(pos){
 	let opt = [];
 
+	const F = MOBILE ? 2 : 1;
+
 	if(selectMove == null || selectMove[0] != "module" ||
 	(shipID != null && ships[shipID].modules[selectMove[1].i].type != RIPPLE))
 		for(let i=0; i<rocks.length; ++i){
 			const d = _dist(screenPos(rocks[i]), pos);
-			if(d < 50) opt.push([d, ["rock", i]]);
+			if(d < 50/F) opt.push([d, ["rock", i]]);
 		}
 
 	if(selectMove == null || (selectMove[0] == "module" &&
 	shipID != null && ships[shipID].modules[selectMove[1].i].type == RIPPLE))
 		for(let i=0; i<ships.length; ++i){
 			const d = _dist(screenPos(ships[i].pos), pos);
-			if(d < 50) opt.push([d-20, ["ship", ships[i].uid]]);
+			if(d < 50/F) opt.push([d-20/F, ["ship", ships[i].uid]]);
 		}
 
 	opt.sort((a, b) => a[0] - b[0]);
@@ -186,12 +188,20 @@ let focus = null;
 
 let posTouches = new Map(), movedTouches = new Set();
 
+let dragMove = null;
+
 function mousePressed(){
 	if(!MOBILE){
 		moved = false;
 		startMouseX = mouseX;
 		startMouseY = mouseY;
 		select = selected();
+		if(focus != null && focus[0] == "ship" && select != null && select[0] == "ship" && focus[1] == select[1] &&
+			selectMove == null && !snapshot)
+			for(let s of ships) if(s.uid == focus[1] && s.team == ID && !s.wait){
+				dragMove = [mouseX, mouseY, s.uid];
+				selectMove = ["ship", s.uid];
+			}
 	}
 }
 
@@ -269,9 +279,16 @@ function mouseReleased(){
 
 		stagingUI();
 
+	}else if(connected && dragMove != null){
+		select = selected();
+		if(select != null) click();
+
 	}else if(connected && !moved && _dist([mouseX, mouseY], [startMouseX, startMouseY]) < 20){
 		click();
 	}
+
+	if(dragMove != null) selectMove = null;
+	dragMove = null;
 }
 
 function echo(...x){
@@ -288,14 +305,20 @@ function draw(){
 
 	if(!staging){
 		if(!MOBILE && mouseIsPressed && !(abs(startMouseX-30) < 30 && abs(startMouseY-30) < 30)){
-			const dist = _dist([mouseX, mouseY], [lastMouseX, lastMouseY]);
-			if(dist > 0.5){
-				camera.x += (lastMouseX-mouseX)/camera.z;
-				camera.y += (lastMouseY-mouseY)/camera.z;
+			if(dragMove != null){
+				dragMove[0] = mouseX;
+				dragMove[1] = mouseY;
+
+			}else{
+				const dist = _dist([mouseX, mouseY], [lastMouseX, lastMouseY]);
+				if(dist > 0.5){
+					camera.x += (lastMouseX-mouseX)/camera.z;
+					camera.y += (lastMouseY-mouseY)/camera.z;
+				}
+				scrollVel[0] = lastMouseX-mouseX;
+				scrollVel[1] = lastMouseY-mouseY;
+				if(dist > 4) moved = true;
 			}
-			scrollVel[0] = lastMouseX-mouseX;
-			scrollVel[1] = lastMouseY-mouseY;
-			if(dist > 4) moved = true;
 		}
 	}
 
@@ -338,6 +361,12 @@ function updateTouch(){
 			if(_dist(P.first, [t.x, t.y]) > 10 && !movedTouches.has(t.id)){
 				movedTouches.add(t.id);
 				P.first = [t.x, t.y];
+				if(focus != null && focus[0] == "ship" && select != null && select[0] == "ship" && focus[1] == select[1] &&
+					selectMove == null && touches.length == 1 && !snapshot)
+						for(let s of ships) if(s.uid == focus[1] && s.team == ID && !s.wait){
+							dragMove = [t.x, t.y, s.uid, t.id];
+							selectMove = ["ship", s.uid];
+						}
 			}
 
 			V = [P.last[0]-t.x, P.last[1]-t.y];
@@ -358,7 +387,11 @@ function updateTouch(){
 					if(abs(P.orig[0]-(width-30)) < 30 && abs(P.orig[1]-30) < 30)
 						lockID = null;
 					
-					else{
+					else if(dragMove != null){
+						dragMove[0] = touches[0].x;
+						dragMove[1] = touches[0].y;
+					
+					}else{
 						camera.x = offset[0] + (P.first[0]-P.last[0])/camera.z;
 						camera.y = offset[1] + (P.first[1]-P.last[1])/camera.z;
 
@@ -374,6 +407,9 @@ function updateTouch(){
 		}
 
 	}else if(touches.length == 2){
+		if(dragMove != null) selectMove = null;
+		dragMove = null;
+
 		ctlState = 2;
 
 		if(lockID == touches[0].id+touches[1].id){
@@ -403,8 +439,14 @@ function updateTouch(){
 	for(let k of rem){
 		const P = posTouches.get(k);
 
-		if(movedTouches.has(k)) movedTouches.delete(k);
-		else if(touches.length == 0 && ctlState == 0){
+		if(movedTouches.has(k)){
+			if(!staging && connected && dragMove != null && dragMove[3] == k){
+				select = selectedPos(P.last);
+				console.log(select);
+				if(select != null) click();
+			}
+			movedTouches.delete(k);
+		}else if(touches.length == 0 && ctlState == 0){
 			mobileClick({first: [...P.first], last: [...P.last]});
 		}
 
@@ -414,6 +456,11 @@ function updateTouch(){
 
 		posTouches.delete(k);
 		movedTouches.delete(k);
+	}
+
+	if(rem.length){
+		if(dragMove != null) selectMove = null;
+		dragMove = null;
 	}
 }
 
@@ -436,7 +483,7 @@ function windowResized(){
 function saveState(){
 	return JSON.stringify({
 		ships, rocks, blasts, deaths, heals, dead, sectorDeaths,
-		emps, imps, ROWS, COLS, ID: socket.id, now: Date.now()
+		emps, imps, ROWS, COLS, ID: ID, now: Date.now()
 	});
 }
 
@@ -466,7 +513,7 @@ function loadState(STATE){
 
 function god(){
 	if(!staging && connected && focus != null && focus[0] == "ship" && shipID != null)
-		socket.emit("spawn", {gameID: gameID, arg: [DARTP, socket.id, [], ships[shipID].pos]});
+		socket.emit("spawn", {gameID: gameID, arg: [DELTAP, ID, [], ships[shipID].pos]});
 }
 
 function ascend(){

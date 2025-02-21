@@ -625,11 +625,18 @@ function main(){
 			}
 
 			if(s.wait){
-				push(); translate(width/2, height/2);
-				translate(-camera.x*camera.z, -camera.y*camera.z);
+				push();
 				stroke(255, 50, 50, 30); strokeWeight(4*sqrt(camera.z)); noFill();
-				line(s.pos[0]*camera.z, s.pos[1]*camera.z,
-					s.wait[0]*camera.z, s.wait[1]*camera.z);
+				line(...screenPos(s.pos), ...screenPos(s.wait));
+				pop();
+			}
+
+			if(dragMove != null && dragMove[2] == s.uid){
+				push();
+				stroke(255, 50, 50, 30); strokeWeight(4*sqrt(camera.z)); noFill();
+				if(s.move.length)
+					line(...screenPos(s.move[s.move.length-1].slice(0, 2)), dragMove[0], dragMove[1]);
+				else line(...screenPos(s.pos), dragMove[0], dragMove[1]);
 				pop();
 			}
 
@@ -857,10 +864,12 @@ function main(){
 			}
 		}
 
-
 		for(let s of ships){
 			push(); translate(width/2+(s.vpos[0]-camera.x)*camera.z, height/2+(s.vpos[1]-camera.y)*camera.z);
-			rotate(s.rot); scale(sqrt(camera.z));
+			if(dragMove != null && dragMove[2] == s.uid && !s.move.length)
+				rotate(atan2(dragMove[1]-screenPos(s.vpos)[1], dragMove[0]-screenPos(s.vpos)[0]));
+			else rotate(s.rot);
+			scale(sqrt(camera.z));
 			drawShip(s.type, s.team != ID ? (s.type == BS && Number.isInteger(s.team) ? 2 : 1) : 0, s.move.length && !s.emp ? 1 : 0);
 			rotate(-s.rot);
 			if(s.imp){
@@ -1501,13 +1510,15 @@ function click(){
 
 		}else if(select && select[0] == "rock"){
 			if(selectMove[0] == "ship"){
-				socket.emit("move", {
-					gameID: gameID, shipID: selectMove[1],
-					pos: [rocks[select[1]][0], rocks[select[1]][1]+10],
-					dock: select[1]
-				});
-				ships[shipID].wait = [rocks[select[1]][0], rocks[select[1]][1]+10, 1, select[1]];
-				selectMove = null;
+				if(ships[shipID].move.length || ships[shipID].dock == null || ships[shipID].dock != select[1]){
+					socket.emit("move", {
+						gameID: gameID, shipID: selectMove[1],
+						pos: [rocks[select[1]][0], rocks[select[1]][1]+10],
+						dock: select[1]
+					});
+					ships[shipID].wait = [rocks[select[1]][0], rocks[select[1]][1]+10, 1, select[1]];
+					selectMove = null;
+				}
 				
 			}else if(selectMove[0] == "module" && shipID != null){
 				const P = [rocks[select[1]][0], rocks[select[1]][1]+10];
