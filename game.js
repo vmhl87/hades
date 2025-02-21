@@ -272,7 +272,7 @@ class Ship{
 		this.ally = null;
 
 		this.ai = null;
-		this.playerKill = false;
+		this.kill = null;
 
 		for(let m of this.modules){
 			if(IS_WEAPON(m.type))
@@ -349,7 +349,7 @@ class Ship{
 		};
 	}
 	
-	hurt(x, pkill=false){
+	hurt(x, src = null){
 		if(this.type == BS && this.ai != null)
 			this.ai[1] = true;
 
@@ -386,7 +386,7 @@ class Ship{
 
 		if(dmg) this.hp = Math.max(0, this.hp-dmg);
 
-		if(this.hp == 0 && pkill) this.playerKill = true;
+		if(this.hp == 0 && src != null) this.kill = src;
 	}
 
 	heal(x){
@@ -624,7 +624,7 @@ class Game{
 				for(let x of this.ships) if(x.team != s.team)
 					for(let m of x.modules) if(m.type == BARRIER && m.state < 0)
 						if(_dist(x.pos, s.pos) < RANGE[BARRIER])
-							s.hurt(DAMAGE[BARRIER]);
+							s.hurt(DAMAGE[BARRIER], x.team);
 
 				s.pos = s.tp.slice(0, 2);
 				s.dock = s.tp[2];
@@ -633,14 +633,14 @@ class Game{
 				for(let x of this.ships) if(x.team != s.team)
 					for(let m of x.modules) if(m.type == BARRIER && m.state < 0)
 						if(_dist(x.pos, s.pos) < RANGE[BARRIER])
-							s.hurt(DAMAGE[BARRIER]);
+							s.hurt(DAMAGE[BARRIER], x.team);
 			}
 
 			if(T == DESTINY && S == 0){
 				for(let x of this.ships)
 					if(x.team != s.team)
 						if(_dist(x.pos, s.pos) < RANGE[DESTINY])
-							x.hurt(5000, 1);
+							x.hurt(5000, s.team);
 
 				this.explode([...s.pos], RANGE[DESTINY], 9);
 				s.pos = s.tp.slice(0, 2);
@@ -650,7 +650,7 @@ class Game{
 				for(let x of this.ships) if(x.team != s.team)
 					for(let m of x.modules) if(m.type == BARRIER && m.state < 0)
 						if(_dist(x.pos, s.pos) < RANGE[BARRIER])
-							s.hurt(DAMAGE[BARRIER]);
+							s.hurt(DAMAGE[BARRIER], x.team);
 			}
 
 			if([LASER, LASER2, COL].includes(T)){
@@ -732,7 +732,7 @@ class Game{
 					for(let x of this.ships)
 						if(x.team != s.team)
 							if(_dist(x.pos, s.pos) < RANGE[IMPULSE])
-								x.hurt(DAMAGE[IMPULSE]/TPS, 1);
+								x.hurt(DAMAGE[IMPULSE]/TPS, s.team);
 			}
 
 			if(T == ALLY && s.modules[i].aux[0] > 0 && s.imp == 0){
@@ -768,7 +768,7 @@ class Game{
 					for(let x of this.ships)
 						if(x.team != s.team)
 							if(_dist(x.pos, s.pos) < RANGE[MIRROR])
-								x.hurt(s.modules[i].blast[0]*DAMAGE[MIRROR], 1);
+								x.hurt(s.modules[i].blast[0]*DAMAGE[MIRROR], s.team);
 
 					s.modules[i].blast[0] = 0;
 				}
@@ -782,7 +782,7 @@ class Game{
 					for(let x of this.ships)
 						if(x.team != s.team)
 							if(_dist(x.pos, s.pos) < RANGE[VENG])
-								x.hurt(DAMAGE[VENG], 1);
+								x.hurt(DAMAGE[VENG], s.team);
 
 					this.explode([...s.pos], RANGE[VENG], 9);
 				}
@@ -1184,7 +1184,7 @@ class Game{
 
 						if(D != null)
 							for(let x of m.aux) if(M.has(x)){
-								this.ships[M.get(x)].hurt(D*amp[M.get(s.uid)]*sol[M.get(s.uid)]/TPS, 1);
+								this.ships[M.get(x)].hurt(D*amp[M.get(s.uid)]*sol[M.get(s.uid)]/TPS, s.team);
 							}
 					}
 		}
@@ -1215,7 +1215,7 @@ class Game{
 					for(let x of this.ships)
 						if(x.uid == s.ai)
 							if(_dist(x.pos, s.pos) < RANGE[DARTP])
-								x.hurt(4000, 1);
+								x.hurt(4000, s.team);
 				}
 
 				if(s.type == ROCKETP){
@@ -1224,7 +1224,7 @@ class Game{
 					for(let x of this.ships)
 						if(x.team != s.team)
 							if(_dist(x.pos, s.pos) < RANGE[ROCKETP])
-								x.hurt(1000, 1);
+								x.hurt(1000, s.team);
 				}
 
 				if(s.type == DELTAP){
@@ -1233,7 +1233,7 @@ class Game{
 					for(let x of this.ships)
 						if(x.team != s.team)
 							if(_dist(x.pos, s.pos) < RANGE[DELTAP])
-								x.hurt(3000, 1);
+								x.hurt(3000, s.team);
 				}
 
 				if(s.type == BOMBERP){
@@ -1242,7 +1242,7 @@ class Game{
 					for(let x of this.ships)
 						if(x.team != s.team)
 							if(_dist(x.pos, s.pos) < RANGE[BOMBERP])
-								x.hurt(2000, 0);
+								x.hurt(2000);
 				}
 
 			}
@@ -1254,7 +1254,7 @@ class Game{
 				for(let x of this.ships)
 					if(x.team != s.team)
 						if(_dist(x.pos, s.pos) < RANGE[DELTAP])
-							x.hurt(500, 1);
+							x.hurt(500, s.team);
 			}
 
 			if(s.type == ROCKETP){
@@ -1262,7 +1262,7 @@ class Game{
 				for(let x of this.ships)
 					if(x.team != s.team)
 						if(_dist(x.pos, s.pos) < RANGE[ROCKETP])
-							x.hurt(200, 1);
+							x.hurt(200, s.team);
 			}
 
 			if(s.type == BOMBERP){
@@ -1270,7 +1270,7 @@ class Game{
 				for(let x of this.ships)
 					if(x.team != s.team)
 						if(_dist(x.pos, s.pos) < 40)
-							x.hurt(500, 0);
+							x.hurt(500);
 			}
 		}
 
@@ -1403,7 +1403,7 @@ class Game{
 			}
 		};
 
-		if(this.ships.filter(x => x.hp == 0 && x.type == COL && x.playerKill).length){
+		if(this.ships.filter(x => x.hp == 0 && x.type == COL && x.kill != null).length){
 			const REM = Math.ceil(this.aliveCount*0.2);
 
 			for(let i=0; i<REM; ++i){
