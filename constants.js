@@ -209,8 +209,8 @@ STATS[DECOY] = "HP: 1000, Deploy range: 250m\nLifetime: 40s";
 STATS[REPAIR] = "HP: 1000, Heal amount: 500-2000\nDeploy range: 200m, Lifetime: 40s";
 STATS[ROCKET] = "HP: 600, Deploy range: 250m\nLifetime: 100s";
 STATS[TURRET] = "HP: 1500, Setup time: 3s\nLifetime: 120s";
-STATS[PHASE] = "HP: 1000, Range: 150m, DPS: 200\nLifetime: 30s";
-STATS[WARP] = "HP: 900, Delay: 3s\nDeploy range: 400m, Lifetime: 40s";
+STATS[PHASE] = "HP: 1000, Range: 150m\nLifetime: 30s";
+STATS[WARP] = "HP: 900, Delay: 3s, DPS: 200\nDeploy range: 400m, Lifetime: 40s";
 
 let MODULE_NAME = new Array(ct);
 
