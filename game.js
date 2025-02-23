@@ -6,27 +6,27 @@ let ct = 0;
 
 const BS = ++ct, SENTINEL = ++ct, GUARD = ++ct, INT = ++ct, COL = ++ct, BOMBER = ++ct;
 
-const DARTP = ++ct, ROCKETP = ++ct, DELTAP = ++ct, BOMBERP = ++ct;
+const DARTP = ++ct, ROCKETP = ++ct, STRIKEP = ++ct, BOMBERP = ++ct;
 
 // DRONE TYPES
 
-const DECOY = ++ct, REPAIR = ++ct, ROCKET = ++ct, TURRET = ++ct, SHIELD = ++ct;
+const DECOY = ++ct, ROCKET = ++ct, TURRET = ++ct, PHASE = ++ct, WARP = ++ct, REPAIR = ++ct;
 
 // WEAPON TYPES
 
-const LASER = ++ct, BATTERY = ++ct, MASS = ++ct, LASER2 = ++ct, DART = ++ct;
+const LASER = ++ct, CANNON = ++ct, SPREAD = ++ct, LASER2 = ++ct, DART = ++ct;
 
 /* UNOBTAIN */ const ROCKETD = ++ct, TURRETD = ++ct;
 
 // SHIELD TYPES
 
-const ALPHA = ++ct, IMPULSE = ++ct, PASSIVE = ++ct, OMEGA = ++ct, MIRROR = ++ct, ALLY = ++ct;
+const ALPHA = ++ct, DELTA = ++ct, PASSIVE = ++ct, OMEGA = ++ct, MIRROR = ++ct, ALLY = ++ct;
 
 // MODULE TYPES
 
-const EMP = ++ct, SOL = ++ct, FORT = ++ct, TP = ++ct, AMP = ++ct, DESTINY = ++ct, BARRIER = ++ct, DELTA = ++ct, RIPPLE = ++ct, DISRUPT = ++ct;
+const EMP = ++ct, DUEL = ++ct, FORT = ++ct, TP = ++ct, AMP = ++ct, LEAP = ++ct, BARRIER = ++ct, STRIKE = ++ct, RIPPLE = ++ct, DISRUPT = ++ct;
 
-/* UNOBTAIN */ const VENG = ++ct, SECT = ++ct;
+/* UNOBTAIN */ const SUSPEND = ++ct, VENG = ++ct, APOCALYPSE = ++ct;
 
 let SPEED = new Array(ct), HP = new Array(ct),
 	EFFECT_TIME = new Array(ct), RECHARGE_TIME = new Array(ct),
@@ -35,26 +35,27 @@ let SPEED = new Array(ct), HP = new Array(ct),
 	DAMAGE = new Array(ct), LASER_DAMAGE = new Array(ct),
 	STRENGTH = new Array(ct);
 
-STRENGTH[IMPULSE] = 2250;
+STRENGTH[DELTA] = 2250;
 STRENGTH[PASSIVE] = 3500;
 STRENGTH[OMEGA] = 4700;
 STRENGTH[MIRROR] = 1000;
 STRENGTH[ALLY] = 1500;
 
-DAMAGE[BATTERY] = 284;
-DAMAGE[MASS] = 220;
+DAMAGE[CANNON] = 284;
+DAMAGE[SPREAD] = 220;
 DAMAGE[SENTINEL] = 200;
 DAMAGE[GUARD] = 60;
 DAMAGE[INT] = 100;
 DAMAGE[TURRETD] = 200;
 
 DAMAGE[BARRIER] = 3000;
-DAMAGE[SOL] = 1.5;
+DAMAGE[DUEL] = 1.5;
 DAMAGE[AMP] = 3;
+DAMAGE[SUSPEND] = 0.70;
 DAMAGE[MIRROR] = 3;
 DAMAGE[FORT] = 0.6;
 DAMAGE[VENG] = 7000;
-DAMAGE[IMPULSE] = 900;
+DAMAGE[DELTA] = 900;
 
 LASER_DAMAGE[LASER] = [160, 350, 600];
 LASER_DAMAGE[LASER2] = [184, 312, 800];
@@ -64,12 +65,13 @@ EXPIRE_TIME[DECOY] = 40;
 EXPIRE_TIME[REPAIR] = 40;
 EXPIRE_TIME[ROCKET] = 100;
 EXPIRE_TIME[TURRET] = 120;
-EXPIRE_TIME[SHIELD] = 45;
+EXPIRE_TIME[PHASE] = 30;
+EXPIRE_TIME[WARP] = 40;
 
 RECHARGE_TIME[TURRETD] = 3;
 
-EFFECT_TIME[BATTERY] = 0;
-RECHARGE_TIME[BATTERY] = 2;
+EFFECT_TIME[CANNON] = 0;
+RECHARGE_TIME[CANNON] = 2;
 
 EFFECT_TIME[DART] = 0;
 RECHARGE_TIME[DART] = 10;
@@ -92,19 +94,22 @@ RECHARGE_TIME[TP] = 55;
 EFFECT_TIME[AMP] = 30;
 RECHARGE_TIME[AMP] = 60;
 
-EFFECT_TIME[DESTINY] = 6;
-RECHARGE_TIME[DESTINY] = 90;
+EFFECT_TIME[LEAP] = 6;
+RECHARGE_TIME[LEAP] = 90;
 
 EFFECT_TIME[BARRIER] = 11;
 RECHARGE_TIME[BARRIER] = 60;
 
-EFFECT_TIME[DELTA] = 0;
-RECHARGE_TIME[DELTA] = 45;
+EFFECT_TIME[STRIKE] = 0;
+RECHARGE_TIME[STRIKE] = 45;
 
 RECHARGE_TIME[RIPPLE] = 60;
 
 EFFECT_TIME[VENG] = 10;
 RECHARGE_TIME[VENG] = 120;
+
+EFFECT_TIME[SUSPEND] = 30;
+RECHARGE_TIME[SUSPEND] = 90;
 
 EFFECT_TIME[DISRUPT] = 6;
 RECHARGE_TIME[DISRUPT] = 45;
@@ -121,16 +126,19 @@ RECHARGE_TIME[ROCKET] = 120;
 EFFECT_TIME[TURRET] = 3;
 RECHARGE_TIME[TURRET] = 60;
 
-EFFECT_TIME[SHIELD] = 0;
-RECHARGE_TIME[SHIELD] = 90;
+EFFECT_TIME[PHASE] = 0;
+RECHARGE_TIME[PHASE] = 90;
+
+EFFECT_TIME[WARP] = 3;
+RECHARGE_TIME[WARP] = 60;
 
 // SHIELD
 
 EFFECT_TIME[ALPHA] = 8;
 RECHARGE_TIME[ALPHA] = 45;
 
-EFFECT_TIME[IMPULSE] = 45;
-RECHARGE_TIME[IMPULSE] = 75;
+EFFECT_TIME[DELTA] = 45;
+RECHARGE_TIME[DELTA] = 75;
 
 EFFECT_TIME[OMEGA] = 45;
 RECHARGE_TIME[OMEGA] = 60;
@@ -145,7 +153,7 @@ EFFECT_TIME[ALLY] = 45;
 RECHARGE_TIME[ALLY] = 60;
 
 ACTIVATED[ALPHA] = true;
-ACTIVATED[IMPULSE] = true;
+ACTIVATED[DELTA] = true;
 for(let i=OMEGA; i<=ALLY; ++i)
 	ACTIVATED[i] = true;
 
@@ -153,16 +161,18 @@ ACTIVATED[EMP] = true;
 ACTIVATED[FORT] = true;
 ACTIVATED[TP] = true;
 ACTIVATED[AMP] = true;
-ACTIVATED[DESTINY] = true;
+ACTIVATED[LEAP] = true;
 ACTIVATED[BARRIER] = true;
-ACTIVATED[DELTA] = true;
+ACTIVATED[STRIKE] = true;
 ACTIVATED[RIPPLE] = true;
 ACTIVATED[DISRUPT] = true;
+ACTIVATED[SUSPEND] = true;
 ACTIVATED[DECOY] = true;
 ACTIVATED[REPAIR] = true;
 ACTIVATED[ROCKET] = true;
 ACTIVATED[TURRET] = true;
-ACTIVATED[SHIELD] = true;
+ACTIVATED[PHASE] = true;
+ACTIVATED[WARP] = true;
 
 SPEED[BS] = 20;
 SPEED[SENTINEL] = 10;
@@ -175,10 +185,10 @@ SPEED[REPAIR] = 20;
 SPEED[ROCKET] = 15;
 SPEED[DARTP] = 25;
 SPEED[ROCKETP] = 70;
-SPEED[DELTAP] = 110;
+SPEED[STRIKEP] = 110;
 SPEED[BOMBERP] = 25;
 
-SPEED[IMPULSE] = 2;
+SPEED[DELTA] = 2;
 
 HP[BS] = 7000;
 HP[SENTINEL] = 1200;
@@ -190,17 +200,18 @@ HP[DECOY] = 1000;
 HP[REPAIR] = 1000;
 HP[ROCKET] = 600;
 HP[TURRET] = 1500;
-HP[SHIELD] = 1000;
+HP[PHASE] = 1000;
+HP[WARP] = 900;
 HP[DARTP] = 250;
 HP[ROCKETP] = 400;
-HP[DELTAP] = 180;
+HP[STRIKEP] = 180;
 HP[BOMBERP] = 900;
 
-RANGE[DESTINY] = 65;
+RANGE[LEAP] = 65;
 RANGE[BARRIER] = 100;
 RANGE[DARTP] = 40;
 RANGE[ROCKETP] = 70;
-RANGE[DELTAP] = 70;
+RANGE[STRIKEP] = 70;
 RANGE[BOMBERP] = 100;
 
 RANGE[REPAIR] = 60;
@@ -209,7 +220,8 @@ RANGE[AMP] = 100;
 RANGE[MIRROR] = 90;
 RANGE[DISRUPT] = 70;
 RANGE[VENG] = 150;
-RANGE[IMPULSE] = 55;
+RANGE[SUSPEND] = 140;
+RANGE[DELTA] = 55;
 RANGE[ALLY] = 90;
 
 for(let i=LASER; i<=LASER2; ++i) RANGE[i] = 80;
@@ -219,8 +231,8 @@ RANGE[TURRETD] = 80;
 for(let i=SENTINEL; i<=COL; ++i) RANGE[i] = 80;
 
 TARGETS[LASER] = 1;
-TARGETS[BATTERY] = 1;
-TARGETS[MASS] = 3;
+TARGETS[CANNON] = 1;
+TARGETS[SPREAD] = 3;
 TARGETS[LASER2] = 2;
 TARGETS[DART] = 1;
 TARGETS[ROCKETD] = 1;
@@ -274,6 +286,8 @@ class Ship{
 		this.ai = null;
 		this.kill = null;
 
+		this.suspend = 1;
+
 		for(let m of this.modules){
 			if(IS_WEAPON(m.type))
 				m.aux = [];
@@ -281,7 +295,7 @@ class Ship{
 			else if(m.type == PASSIVE)
 				m.aux = [1, 1];
 
-			else if(m.type == IMPULSE)
+			else if(m.type == DELTA)
 				m.aux = [0, 0, 0];
 
 			else if(m.type >= ALPHA && m.type <= ALLY)
@@ -293,7 +307,7 @@ class Ship{
 			if(m.type == TURRETD)
 				m.state = 0;
 
-			if([LASER, LASER2, COL, BATTERY].includes(m.type))
+			if([LASER, LASER2, COL, CANNON].includes(m.type))
 				m.state = 0;
 		}
 
@@ -394,7 +408,7 @@ class Ship{
 	}
 
 	travel(){
-		if([TURRET, SHIELD].includes(this.type)){
+		if([TURRET, PHASE].includes(this.type)){
 			this.move = [];
 			this.wait = null;
 			this.dock = null;
@@ -428,10 +442,10 @@ class Ship{
 				this.pos[1] += dir[1]*dist;
 			}
 
-			let S = SPEED[this.type];
+			let S = SPEED[this.type] * this.suspend;
 
-			for(let m of this.modules) if(m.type == IMPULSE && m.aux[2])
-				S *= SPEED[IMPULSE];
+			for(let m of this.modules) if(m.type == DELTA && m.aux[2])
+				S *= SPEED[DELTA];
 
 			this.vel = Math.min(this.vel+32/TPS, S);
 
@@ -466,7 +480,7 @@ class Game{
 		const T = this.ships[s].modules[dat.i].type;
 
 		if(ACTIVATED[T]){
-			if(T == IMPULSE)
+			if(T == DELTA)
 				this.ships[s].modules[dat.i].aux = [1, 1, 1];
 
 			else if(T >= ALPHA && T <= ALLY)
@@ -477,7 +491,7 @@ class Game{
 
 		if(T == RIPPLE) this.ships[s].modules[dat.i].state = 0;
 
-		if(T == DELTA) this.addShip(DELTAP, this.ships[s].team, [], [...this.ships[s].pos], [[...dat.loc, dat.dock]]);
+		if(T == STRIKE) this.addShip(STRIKEP, this.ships[s].team, [], [...this.ships[s].pos], [[...dat.loc, dat.dock]]);
 
 		if(T == DECOY) this.addShip(DECOY, this.ships[s].team, [], [...this.ships[s].pos], [[...dat.loc, dat.dock]]);
 		if(T == REPAIR) this.addShip(REPAIR, this.ships[s].team, [], [...this.ships[s].pos], [[...dat.loc, dat.dock]]);
@@ -491,13 +505,22 @@ class Game{
 			]);
 		}
 
-		if(T == SHIELD){
+		if(T == PHASE){
 			const R = Math.random()*Math.PI*2;
-			this.addShip(SHIELD, this.ships[s].team, [ALLY], [
+			this.addShip(PHASE, this.ships[s].team, [SUSPEND], [
 				this.ships[s].pos[0]+10*Math.cos(R),
 				this.ships[s].pos[1]+10*Math.sin(R)
 			]);
 			this.activateModule(this.ships.length-1, {i: 0});
+		}
+
+		if(T == WARP){
+			const R = Math.random()*Math.PI*2;
+			this.addShip(WARP, this.ships[s].team, [SENTINEL, TP], [
+				this.ships[s].pos[0]+10*Math.cos(R),
+				this.ships[s].pos[1]+10*Math.sin(R)
+			]);
+			this.activateModule(this.ships.length-1, {i: 1, loc: dat.loc, dock: dat.dock});
 		}
 
 		if(T == TP){
@@ -506,7 +529,7 @@ class Game{
 			this.ships[s].tp = [...dat.loc, dat.dock];
 		}
 
-		if(T == DESTINY){
+		if(T == LEAP){
 			let T = [this.ships[s].pos[0]+COLS*150, this.ships[s].pos[1]+ROWS*150];
 			T[0] = Math.floor(T[0]/300);
 			T[1] = Math.floor(T[1]/300);
@@ -596,7 +619,7 @@ class Game{
 				if(s.modules[i].state < 0)
 					s.modules[i].state = Math.min(0, s.modules[i].state+1/(1+EFFECT_TIME[T]*TPS));
 				else{
-					if(T == IMPULSE)
+					if(T == DELTA)
 						s.modules[i].state = Math.min(0.75, s.modules[i].state+0.75/(RECHARGE_TIME[T]*TPS));
 					else if(T >= ALPHA && T <= ALLY)
 						s.modules[i].state = Math.min(1, s.modules[i].state+1/(RECHARGE_TIME[T]*TPS));
@@ -604,7 +627,7 @@ class Game{
 				}
 
 				if(s.modules[i].state == 0 && T >= ALPHA && T <= ALLY){
-					if(T == IMPULSE)
+					if(T == DELTA)
 						s.modules[i].state = 0.75*EFFECT_TIME[T]/RECHARGE_TIME[T];
 					else s.modules[i].state = EFFECT_TIME[T]/RECHARGE_TIME[T];
 				}
@@ -636,13 +659,13 @@ class Game{
 							s.hurt(DAMAGE[BARRIER], x.team);
 			}
 
-			if(T == DESTINY && S == 0){
+			if(T == LEAP && S == 0){
 				for(let x of this.ships)
 					if(x.team != s.team)
-						if(_dist(x.pos, s.pos) < RANGE[DESTINY])
+						if(_dist(x.pos, s.pos) < RANGE[LEAP])
 							x.hurt(5000, s.team);
 
-				this.explode([...s.pos], RANGE[DESTINY], 9);
+				this.explode([...s.pos], RANGE[LEAP], 9);
 				s.pos = s.tp.slice(0, 2);
 				s.dock = s.tp[2];
 				s.tp = null;
@@ -724,15 +747,15 @@ class Game{
 				}
 			}
 
-			if(T == IMPULSE){
+			if(T == DELTA){
 				if(1+S > 10/EFFECT_TIME[T] || (s.modules[i].aux[2] && s.move.length == 0))
 					s.modules[i].aux[2] = 0;
 
 				if(s.modules[i].aux[2] == 1 && s.imp == 0)
 					for(let x of this.ships)
 						if(x.team != s.team)
-							if(_dist(x.pos, s.pos) < RANGE[IMPULSE])
-								x.hurt(DAMAGE[IMPULSE]/TPS, s.team);
+							if(_dist(x.pos, s.pos) < RANGE[DELTA])
+								x.hurt(DAMAGE[DELTA]/TPS, s.team);
 			}
 
 			if(T == ALLY && s.modules[i].aux[0] > 0 && s.imp == 0){
@@ -753,7 +776,7 @@ class Game{
 				if(s.modules[i].aux[0] <= 0){
 					s.modules[i].aux[1] = 0;
 					if(S < 0){
-						if(T == IMPULSE)
+						if(T == DELTA)
 							s.modules[i].state = (1+s.modules[i].state)*0.75*EFFECT_TIME[T]/RECHARGE_TIME[T];
 						else s.modules[i].state = (1+s.modules[i].state)*EFFECT_TIME[T]/RECHARGE_TIME[T];
 					}
@@ -842,7 +865,7 @@ class Game{
 
 		for(let s of this.ships) for(let m of s.modules)
 			if(m.type == BARRIER && m.state < 0)
-				for(let x of this.ships) if(x.team != s.team && x.type != DELTAP)
+				for(let x of this.ships) if(x.team != s.team && x.type != STRIKEP)
 					if(_dist(x.pos, s.pos) < RANGE[BARRIER])
 						locked.add(x.uid);
 		
@@ -851,7 +874,7 @@ class Game{
 		let using = new Array(this.rocks.length).fill(false),
 			priority = new Array(this.rocks.length).fill(false);
 		
-		for(let s of this.ships) if(s.team != CERB && [BS, DECOY, REPAIR, ROCKET, TURRET, SHIELD].includes(s.type)){
+		for(let s of this.ships) if(s.team != CERB && [BS, DECOY, REPAIR, ROCKET, WARP].includes(s.type)){
 			if(s.type == DECOY){
 				if(s.move.length) priority[s.move[0][2]] = true;
 				else priority[s.dock] = true;
@@ -993,7 +1016,7 @@ class Game{
 
 								if(m.type == TURRET) this.activateModule(i, {i: j});
 
-								if(m.type == SHIELD) this.activateModule(i, {i: j});
+								if(m.type == PHASE) this.activateModule(i, {i: j});
 
 								if(m.type == DECOY){
 									this.activateModule(i, {i: j, loc: s.move.length ? s.move[0].slice(0, 2) :  [...s.pos],
@@ -1057,6 +1080,13 @@ class Game{
 			}
 		};
 
+		for(let s of this.ships) s.suspend = 1;
+
+		for(let s of this.ships) for(let m of s.modules) if(m.type == SUSPEND && m.state < 0){
+			for(let x of this.ships) if(_dist(x.pos, s.pos) < RANGE[SUSPEND] && x.team != s.team)
+				x.suspend = 0.5;
+		}
+
 		for(let s of this.ships) if(!s.emp && !locked.has(s.uid) && !s.fort) s.travel();
 
 		{
@@ -1066,7 +1096,7 @@ class Game{
 
 			for(let i=0; i<this.ships.length; ++i)
 				if(!this.ships[i].move.length && this.ships[i].dock != null && this.ships[i].tp == null
-					&& ![ROCKETP, DARTP, DELTAP].includes(this.ships[i].type))
+					&& ![ROCKETP, DARTP, STRIKEP].includes(this.ships[i].type))
 					X[this.ships[i].dock].push(i);
 
 			for(let i=0; i<this.rocks.length; ++i)
@@ -1080,12 +1110,12 @@ class Game{
 		for(let s of this.ships){
 			for(let m of s.modules){
 				if(IS_WEAPON(m.type) &&
-					(![BATTERY, TURRETD].includes(m.type) || m.state == 1)){
+					(![CANNON, TURRETD].includes(m.type) || m.state == 1)){
 					let targets = [], decoys = [];
 
 					for(let x of this.ships) if(x.team != s.team)
 						if(_dist(x.pos, s.pos) < RANGE[m.type] && (![DART, ROCKETD].includes(m.type)
-							|| [BS, DECOY, REPAIR, ROCKET, TURRET, SHIELD].includes(x.type)))
+							|| [BS, DECOY, REPAIR, ROCKET, TURRET, PHASE, WARP].includes(x.type)))
 							if(m.type != ROCKETD || _dist(x.pos, s.pos) > 60){
 								if(x.type == DECOY) decoys.push([_dist(x.pos, s.pos), x.uid]);
 								else targets.push([_dist(x.pos, s.pos), x.uid]);
@@ -1135,7 +1165,7 @@ class Game{
 						targets = targets.slice(1);
 					}
 
-				if(orig != null && [LASER, COL, BATTERY].includes(m.type)
+				if(orig != null && [LASER, COL, CANNON].includes(m.type)
 					&& (!m.aux.length || m.aux[0] != orig)){
 						m.state = 0;
 						m.aux = [];
@@ -1151,9 +1181,15 @@ class Game{
 			let amp = new Array(this.ships.length).fill(1), sol = new Array(this.ships.length).fill(1);
 
 			for(let s of this.ships)
-				for(let m of s.modules) if(m.type == AMP && m.state < 0){
-					for(let x of this.ships) if(_dist(x.pos, s.pos) < RANGE[AMP])
-						amp[M.get(x.uid)] = DAMAGE[AMP];
+				for(let m of s.modules){
+					if(m.type == AMP && m.state < 0){
+						for(let x of this.ships) if(_dist(x.pos, s.pos) < RANGE[AMP])
+							amp[M.get(x.uid)] = DAMAGE[AMP];
+					}
+					if(m.type == SUSPEND && m.state < 0){
+						for(let x of this.ships) if(_dist(x.pos, s.pos) < RANGE[SUSPEND] && x.team != s.team)
+							sol[M.get(x.uid)] = DAMAGE[SUSPEND];
+					}
 				}
 
 			let count = new Array(ROWS*COLS).fill(0);
@@ -1163,20 +1199,20 @@ class Game{
 
 			for(let s of this.ships)
 				for(let m of s.modules)
-					if(m.type == SOL){
+					if(m.type == DUEL){
 						m.state =
 							count[Math.floor((s.pos[0]+150*COLS)/300)+COLS*Math.floor((s.pos[1]+150*ROWS)/300)]
 							== 2 ? 1 : 0;
 						// TODO this switches off multi-sol tactic
-						//if(m.state) sol[M.get(s.uid)] = DAMAGE[SOL];
-						if(m.state) sol[M.get(s.uid)] *= DAMAGE[SOL];
+						//if(m.state) sol[M.get(s.uid)] = DAMAGE[DUEL];
+						if(m.state) sol[M.get(s.uid)] *= DAMAGE[DUEL];
 
 					}
 
 			for(let s of this.ships) if(!s.emp)
 				for(let m of s.modules)
 					if(IS_WEAPON(m.type) &&
-						(m.type != BATTERY || m.state == 1)){
+						(m.type != CANNON || m.state == 1)){
 						const D = DAMAGE[m.type] != null ? DAMAGE[m.type] :
 							(LASER_DAMAGE[m.type] != null ? LASER_DAMAGE[m.type][
 								m.state < 0.6 ? 0 : (m.state < 1 ? 1 : 2)
@@ -1203,7 +1239,7 @@ class Game{
 		for(let i=0; i<this.ships.length; ++i) for(let m of this.ships[i].modules){
 			// TODO old ripple behavior
 			//if(m.type == RIPPLE && targets[i] == 0 && m.state == 0.75) m.state = 1;
-			if(m.type == IMPULSE && this.ships[i].move.length > 0 && m.state == 0.75) m.state = 1;
+			if(m.type == DELTA && this.ships[i].move.length > 0 && m.state == 0.75) m.state = 1;
 		}
 
 		for(let s of this.ships) if(s.hp){
@@ -1227,12 +1263,12 @@ class Game{
 								x.hurt(1000, s.team);
 				}
 
-				if(s.type == DELTAP){
+				if(s.type == STRIKEP){
 					s.hp = -1;
-					this.explode(s.pos, RANGE[DELTAP], 7);
+					this.explode(s.pos, RANGE[STRIKEP], 7);
 					for(let x of this.ships)
 						if(x.team != s.team)
-							if(_dist(x.pos, s.pos) < RANGE[DELTAP])
+							if(_dist(x.pos, s.pos) < RANGE[STRIKEP])
 								x.hurt(3000, s.team);
 				}
 
@@ -1249,11 +1285,11 @@ class Game{
 		}
 
 		for(let s of this.ships) if(s.hp == 0){
-			if(s.type == DELTAP){
-				this.explode(s.pos, RANGE[DELTAP], 1);
+			if(s.type == STRIKEP){
+				this.explode(s.pos, RANGE[STRIKEP], 1);
 				for(let x of this.ships)
 					if(x.team != s.team)
-						if(_dist(x.pos, s.pos) < RANGE[DELTAP])
+						if(_dist(x.pos, s.pos) < RANGE[STRIKEP])
 							x.hurt(500, s.team);
 			}
 
@@ -1276,7 +1312,7 @@ class Game{
 
 		for(let i=0; i<ROWS*COLS; ++i)
 			if(this.dead[i] > 0 && this.dead[i] != 2){
-				this.dead[i] = Math.min(2, this.dead[i]+1/(SECTOR_COLLAPSE_TIME*TPS));
+				this.dead[i] = Math.min(2, this.dead[i]+1/(APOCALYPSEOR_COLLAPSE_TIME*TPS));
 				if(this.dead[i] == 2){
 					for(let s of this.ships)
 						if(Math.floor((s.pos[0]+150*COLS)/300)+Math.floor((s.pos[1]+150*ROWS)/300)*COLS == i)
@@ -1286,7 +1322,7 @@ class Game{
 			}
 
 		for(let s of this.ships){
-			if(s.type >= DECOY && s.type <= SHIELD){
+			if(s.type >= DECOY && s.type <= REPAIR){
 				s.expire = Math.max(0, s.expire-1/(TPS*EXPIRE_TIME[s.type]));
 			}
 
@@ -1346,7 +1382,7 @@ class Game{
 							if(this.sectors[X].length){
 								const J = this.sectors[X][Math.floor(Math.random()*this.sectors[X].length)];
 								const P = this.rocks[J];
-								this.addShip(SENTINEL+I, CERB, [SENTINEL+I, SENTINEL+I == COL ? SECT : null], [P[0], P[1]-300*ROWS*10], []);
+								this.addShip(SENTINEL+I, CERB, [SENTINEL+I, SENTINEL+I == COL ? APOCALYPSE : null], [P[0], P[1]-300*ROWS*10], []);
 								this.ships[this.ships.length-1].dock = J;
 								if(SENTINEL+I != INT) for(let i=0; i<this.sectors.length; ++i)
 									if(this.sectors[i].includes(J)) this.ships[this.ships.length-1].ai[1] = i;
@@ -1372,25 +1408,25 @@ class Game{
 							const P = this.rocks[J];
 
 							const MODS = [
-								[BATTERY, OMEGA, VENG],
+								[CANNON, OMEGA, VENG],
 								[LASER, OMEGA, VENG],
-								[BATTERY, PASSIVE, VENG, DECOY],
+								[CANNON, PASSIVE, VENG, DECOY],
 								[LASER, PASSIVE, VENG],
-								[BATTERY, PASSIVE, SOL, ROCKET],
-								[MASS, PASSIVE, SOL],
-								[MASS, PASSIVE, FORT, SOL],
-								[BATTERY, ALPHA, AMP],
-								[BATTERY, PASSIVE, FORT, SHIELD],
+								[CANNON, PASSIVE, DUEL, ROCKET],
+								[SPREAD, PASSIVE, DUEL],
+								[SPREAD, PASSIVE, FORT, DUEL],
+								[CANNON, ALPHA, AMP],
+								[CANNON, PASSIVE, FORT, PHASE],
 								[LASER, PASSIVE, EMP, DECOY],
 								[DART, OMEGA, EMP, ROCKET],
 								[DART, ALLY, BARRIER, DECOY],
 								[DART, ALLY, EMP],
-								[BATTERY, MIRROR, SOL],
+								[CANNON, MIRROR, DUEL],
 								[LASER, MIRROR, BARRIER, DECOY],
-								[MASS, OMEGA, AMP, EMP],
-								[MASS, ALPHA, VENG, AMP, ROCKET],
+								[SPREAD, OMEGA, AMP, EMP],
+								[SPREAD, ALPHA, VENG, AMP, ROCKET],
 								[DART, PASSIVE, EMP, TURRET],
-								[LASER, PASSIVE, BARRIER, SHIELD],
+								[LASER, PASSIVE, BARRIER, PHASE],
 							];
 
 							const I = Math.floor(Math.random()*MODS.length);
@@ -1418,7 +1454,7 @@ class Game{
 		let q = [];
 		for(let s of this.ships){
 			if(s.hp > 0) q.push(s.encode());
-			else if([BS, DECOY, REPAIR, ROCKET, TURRET, SHIELD, COL].includes(s.type))
+			else if([BS, DECOY, REPAIR, ROCKET, TURRET, PHASE, WARP, COL].includes(s.type))
 				this.die(s.pos);
 
 			if(s.ally != null && s.ally[0] != null && s.ally[0].hp <= 0) s.ally = null;

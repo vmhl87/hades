@@ -502,7 +502,7 @@ function drawShip(T, O, M){
 		circle(3*sin(PI*4/3), -3*cos(PI*4/3), 2.5);
 	}
 
-	if(T == SHIELD){
+	if(T == PHASE){
 		if(O == 0) fill(100, 150, 150);
 		if(O == 1) fill(170, 70, 70);
 		circle(0, 0, 15);
@@ -568,6 +568,22 @@ function drawShip(T, O, M){
 		if(O == 1) fill(120, 40, 40);
 		circle(3, 0, 2.5);
 	}
+	
+	if(T == WARP){
+		if(O == 0) fill(100, 150, 150);
+		if(O == 1) fill(170, 70, 70);
+		_symm([
+			[8.5, 0],
+			[8, 2],
+			[-4, 8],
+			[-6, 7],
+			[-4, 6],
+			[-2, 2]
+		]);
+		if(O == 0) fill(60, 100, 100);
+		if(O == 1) fill(120, 40, 40);
+		circle(3, 0, 2.5);
+	}
 
 	if(T == DARTP){
 		if(M){
@@ -603,7 +619,7 @@ function drawShip(T, O, M){
 		]);
 	}
 
-	if(T == DELTAP){
+	if(T == STRIKEP){
 		if(M){
 			fill(60, 180, 180);
 			_symm([
@@ -758,12 +774,12 @@ function drawModule(T){
 		line(-5, -1.3, 0, -9);
 	}
 
-	if(T == BATTERY){
+	if(T == CANNON){
 		_batt(-4, 0, 1, 1);
 		_batt(4, 0, 1, 1);
 	}
 
-	if(T == MASS){
+	if(T == SPREAD){
 		_batt(-6, 0, 1, 0);
 		_batt(0, 1, 1, 1);
 		_batt(6, 0, 0, 1);
@@ -889,7 +905,7 @@ function drawModule(T){
 		arc(0, 0, 20, 20, PI-PI*0.3, PI+PI*0.3);
 	}
 
-	if(T == IMPULSE){
+	if(T == DELTA){
 		stroke(50, 150, 150); noFill();
 		arc(0, 0, 25, 25, -PI*0.35, PI*0.15);
 		arc(0, 0, 25, 25, PI-PI*0.15, PI+PI*0.35);
@@ -986,7 +1002,7 @@ function drawModule(T){
 		circle(0, 0, 20);
 	}
 
-	if(T == SOL){
+	if(T == DUEL){
 		fill(50, 150, 50); noStroke();
 		beginShape();
 		vertex(-0.5, -10);
@@ -1032,7 +1048,7 @@ function drawModule(T){
 		line(-7, 0, 7, 0);
 	}
 
-	if(T == DESTINY){
+	if(T == LEAP){
 		stroke(50, 150, 50); fill(50, 150, 50);
 		beginShape();
 		vertex(0, -5);
@@ -1069,7 +1085,7 @@ function drawModule(T){
 		circle(0, 0, 25);
 	}
 
-	if(T == DELTA){
+	if(T == STRIKE){
 		stroke(50, 150, 50); fill(50, 150, 50);
 		beginShape();
 		vertex(10, -10);
@@ -1114,6 +1130,15 @@ function drawModule(T){
 		endShape();
 	}
 
+	if(T == SUSPEND){
+		stroke(50, 150, 50); noFill();
+		arc(0, 0, 25, 25, PI*0.225, PI*1.275);
+		for(let i=1.4; i<2; i+=0.2)
+			arc(0, 0, 25, 25, PI*(i+0.025), PI*(i+0.075));
+		line(-6, -2, 0, 2);
+		line(6, -2, 0, 2);
+	}
+
 	if(T == VENG){
 		stroke(50, 150, 50); noFill();
 		beginShape();
@@ -1136,7 +1161,7 @@ function drawModule(T){
 		line(8, -2, 9, -2.75);
 	}
 
-	if(T == SECT){
+	if(T == APOCALYPSE){
 		stroke(50, 150, 50); noFill();
 		rectMode(CENTER, CENTER);
 		rect(0, 0, 25, 25);
@@ -1231,7 +1256,7 @@ function drawModule(T){
 		arc(0, 0, 22, 22, PI/2+PI*4/3-PI/4, PI/2+PI*4/3+PI/4);
 	}
 
-	if(T == SHIELD){
+	if(T == PHASE){
 		stroke(150, 100, 50); noFill();
 		line(0, -5, 0, 5);
 		line(-5, 0, 5, 0);
@@ -1239,6 +1264,20 @@ function drawModule(T){
 		arc(0, 0, 22, 22, PI/2-PI/6, PI/2+PI/6);
 		arc(0, 0, 22, 22, PI-PI/6, PI+PI/6);
 		arc(0, 0, 22, 22, PI*1.5-PI/6, PI*1.5+PI/6);
+	}
+
+	if(T == WARP){
+		stroke(150, 100, 50); fill(150, 100, 50);
+		beginShape();
+		vertex(0, -7);
+		vertex(5, 4);
+		vertex(2, 2);
+		vertex(0, 7);
+		vertex(-2, 2);
+		vertex(-5, 4);
+		endShape(CLOSE); noFill();
+		arc(0, 0, 25, 30, -PI*0.2, PI*0.2);
+		arc(0, 0, 25, 30, PI-PI*0.2, PI+PI*0.2);
 	}
 
 	pop();
@@ -1252,8 +1291,8 @@ function drawModule2(T, S){
 	if(T >= LASER && T <= TURRETD) fill(255, 50, 50, 60);
 	if(T >= SENTINEL && T <= BOMBER) fill(255, 50, 50, 60);
 	if(T >= ALPHA && T <= ALLY) fill(0, 255, 255, 60);
-	if(T >= EMP && T <= SECT) fill(100, 255, 100, 60);
-	if(T >= DECOY && T <= SHIELD) fill(255, 100, 0, 60);
+	if(T >= EMP && T <= APOCALYPSE) fill(100, 255, 100, 60);
+	if(T >= DECOY && T <= WARP) fill(255, 100, 0, 60);
 
 	rect(-20, -20, 40, 40);
 
@@ -1264,6 +1303,6 @@ function drawModule2(T, S){
 
 	fill(0, 40);
 	if(S != 1 && S >= 0)
-		if(!(T >= LASER && T <= ROCKETD) && (T != IMPULSE || S != 0.75))
+		if(!(T >= LASER && T <= ROCKETD) && (T != DELTA || S != 0.75))
 			rect(-20, 20-40*abs(S), 40, 40*abs(S));
 }

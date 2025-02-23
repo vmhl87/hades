@@ -352,36 +352,36 @@ function main(){
 					pop();
 				}
 
-				for(let i=0; i<5; ++i){
+				for(let i=0; i<6; ++i){
 					fill(100, 255, 100,
 						modules[5-chooseModule] == EMP+i ? 60 :
-						(mouseIn(width/2-100+i*50, height/2+225, 20, 20) ? 80 : 60)
+						(mouseIn(width/2-125+i*50, height/2+225, 20, 20) ? 80 : 60)
 					);
-					rect(width/2-120+i*50, height/2+205, 40, 40);
-					push(); translate(width/2-100+i*50, height/2+225);
+					rect(width/2-145+i*50, height/2+205, 40, 40);
+					push(); translate(width/2-125+i*50, height/2+225);
 					drawModule(EMP+i);
 					pop();
 					fill(0, 100);
-					if(modules[5-chooseModule] == EMP+i) rect(width/2-120+i*50, height/2+205, 40, 40);
+					if(modules[5-chooseModule] == EMP+i) rect(width/2-125+i*50, height/2+205, 40, 40);
 				}
 
 				for(let i=0; i<6; ++i){
 					fill(100, 255, 100,
-						modules[5-chooseModule] == EMP+5+i ? 60 :
+						modules[5-chooseModule] == EMP+6+i ? 60 :
 						(mouseIn(width/2-125+i*50, height/2+275, 20, 20) ? 80 : 60)
 					);
 					rect(width/2-145+i*50, height/2+255, 40, 40);
 					push(); translate(width/2-125+i*50, height/2+275);
-					drawModule(EMP+5+i);
+					drawModule(EMP+6+i);
 					pop();
 					fill(0, 100);
-					if(modules[5-chooseModule] == EMP+5+i) rect(width/2-145+i*50, height/2+255, 40, 40);
+					if(modules[5-chooseModule] == EMP+6+i) rect(width/2-145+i*50, height/2+255, 40, 40);
 				}
 
-				for(let i=0; i<5; ++i){
-					fill(255, 100, 0, mouseIn(width/2-100+i*50, height/2+325, 20, 20) ? 80 : 60);
-					rect(width/2-120+i*50, height/2+305, 40, 40);
-					push(); translate(width/2-100+i*50, height/2+325);
+				for(let i=0; i<6; ++i){
+					fill(255, 100, 0, mouseIn(width/2-125+i*50, height/2+325, 20, 20) ? 80 : 60);
+					rect(width/2-145+i*50, height/2+305, 40, 40);
+					push(); translate(width/2-125+i*50, height/2+325);
 					drawModule(DECOY+i);
 					pop();
 				}
@@ -424,16 +424,16 @@ function main(){
 
 		let REV = new Map();
 
-		let bsID = [], cerbID = [], repairID = [], shieldID = [];
+		let bsID = [], cerbID = [], repairID = [], modID = [];
 		for(let i=0; i<ships.length; ++i){
 			if(ships[i].type == BS){
 				bsID.push(i);
-				shieldID.push(i);
+				modID.push(i);
 			}
 			if(ships[i].type >= SENTINEL && ships[i].type <= COL)
 				cerbID.push(i);
 			if(ships[i].type == REPAIR) repairID.push(i);
-			if(ships[i].type == SHIELD) shieldID.push(i);
+			if(ships[i].type == PHASE) modID.push(i);
 			REV.set(ships[i].uid, i);
 		}
 
@@ -553,7 +553,7 @@ function main(){
 					if(ships[shipID].modules[i].type == ROCKETD)
 						circle(...screenPos(ships[shipID].vpos), 60*2*camera.z);
 				}
-				if([DARTP, ROCKETP, DELTAP, BOMBERP].includes(ships[shipID].type))
+				if([DARTP, ROCKETP, STRIKEP, BOMBERP].includes(ships[shipID].type))
 					circle(...screenPos(ships[shipID].move[ships[shipID].move.length-1]),
 						RANGE[ships[shipID].type]*2*camera.z);
 				if(shade){
@@ -566,26 +566,26 @@ function main(){
 				noFill(); stroke(90, 70, 70, 100);
 				for(let s of ships) if(s.team != ships[shipID].team){
 					let near = _dist(ships[shipID].vpos, s.vpos) < 130;
-					if([DARTP, ROCKETP, DELTAP, BOMBERP].includes(s.type))
+					if([DARTP, ROCKETP, STRIKEP, BOMBERP].includes(s.type))
 						if(_dist(ships[shipID].vpos, s.move[s.move.length-1]) < RANGE[s.type]+20)
 							circle(...screenPos(s.move[s.move.length-1]), RANGE[s.type]*2*camera.z);
 					if(ships[shipID].wait){
 						if(_linedist(ships[shipID].vpos, ships[shipID].wait, s.vpos) < 130) near = true;
-						if([DARTP, ROCKETP, DELTAP, BOMBERP].includes(s.type))
+						if([DARTP, ROCKETP, STRIKEP, BOMBERP].includes(s.type))
 							if(_linedist(ships[shipID].vpos, ships[shipID].wait,
 								s.move[s.move.length-1]) < RANGE[s.type]+20)
 								circle(...screenPos(s.move[s.move.length-1]), RANGE[s.type]*2*camera.z);
 					}
 					if(ships[shipID].move.length){
 						if(_linedist(ships[shipID].vpos, ships[shipID].move[0], s.vpos) < 130) near = true;
-						if([DARTP, ROCKETP, DELTAP, BOMBERP].includes(s.type))
+						if([DARTP, ROCKETP, STRIKEP, BOMBERP].includes(s.type))
 							if(_linedist(ships[shipID].vpos, ships[shipID].move[0],
 								s.move[s.move.length-1]) < RANGE[s.type]+20)
 								circle(...screenPos(s.move[s.move.length-1]), RANGE[s.type]*2*camera.z);
 					}
 					for(let i=0; i<ships[shipID].move.length-1; ++i){
 						if(_linedist(ships[shipID].move[i], ships[shipID].move[i+1], s.vpos) < 130) near = true;
-						if([DARTP, ROCKETP, DELTAP, BOMBERP].includes(s.type))
+						if([DARTP, ROCKETP, STRIKEP, BOMBERP].includes(s.type))
 							if(_linedist(ships[shipID].move[i], ships[shipID].move[i+1],
 								s.move[s.move.length-1]) < RANGE[s.type]+20)
 								circle(...screenPos(s.move[s.move.length-1]), RANGE[s.type]*2*camera.z);
@@ -650,7 +650,7 @@ function main(){
 			}
 		}
 
-		for(let i of shieldID){
+		for(let i of bsID){
 			const s = ships[i];
 			if(s.imp == 0){
 				push(); translate(width/2+(s.vpos[0]-camera.x)*camera.z, height/2+(s.vpos[1]-camera.y)*camera.z);
@@ -669,10 +669,10 @@ function main(){
 						circle(0, 0, 50);
 					}
 
-					if(m.type == IMPULSE){
+					if(m.type == DELTA){
 						if(m.aux[2]){
 							fill(200, 100, 50, 100); noStroke();
-							circle(0, 0, RANGE[IMPULSE]*2*sqrt(camera.z));
+							circle(0, 0, RANGE[DELTA]*2*sqrt(camera.z));
 						}
 
 						stroke(50, 150, 150, 40); noFill(); strokeWeight(3);
@@ -791,14 +791,14 @@ function main(){
 
 		if(!snapshot) deaths = deaths.filter(x => x[1] > NOW);
 
-		for(let i of bsID){
+		for(let i of modID){
 			const s = ships[i];
 			for(let m of s.modules){
-				if(m.type == DESTINY && m.state < 0){
+				if(m.type == LEAP && m.state < 0){
 					push(); fill(255, 100, 50, 20); noStroke();
-					circle(...screenPos(s.vpos), RANGE[DESTINY]*2*camera.z);
+					circle(...screenPos(s.vpos), RANGE[LEAP]*2*camera.z);
 					noFill(); stroke(200, 100, 50); strokeWeight(2*sqrt(camera.z));
-					arc(...screenPos(s.vpos), RANGE[DESTINY]*2*camera.z, RANGE[DESTINY]*2*camera.z,
+					arc(...screenPos(s.vpos), RANGE[LEAP]*2*camera.z, RANGE[LEAP]*2*camera.z,
 						-PI/2, -PI/2+PI*2*(1+m.state));
 					pop();
 				}
@@ -840,6 +840,25 @@ function main(){
 						circle(...screenPos(s.vpos), (RANGE[AMP]-12)*2*camera.z);
 						strokeWeight(0.3*sqrt(camera.z));
 						circle(...screenPos(s.vpos), (RANGE[AMP]-16)*2*camera.z);
+					}
+					pop();
+				}
+
+				if(m.type == SUSPEND && m.state < 0){
+					push(); strokeWeight(2*sqrt(camera.z));
+					fill(100, 150, 200, 30); noStroke();
+					circle(...screenPos(s.vpos), RANGE[SUSPEND]*2*camera.z);
+					stroke(10, 150, 200, 100); noFill();
+					circle(...screenPos(s.vpos), RANGE[SUSPEND]*2*camera.z);
+					if(m.state < -3/TIME[m.type] || ((-m.state*TIME[m.type])%1 < 0.5)){
+						strokeWeight(1.5*sqrt(camera.z));
+						circle(...screenPos(s.vpos), (RANGE[SUSPEND]-4)*2*camera.z);
+						strokeWeight(sqrt(camera.z));
+						circle(...screenPos(s.vpos), (RANGE[SUSPEND]-8)*2*camera.z);
+						strokeWeight(0.6*sqrt(camera.z));
+						circle(...screenPos(s.vpos), (RANGE[SUSPEND]-12)*2*camera.z);
+						strokeWeight(0.3*sqrt(camera.z));
+						circle(...screenPos(s.vpos), (RANGE[SUSPEND]-16)*2*camera.z);
 					}
 					pop();
 				}
@@ -915,10 +934,10 @@ function main(){
 				if(m.type >= ALPHA && m.type <= ALLY)
 					if(m.aux[0]){
 						fill(100, 80); noStroke();
-						rect(-15, s.type == SHIELD ? -30 : -25, 30, 3);
+						rect(-15, -25, 30, 3);
 
 						fill(50, 150, 150);
-						rect(-15, s.type == SHIELD ? -30 : -25, ceil(30*m.aux[0]), 3);
+						rect(-15, -25, ceil(30*m.aux[0]), 3);
 					}
 
 
@@ -960,7 +979,7 @@ function main(){
 				let sol = false;
 
 				for(let m of s.modules)
-					if(m.type == SOL && m.state == 1)
+					if(m.type == DUEL && m.state == 1)
 						sol = true;
 
 				for(let m of s.modules)
@@ -1004,7 +1023,7 @@ function main(){
 								stroke(50, 150, 200); strokeWeight(2*S);
 								line(...screenPos(R), ...screenPos(x.vpos));
 
-							}else if([BATTERY, MASS, SENTINEL, GUARD, INT].includes(m.type)){
+							}else if([CANNON, SPREAD, SENTINEL, GUARD, INT].includes(m.type)){
 								stroke(200, 100, 50); strokeWeight(2*S);
 								const L = (((frameCount+x.uid*6+s.uid*3)/20) % 1) * 0.9;
 								line(...screenPos(_lerp(C, x.vpos, L)),
@@ -1014,7 +1033,7 @@ function main(){
 
 						if(sol){
 							push(); translate(...screenPos(s.vpos)); scale(S);
-							translate(0, 25); scale(1/2); drawModule(SOL);
+							translate(0, 25); scale(1/2); drawModule(DUEL);
 							pop();
 						}
 					}
@@ -1378,20 +1397,20 @@ function stagingUI(){
 				p = false;
 			}
 
-		for(let i=0; i<5; ++i)
-			if(mouseIn(width/2-100+i*50, height/2+225-OFFSET, 20, 20)){
+		for(let i=0; i<6; ++i)
+			if(mouseIn(width/2-125+i*50, height/2+225-OFFSET, 20, 20)){
 				modules[chooseModule+10] = modules[chooseModule+10] == EMP+i ? null : EMP+i;
 				p = false;
 			}
 
 		for(let i=0; i<6; ++i)
 			if(mouseIn(width/2-125+i*50, height/2+275-OFFSET, 20, 20)){
-				modules[chooseModule+10] = modules[chooseModule+10] == EMP+5+i ? null : EMP+5+i;
+				modules[chooseModule+10] = modules[chooseModule+10] == EMP+6+i ? null : EMP+6+i;
 				p = false;
 			}
 
-		for(let i=0; i<5; ++i)
-			if(mouseIn(width/2-100+i*50, height/2+325-OFFSET, 20, 20)){
+		for(let i=0; i<6; ++i)
+			if(mouseIn(width/2-125+i*50, height/2+325-OFFSET, 20, 20)){
 				modules[chooseModule+10] = modules[chooseModule+10] == DECOY+i ? null : DECOY+i;
 				p = false;
 			}
@@ -1471,7 +1490,7 @@ function click(){
 		for(let i=0; i<ships[shipID].modules.length; ++i){
 			if(mouseIn(width/2+25-25*ships[shipID].modules.length+50*i, height-120-10-25, 25, 25)){
 				if(ships[shipID].team == ID && ships[shipID].modules[i].state == 1){
-					if(ships[shipID].tp != null && [TP, DESTINY, RIPPLE].includes(ships[shipID].modules[i].type))
+					if(ships[shipID].tp != null && [TP, LEAP, RIPPLE].includes(ships[shipID].modules[i].type))
 						return;
 					if(LOCMOD.includes(ships[shipID].modules[i].type))
 						selectMove = ["module", {s: focus[1], i: i}];
@@ -1525,7 +1544,7 @@ function click(){
 
 				if(RANGE[ships[shipID].modules[selectMove[1].i].type] == null ||
 					_dist(P, ships[shipID].vpos) < RANGE[ships[shipID].modules[selectMove[1].i].type]){
-					if(ships[shipID].modules[selectMove[1].i].type != DELTA || ships[shipID].move.length > 0
+					if(ships[shipID].modules[selectMove[1].i].type != STRIKE || ships[shipID].move.length > 0
 						|| (ships[shipID].move.length == 0 && select[1] != ships[shipID].dock)){
 						socket.emit("activateModule", {gameID: gameID, shipID: selectMove[1].s,
 							i: selectMove[1].i, loc: P, dock: select[1]});
@@ -1566,7 +1585,7 @@ function keyReleased(){
 			for(let i=0; i<ships[shipID].modules.length; ++i){
 				if(key == keys[i]){
 					if(ships[shipID].team == ID && !snapshot && ships[shipID].modules[i].state == 1){
-						if(ships[shipID].tp != null && [TP, DESTINY, RIPPLE].includes(ships[shipID].modules[i].type))
+						if(ships[shipID].tp != null && [TP, LEAP, RIPPLE].includes(ships[shipID].modules[i].type))
 							return;
 						if(LOCMOD.includes(ships[shipID].modules[i].type))
 							selectMove = ["module", {s: focus[1], i: i}];
