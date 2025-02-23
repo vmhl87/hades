@@ -521,6 +521,11 @@ class Game{
 				this.ships[s].pos[1]+10*Math.sin(R)
 			]);
 			this.activateModule(this.ships.length-1, {i: 1, loc: dat.loc, dock: dat.dock});
+			this.addShip(WARP, this.ships[s].team, [SENTINEL, TP], [
+				this.ships[s].pos[0]-10*Math.cos(R),
+				this.ships[s].pos[1]-10*Math.sin(R)
+			]);
+			this.activateModule(this.ships.length-1, {i: 1, loc: dat.loc, dock: dat.dock});
 		}
 
 		if(T == TP){

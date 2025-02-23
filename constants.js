@@ -162,7 +162,7 @@ INFO[REPAIR] = "A drone that once destroyed repairs allied ships within range by
 INFO[ROCKET] = "A drone that periodically fires rockets at enemy vessels within range. Battleships are preferred over Cerberus.";
 INFO[TURRET] = "A drone that after a small setup time applies constant damage to three enemies within range.";
 INFO[PHASE] = "A drone that projects a suspension field around nearby enemy ships, slowing them down and decreasing their weapon damage.";
-INFO[WARP] = "A drone that after a small delay teleports to a target location and fires on enemy ships.";
+INFO[WARP] = "Two drones that after a small delay teleport to a target location and fire on enemy ships.";
 
 let STATS = new Array(ct);
 
