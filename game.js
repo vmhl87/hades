@@ -1312,7 +1312,7 @@ class Game{
 
 		for(let i=0; i<ROWS*COLS; ++i)
 			if(this.dead[i] > 0 && this.dead[i] != 2){
-				this.dead[i] = Math.min(2, this.dead[i]+1/(APOCALYPSEOR_COLLAPSE_TIME*TPS));
+				this.dead[i] = Math.min(2, this.dead[i]+1/(SECTOR_COLLAPSE_TIME*TPS));
 				if(this.dead[i] == 2){
 					for(let s of this.ships)
 						if(Math.floor((s.pos[0]+150*COLS)/300)+Math.floor((s.pos[1]+150*ROWS)/300)*COLS == i)
