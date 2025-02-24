@@ -196,12 +196,14 @@ function mousePressed(){
 		startMouseX = mouseX;
 		startMouseY = mouseY;
 		select = selected();
+		/*
 		if(focus != null && focus[0] == "ship" && select != null && select[0] == "ship" && focus[1] == select[1] &&
 			selectMove == null && !snapshot)
 			for(let s of ships) if(s.uid == focus[1] && s.team == ID && !s.wait && s.type == BS){
 				dragMove = [mouseX, mouseY, s.uid];
 				selectMove = ["ship", s.uid];
 			}
+			*/
 	}
 }
 
@@ -279,7 +281,7 @@ function mouseReleased(){
 
 		stagingUI();
 
-	}else if(connected && dragMove != null && moved){
+	}else if(connected && dragMove != null){
 		select = selected();
 		if(select != null) click();
 
@@ -305,19 +307,29 @@ function draw(){
 
 	if(!staging){
 		if(!MOBILE && mouseIsPressed && !(abs(startMouseX-30) < 30 && abs(startMouseY-30) < 30)){
+			const dist = _dist([mouseX, mouseY], [lastMouseX, lastMouseY]);
+			if(dist > 4){
+				moved = true;
+				if(focus != null && focus[0] == "ship" && select != null && select[0] == "ship" && focus[1] == select[1] &&
+					selectMove == null && !snapshot)
+						for(let s of ships) if(s.uid == focus[1] && s.team == ID && !s.wait && s.type == BS){
+							dragMove = [mouseX, mouseY, s.uid];
+							selectMove = ["ship", s.uid];
+						}
+				scrollVel = [0, 0];
+			}
+
 			if(dragMove != null){
 				dragMove[0] = mouseX;
 				dragMove[1] = mouseY;
 
 			}else{
-				const dist = _dist([mouseX, mouseY], [lastMouseX, lastMouseY]);
 				if(dist > 0.5){
 					camera.x += (lastMouseX-mouseX)/camera.z;
 					camera.y += (lastMouseY-mouseY)/camera.z;
 				}
 				scrollVel[0] = lastMouseX-mouseX;
 				scrollVel[1] = lastMouseY-mouseY;
-				if(dist > 4) moved = true;
 			}
 		}
 	}
