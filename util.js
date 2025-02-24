@@ -279,7 +279,7 @@ function mouseReleased(){
 
 		stagingUI();
 
-	}else if(connected && dragMove != null){
+	}else if(connected && dragMove != null && moved){
 		select = selected();
 		if(select != null) click();
 

@@ -183,6 +183,7 @@ SPEED[BOMBER] = 8;
 SPEED[DECOY] = 20;
 SPEED[REPAIR] = 20;
 SPEED[ROCKET] = 15;
+SPEED[WARP] = 20;
 SPEED[DARTP] = 25;
 SPEED[ROCKETP] = 70;
 SPEED[STRIKEP] = 110;
@@ -639,9 +640,7 @@ class Game{
 			}
 
 			if(T == RIPPLE)
-				// TODO new ripple behavior
 				s.modules[i].state = Math.min(1, s.modules[i].state+1/(RECHARGE_TIME[T]*TPS));
-				//s.modules[i].state = Math.min(0.75, s.modules[i].state+0.75/(RECHARGE_TIME[T]*TPS));
 
 			if(T == TURRETD)
 				s.modules[i].state = Math.min(1, s.modules[i].state+1/(RECHARGE_TIME[T]*TPS));
