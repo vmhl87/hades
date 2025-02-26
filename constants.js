@@ -80,7 +80,7 @@ HP[BOMBERP] = 900;
 for(let i=LASER; i<=LASER2; ++i) RANGE[i] = 80;
 RANGE[DART] = 100;
 RANGE[ROCKETD] = 400;
-RANGE[TURRETD] = 80;
+RANGE[TURRETD] = 130;
 for(let i=SENTINEL; i<=COL; ++i) RANGE[i] = 80;
 
 function weaponRange(T){
@@ -177,7 +177,7 @@ STATS[LASER2] = "DPS: 184-800, Charge time: 6s\nRange: 80m";
 STATS[DART] = "Damage: 4000, Recharge time: 10s\nRange: 100m";
 
 STATS[ROCKETD] = "Damage: 1000, Recharge time: 12s\nRange: 400m";
-STATS[TURRETD] = "DPS: 200\nRange: 80m";
+STATS[TURRETD] = "DPS: 200\nRange: 130m";
 
 STATS[SENTINEL] = "DPS: 200\nRange: 80m";
 STATS[GUARD] = "DPS: 60\nRange: 80m";
