@@ -1122,6 +1122,8 @@ class Game{
 					];
 		}
 
+		let firing = new Set();
+
 		for(let s of this.ships){
 			for(let m of s.modules){
 				if(IS_WEAPON(m.type) &&
@@ -1186,7 +1188,10 @@ class Game{
 							m.aux = [];
 						}
 
-					if(m.aux.length) m.use = true;
+					if(m.aux.length){
+						m.use = true;
+						firing.add(s.uid);
+					}
 				}
 			}
 		}
@@ -1224,7 +1229,7 @@ class Game{
 						//if(m.state) sol[M.get(s.uid)] = DAMAGE[DUEL];
 						if(m.state){
 							sol[M.get(s.uid)] *= DAMAGE[DUEL];
-							m.use = true;
+							if(firing.has(s.uid)) m.use = true;
 						}
 
 					}
