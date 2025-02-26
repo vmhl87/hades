@@ -270,7 +270,7 @@ class Ship{
 		this.team = team;
 		this.modules = [];
 		for(let m of modules) if(m)
-			this.modules.push({type: m, state: 1, aux: null});
+			this.modules.push({type: m, state: 1, aux: null, use: false});
 		this.pos = pos;
 		this.dock = null;
 		this.move = move;
@@ -386,7 +386,10 @@ class Ship{
 		if(this.imp == 0) for(let m of this.modules) if(dmg && m.type >= ALPHA && m.type <= MIRROR && m.aux[0]){
 			if(m.type == ALPHA) return;
 
-			if(m.type == PASSIVE) m.aux[1] = 0;
+			if(m.type == PASSIVE){
+				m.aux[1] = 0;
+				m.use = true;
+			}
 
 			const rem = Math.min(Math.ceil(m.aux[0]*STRENGTH[m.type]), dmg);
 
@@ -488,6 +491,8 @@ class Game{
 				this.ships[s].modules[dat.i].aux = [1, 1];
 
 			this.ships[s].modules[dat.i].state = -1;
+
+			this.ships[s].modules[dat.i].use = true;
 		}
 
 		if(T == RIPPLE) this.ships[s].modules[dat.i].state = 0;
@@ -705,12 +710,17 @@ class Game{
 
 					const X = P%COLS, Y = Math.floor(P/COLS);
 
+					let count = 0;
+
 					for(let x of this.ships) if(x.team != s.team){
 						if(Math.abs(300*X-150*COLS+150 - x.pos[0]) < 300 && Math.abs(300*Y-150*ROWS+150 - x.pos[1]) < 300){
 							this.addShip(BOMBERP, s.team, [], [...s.pos], [[...x.pos, null]]);
 							s.modules[i].state = 0;
+							++count;
 						}
 					}
+
+					if(count) s.modules[i].use = true;
 				}
 			}
 
@@ -816,6 +826,7 @@ class Game{
 				
 				if(S == 1 && s.hp <= 2000){
 					s.modules[i].state = -1;
+					s.modules[i].use = true;
 
 					for(let i=0; i<this.ships.length; ++i)
 						if(this.ships[i].uid == s.uid)
@@ -1169,11 +1180,13 @@ class Game{
 						targets = targets.slice(1);
 					}
 
-				if(orig != null && [LASER, COL, CANNON].includes(m.type)
-					&& (!m.aux.length || m.aux[0] != orig)){
-						m.state = 0;
-						m.aux = [];
-					}
+					if(orig != null && [LASER, COL, CANNON].includes(m.type)
+						&& (!m.aux.length || m.aux[0] != orig)){
+							m.state = 0;
+							m.aux = [];
+						}
+
+					if(m.aux.length) m.use = true;
 				}
 			}
 		}
@@ -1209,7 +1222,10 @@ class Game{
 							== 2 ? 1 : 0;
 						// TODO this switches off multi-sol tactic
 						//if(m.state) sol[M.get(s.uid)] = DAMAGE[DUEL];
-						if(m.state) sol[M.get(s.uid)] *= DAMAGE[DUEL];
+						if(m.state){
+							sol[M.get(s.uid)] *= DAMAGE[DUEL];
+							m.use = true;
+						}
 
 					}
 

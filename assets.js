@@ -1287,12 +1287,22 @@ function drawModule2(T, S){
 	fill(0, 10, 25); noStroke();
 	rect(-20, -20, 40, 40);
 
+	if(T == NULL){
+		fill(255, 40);
+		rect(-20, -20, 40, 40);
+		stroke(80); strokeWeight(3); noFill();
+		arc(0, -6, 17, 13, -PI*0.8, PI*0.5);
+		line(0, 13/2-6, 0, 5);
+		line(0, 10, 0, 12);
+		return;
+	}
+
 	fill(255, 40);
 	if(T >= LASER && T <= TURRETD) fill(255, 50, 50, 60);
 	if(T >= SENTINEL && T <= BOMBER) fill(255, 50, 50, 60);
 	if(T >= ALPHA && T <= ALLY) fill(0, 255, 255, 60);
 	if(T >= EMP && T <= APOCALYPSE) fill(100, 255, 100, 60);
-	if(T >= DECOY && T <= WARP) fill(255, 100, 0, 60);
+	if(T >= DECOY && T <= REPAIR) fill(255, 100, 0, 60);
 
 	rect(-20, -20, 40, 40);
 

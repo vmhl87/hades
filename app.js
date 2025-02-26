@@ -535,9 +535,10 @@ function main(){
 				push();
 				stroke(90, 100); fill(90, 30);
 				if(selectMove == null) for(let i=0; i<ships[shipID].modules.length; ++i)
-					if(mouseIn(width/2+25-25*ships[shipID].modules.length+50*i, height-120-10-25, 25, 20))
-						if(RANGE[ships[shipID].modules[i].type] != null)
-							circle(...screenPos(ships[shipID].vpos), RANGE[ships[shipID].modules[i].type]*2*camera.z);
+					if(ships[shipID].type != BS || ships[shipID].team == ID || ships[shipID].modules[i].use)
+						if(mouseIn(width/2+25-25*ships[shipID].modules.length+50*i, height-120-10-25, 25, 20))
+							if(RANGE[ships[shipID].modules[i].type] != null)
+								circle(...screenPos(ships[shipID].vpos), RANGE[ships[shipID].modules[i].type]*2*camera.z);
 				if(selectMove != null && selectMove[0] == "module" && RANGE[ships[shipID].modules[selectMove[1].i].type])
 					circle(...screenPos(ships[shipID].vpos), RANGE[ships[shipID].modules[selectMove[1].i].type]*2*camera.z);
 				pop();
@@ -545,14 +546,15 @@ function main(){
 				push();
 				noFill(); stroke(...(ships[shipID].team == ID ? [70, 90, 90] : [90, 70, 70]), 100);
 				let shade = true;
-				for(let i=0; i<ships[shipID].modules.length; ++i){
-					if(weaponRange(ships[shipID].modules[i].type) != null){
-						circle(...screenPos(ships[shipID].vpos), weaponRange(ships[shipID].modules[i].type)*2*camera.z);
-						shade = false;
+				for(let i=0; i<ships[shipID].modules.length; ++i)
+					if(ships[shipID].type != BS || ships[shipID].team == ID || ships[shipID].modules[i].use){
+						if(weaponRange(ships[shipID].modules[i].type) != null){
+							circle(...screenPos(ships[shipID].vpos), weaponRange(ships[shipID].modules[i].type)*2*camera.z);
+							shade = false;
+						}
+						if(ships[shipID].modules[i].type == ROCKETD)
+							circle(...screenPos(ships[shipID].vpos), 60*2*camera.z);
 					}
-					if(ships[shipID].modules[i].type == ROCKETD)
-						circle(...screenPos(ships[shipID].vpos), 60*2*camera.z);
-				}
 				if([DARTP, ROCKETP, STRIKEP, BOMBERP].includes(ships[shipID].type))
 					circle(...screenPos(ships[shipID].move[ships[shipID].move.length-1]),
 						RANGE[ships[shipID].type]*2*camera.z);
@@ -590,12 +592,13 @@ function main(){
 								s.move[s.move.length-1]) < RANGE[s.type]+20)
 								circle(...screenPos(s.move[s.move.length-1]), RANGE[s.type]*2*camera.z);
 					}
-					if(near) for(let i=0; i<s.modules.length; ++i){
-						if(RANGE[s.modules[i].type])
-							circle(...screenPos(s.vpos), weaponRange(s.modules[i].type)*2*camera.z);
-						if(s.modules[i].type == ROCKETD)
-							circle(...screenPos(s.vpos), 60*2*camera.z);
-					}
+					if(near) for(let i=0; i<s.modules.length; ++i)
+						if(s.type != BS || s.team == ID || s.modules[i].use){
+							if(weaponRange(s.modules[i].type) != null)
+								circle(...screenPos(s.vpos), weaponRange(s.modules[i].type)*2*camera.z);
+							if(s.modules[i].type == ROCKETD)
+								circle(...screenPos(s.vpos), 60*2*camera.z);
+						}
 				}
 				pop();
 			}
@@ -683,7 +686,7 @@ function main(){
 						circle(0, 0, 55);
 					}
 
-					if(m.type == PASSIVE){
+					if(m.type == PASSIVE && (m.use || s.type != BS || s.team == ID)){
 						stroke(50, 150, 150, ceil(150*m.aux[0])); noFill(); strokeWeight(3);
 						arc(0, 0, 55, 53, -PI*0.25, PI*0.25);
 						arc(0, 0, 55, 53, PI-PI*0.25, PI+PI*0.25);
@@ -932,7 +935,7 @@ function main(){
 
 			if(s.imp == 0) for(let m of s.modules)
 				if(m.type >= ALPHA && m.type <= ALLY)
-					if(m.aux[0]){
+					if(m.aux[0] && (m.use || s.type != BS || s.team == ID)){
 						fill(100, 80); noStroke();
 						rect(-15, -25, 30, 3);
 
@@ -1119,25 +1122,25 @@ function main(){
 
 					for(let m of ships[shipID].modules)
 						if(m.type >= ALPHA && m.type <= ALLY)
-							if(m.aux[0]){
+							if(m.aux[0] && (m.use || ships[shipID].type != BS || ships[shipID].team == ID)){
 								fill(50, 150, 150);
 								rect(width/2+150-20-100, height-120+100-20-20-6, ceil(100*m.aux[0]), 3);
 							}
 
 					for(let i=0; i<ships[shipID].modules.length; ++i){
 						push(); translate(width/2+25-25*ships[shipID].modules.length+50*i, height-120-10-25);
-						drawModule2(ships[shipID].modules[i].type, ships[shipID].modules[i].state);
+						const S = ships[shipID], M = S.modules[i];
+						drawModule2(M.use || S.type != BS || S.team == ID ? M.type : NULL, ships[shipID].modules[i].state);
 						pop();
 
 						if(!MOBILE && mouseIn(width/2+25-25*ships[shipID].modules.length+50*i, height-120-10-25, 25, 20) && mouseIsPressed){
-							const I = INFO[ships[shipID].modules[i].type];
-							const N = MODULE_NAME[ships[shipID].modules[i].type];
+							const T = M.use || S.type != BS || S.team == ID ? M.type : NULL;
 
-							if(I != null){
+							if(MODULE_NAME[T] != null){
 								push(); textSize(14);
-								const W = N+"\n\n"+wrap(I, 220)+"\n\n"+STATS[ships[shipID].modules[i].type];
+								const W = MODULE_NAME[T]+"\n\n"+wrap(INFO[T], 220)+(STATS[T]==null?"":"\n\n"+STATS[T]);
 								const H = font.textBounds(W, 0, 0).h;
-								const P = width/2+25-25*ships[shipID].modules.length+50*i;
+								const P = width/2+25-25*S.modules.length+50*i;
 
 								fill(0, 20, 30); noStroke();
 								rect(width/2-120, height-225-H-10, 240, H+20);

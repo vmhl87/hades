@@ -28,6 +28,8 @@ const EMP = ++ct, DUEL = ++ct, FORT = ++ct, TP = ++ct, AMP = ++ct, LEAP = ++ct, 
 
 /* UNOBTAIN */ const SUSPEND = ++ct, VENG = ++ct, APOCALYPSE = ++ct;
 
+const NULL = 2.71;
+
 let NAME = new Array(ct), HP = new Array(ct), RANGE = new Array(ct).fill(null),
 	TIME = new Array(ct);
 
@@ -164,6 +166,8 @@ INFO[TURRET] = "A drone that after a small setup time applies constant damage to
 INFO[PHASE] = "A drone that projects a suspension field around nearby enemy ships, slowing them down and decreasing their weapon damage.";
 INFO[WARP] = "Two drones that after a small delay teleport to a target location and fire on enemy ships.";
 
+INFO[NULL] = "The owner battleship hasn't used this module yet.";
+
 let STATS = new Array(ct);
 
 STATS[LASER] = "DPS: 160-600, Charge time: 10s\nRange: 80m";
@@ -259,3 +263,5 @@ MODULE_NAME[ROCKET] = "ROCKET DRONE";
 MODULE_NAME[TURRET] = "TURRET DRONE";
 MODULE_NAME[PHASE] = "PHASE DRONE";
 MODULE_NAME[WARP] = "WARP DRONE";
+
+MODULE_NAME[NULL] = "UNKNOWN";
