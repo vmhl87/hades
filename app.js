@@ -172,7 +172,7 @@ function main(){
 		{
 			let pick = null;
 
-			for(let i=0; i<5; ++i) if(mouseIn(width/2-100+50*i, height/2+50, 25, 20))
+			for(let i=0; i<5; ++i) if(mouseIn(width/2-100+50*i, height/2+50, 26, 20))
 				pick = i;
 
 			if(chooseModule != -1) pick = chooseModule < 0 ? chooseModule+10 : chooseModule;
