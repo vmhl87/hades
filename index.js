@@ -97,18 +97,17 @@ function spawnBS(n){
 	return shuffle(Array.from(S).map(x => [x%COLS, Math.floor(x/COLS)]));
 }
 
-function startGame(){
+function startGame(Q){
 	let m = [];
-	for(let q of queue) m.push(q.s.id);
+	for(let q of Q) m.push(q.s.id);
 	console.log("starting new game:", m);
-	const g = new Game(queue.map(x => x.s));
-	const p = spawnBS(queue.length);
-	for(let i=0; i<queue.length; ++i)
-		g.addShip(1, queue[i].s.id, queue[i].modules,
+	const g = new Game(Q.map(x => x.s));
+	const p = spawnBS(Q.length);
+	for(let i=0; i<Q.length; ++i)
+		g.addShip(1, Q[i].s.id, Q[i].modules,
 			[300*(p[i][0]-COLS/2+0.5), 300*(p[i][1]-ROWS/2+0.5)]);
 	g.start();
 	games.push(g);
-	queue = [];
 }
 
 let roundStart = null;
@@ -117,7 +116,8 @@ function checkStartGame(){
 	if(roundStart != null){
 		if(roundStart < Date.now()){
 			roundStart = null;
-			startGame();
+			startGame(queue);
+			queue = [];
 		}
 	}
 }
@@ -197,12 +197,7 @@ io.on("connect", (socket) => {
 
 	socket.on("solo", modules => {
 		console.log("solo match started by", socket.id, "with", modules);
-		const g = new Game([socket]);
-		const p = spawnBS(1);
-		g.addShip(1, socket.id, modules,
-			[300*(p[0][0]-COLS/2+0.5), 300*(p[0][1]-ROWS/2+0.5)]);
-		g.start();
-		games.push(g);
+		startGame([{s: socket, modules: modules}]);
 	});
 
 	socket.on("move", data => {

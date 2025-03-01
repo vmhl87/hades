@@ -494,8 +494,7 @@ function windowResized(){
 
 function saveState(){
 	return JSON.stringify({
-		ships, rocks, blasts, deaths, heals, dead, sectorDeaths,
-		emps, imps, ROWS, COLS, ID: ID, now: Date.now()
+		ships, rocks, entities, ROWS, COLS, ID: ID, now: Date.now()
 	});
 }
 
@@ -505,12 +504,8 @@ function loadState(STATE){
 	ships = [];
 	for(let x of S.ships) ships.push(new Ship(x));
 
-	rocks = S.rocks;
-	blasts = S.blasts;
-	deaths = S.deaths;
-	heals = S.heals;
-	emps = S.emps;
-	imps = S.imps;
+	entities = S.entities;
+
 	ROWS = S.ROWS;
 	COLS = S.COLS;
 	ID = S.ID;
@@ -525,7 +520,7 @@ function loadState(STATE){
 
 function god(){
 	if(!staging && connected && focus != null && focus[0] == "ship" && shipID != null)
-		socket.emit("spawn", {gameID: gameID, arg: [DELTAP, ID, [], ships[shipID].pos]});
+		socket.emit("spawn", {gameID: gameID, arg: [STRIKEP, ID, [], ships[shipID].pos]});
 }
 
 function ascend(){

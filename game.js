@@ -16,7 +16,7 @@ const DECOY = ++ct, ROCKET = ++ct, TURRET = ++ct, PHASE = ++ct, WARP = ++ct, REP
 
 const LASER = ++ct, CANNON = ++ct, SPREAD = ++ct, LASER2 = ++ct, DART = ++ct;
 
-/* UNOBTAIN */ const ROCKETD = ++ct, TURRETD = ++ct;
+/* UNOBTAIN */ const TURRETD = ++ct, ROCKETD = ++ct;
 
 // SHIELD TYPES
 
@@ -258,7 +258,7 @@ function _dist(a, b){
 }
 
 function IS_WEAPON(T){
-	return (T >= LASER && T <= TURRETD) || (T >= SENTINEL && T <= COL);
+	return (T >= LASER && T <= ROCKETD) || (T >= SENTINEL && T <= COL);
 }
 
 let UID = 0;
@@ -465,7 +465,7 @@ class Game{
 		this.ships = [];
 		this.rocks = [];
 		this.uid = ++UID;
-		this.ev = [];
+		this.entities = {blast: [], death: [], heal: [], emp: [], imp: [], sectorDeath: []};
 		this.lifetime = TPS*6;
 		this.age = 0;
 		this.loneBSTimer = Math.random();
@@ -572,7 +572,8 @@ class Game{
 					if(_dist(x.pos, this.ships[s].pos) < RANGE[EMP])
 						x.emp = 1;
 
-			this.ev.push(["emp", [...this.ships[s].pos]]);
+			//this.ev.push(["emp", [...this.ships[s].pos]]);
+			this.entities.emp.push([[...this.ships[s].pos], Date.now() + 4000]);
 		}
 
 		if(T == DISRUPT){
@@ -581,7 +582,8 @@ class Game{
 					if(_dist(x.pos, this.ships[s].pos) < RANGE[DISRUPT])
 						x.imp = 1;
 
-			this.ev.push(["imp", [...this.ships[s].pos]]);
+			//this.ev.push(["imp", [...this.ships[s].pos]]);
+			this.entities.imp.push([[...this.ships[s].pos], Date.now() + 4000]);
 		}
 
 		if(T == FORT) this.ships[s].fort = 1;
@@ -615,11 +617,13 @@ class Game{
 	}
 
 	explode(pos, range, str){
-		this.ev.push(["explode", [[...pos], range, str]]);
+		//this.ev.push(["explode", [[...pos], range, str]]);
+		this.entities.blast.push([[...pos], range, Date.now() + 200*str]);
 	}
 
 	die(pos){
-		this.ev.push(["die", pos]);
+		//this.ev.push(["die", pos]);
+		this.entities.death.push([[...pos], Date.now() + 2000]);
 	}
 
 	updateModules(s){
@@ -1342,7 +1346,8 @@ class Game{
 					for(let s of this.ships)
 						if(Math.floor((s.pos[0]+150*COLS)/300)+Math.floor((s.pos[1]+150*ROWS)/300)*COLS == i)
 							s.hp = 0;
-					this.ev.push(["deadSector", i]);
+					//this.ev.push(["deadSector", i]);
+					this.entities.sectorDeath.push([i, Date.now() + 4000]);
 				}
 			}
 
@@ -1356,7 +1361,8 @@ class Game{
 					if(_dist(x.pos, s.pos) < RANGE[REPAIR])
 						x.heal(2000);
 
-				this.ev.push(["heal", [...s.pos]]);
+				//this.ev.push(["heal", [...s.pos]]);
+				this.entities.heal.push([[...s.pos], Date.now() + 2000]);
 			}
 
 			if(s.expire == 0){
@@ -1367,7 +1373,8 @@ class Game{
 						if(_dist(x.pos, s.pos) < RANGE[REPAIR])
 							x.heal(500);
 
-					this.ev.push(["heal", [...s.pos]]);
+					//this.ev.push(["heal", [...s.pos]]);
+					this.entities.heal.push([[...s.pos], Date.now() + 2000]);
 				}
 			}
 		}
@@ -1487,10 +1494,11 @@ class Game{
 
 		this.ships = this.ships.filter(x => x.hp > 0);
 
-		for(let p of this.players) p.emit("state", {s: q, ev: [...this.ev], dead: this.dead});
+		for(let k of Object.keys(this.entities))
+			this.entities[k] = this.entities[k].filter(x => x[x.length-1] > Date.now());
 
-		this.ev = [];
-		
+		for(let p of this.players) p.emit("state", {s: q, entities: this.entities, dead: this.dead});
+
 		++this.age;
 	}
 

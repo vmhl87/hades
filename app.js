@@ -9,6 +9,8 @@ function preload(){
 	font = loadFont('Ubuntu-Regular.ttf');
 }
 
+let showGuide = false;
+
 function setup(){
 	createCanvas(windowWidth, windowHeight);
 	textAlign(CENTER, CENTER);
@@ -22,8 +24,11 @@ function setup(){
 		element.addEventListener("contextmenu", e => e.preventDefault())
 }
 
-let ships = [], rocks = [], blasts = [], deaths = [], heals = [], emps = [],
-	imps = [], sectorDeaths = [], gameID = null, ROWS, COLS, dead = [];
+//let ships = [], rocks = [], blasts = [], deaths = [], heals = [], emps = [],
+	//imps = [], sectorDeaths = [], gameID = null, ROWS, COLS, dead = [];
+
+let ships = [], rocks = [], blasts = [], entities = [],
+	gameID = null, ROWS, COLS, dead = [];
 
 socket.on("reset", () => {
 	searching = 0;
@@ -54,12 +59,16 @@ socket.on("start", data => {
 
 	rocks = data.rocks;
 
+	/*
 	blasts = [];
 	deaths = [];
 	heals = [];
 	emps = [];
 	imps = [];
 	sectorDeaths = [];
+	*/
+
+	entities = {blast: [], death: [], heal: [], emp: [], imp: [], sectorDeath: []};
 
 	camera.x = 0;
 	camera.y = 0;
@@ -99,6 +108,7 @@ socket.on("state", data => {
 		ships.push(new Ship(d));
 	}
 
+	/*
 	for(let e of data.ev){
 		const T = e[0], D = e[1];
 
@@ -126,6 +136,9 @@ socket.on("state", data => {
 			sectorDeaths.push([D, Date.now() + 4000]);
 		}
 	}
+	*/
+
+	entities = data.entities;
 });
 
 socket.on("end", () => {
@@ -168,6 +181,18 @@ function main(){
 			}
 			pop();
 		}
+
+		push();
+		stroke(50, 200, 200, mouseIn(30, 30, 30, 30) ? 80 : 60); strokeWeight(3);
+		line(20, 20, 40, 20);
+		line(20, 30, 40, 30);
+		line(20, 40, 40, 40);
+		if(mouseIn(30, 30, 30, 30)){
+			textAlign(LEFT, CENTER); textSize(17);
+			fill(50, 200, 200, 80); noStroke();
+			text("GUIDE", 60, 28);
+		}
+		pop();
 
 		{
 			let pick = null;
@@ -473,22 +498,12 @@ function main(){
 						floor((2-dead[i*COLS+j])*SECTOR_COLLAPSE_TIME));
 					rect(300*j, 300*i, 300, 300);
 				}
-		rectMode(CENTER, CENTER);
-		for(let i of sectorDeaths){
-			stroke(255, 50, 50, 150); strokeWeight(2); noFill();
-			let m = min(1, ((Date.now()/2000)%1)*2);
-			if(m < 1) rect(300*(i[0]%COLS)+150, 300*floor(i[0]/COLS)+150, 300*m, 300*m);
-			strokeWeight(1.5);
-			m = min(1, ((Date.now()/2000-0.1)%1)*2);
-			if(m < 1) rect(300*(i[0]%COLS)+150, 300*floor(i[0]/COLS)+150, 300*m, 300*m);
-			strokeWeight(1);
-			m = min(1, ((Date.now()/2000-0.2)%1)*2);
-			if(m < 1) rect(300*(i[0]%COLS)+150, 300*floor(i[0]/COLS)+150, 300*m, 300*m);
+		for(let i of entities.sectorDeath){
+			push(); translate(300*(i[0]%COLS)+150, 300*floor(i[0]/COLS)+150);
+			drawEffect(APOCALYPSE);
+			pop();
 		}
 		pop();
-
-		if(!snapshot) sectorDeaths = sectorDeaths.filter(x => x[1] > Date.now() ||
-			(Date.now()/2000)%1 < 0.5 || (Date.now()/2000-0.2)%1 < 0.5);
 
 		push(); translate(width/2-camera.x*camera.z, height/2-camera.y*camera.z);
 		stroke(200, 30); strokeWeight(2*sqrt(camera.z));
@@ -657,74 +672,22 @@ function main(){
 			const s = ships[i];
 			if(s.imp == 0){
 				push(); translate(width/2+(s.vpos[0]-camera.x)*camera.z, height/2+(s.vpos[1]-camera.y)*camera.z);
-				scale(sqrt(camera.z));
 
 				for(let m of s.modules) if(Array.isArray(m.aux) && m.aux.length && m.aux[0] &&
 					(m.aux[1] > 3/TIME[m.type] || (m.aux[1]*TIME[m.type])%1 < 0.5) || m.type == PASSIVE){
-					push();
 
-					if(m.type == ALPHA){
-						stroke(50, 150, 150, 50); noFill(); strokeWeight(3);
-						arc(0, 0, 50-3, 50-3, -PI*0.25, PI*0.25);
-						arc(0, 0, 50-3, 50-3, PI-PI*0.25, PI+PI*0.25);
+					if(m.type == ALPHA) drawEffect(ALPHA);
 
-						noStroke(); fill(50, 150, 150, 80);
-						circle(0, 0, 50);
-					}
+					if(m.type == DELTA) drawEffect(DELTA, m.aux[2]);
 
-					if(m.type == DELTA){
-						if(m.aux[2]){
-							fill(200, 100, 50, 100); noStroke();
-							circle(0, 0, RANGE[DELTA]*2*sqrt(camera.z));
-						}
+					if(m.type == PASSIVE && (m.use || s.type != BS || s.team == ID))
+						drawEffect(PASSIVE, m.aux[0]);
 
-						stroke(50, 150, 150, 40); noFill(); strokeWeight(3);
-						arc(0, 0, 55-3, 55-3, -PI*0.25+frameCount/30, PI*0.25+frameCount/30);
-						arc(0, 0, 55-3, 55-3, PI-PI*0.25+frameCount/30, PI+PI*0.25+frameCount/30);
+					if(m.type == OMEGA) drawEffect(OMEGA);
 
-						noStroke(); fill(50, 150, 150, 40);
-						circle(0, 0, 55);
-					}
+					if(m.type == MIRROR) drawEffect(MIRROR, m.aux[0]);
 
-					if(m.type == PASSIVE && (m.use || s.type != BS || s.team == ID)){
-						stroke(50, 150, 150, ceil(150*m.aux[0])); noFill(); strokeWeight(3);
-						arc(0, 0, 55, 53, -PI*0.25, PI*0.25);
-						arc(0, 0, 55, 53, PI-PI*0.25, PI+PI*0.25);
-
-						noStroke(); fill(50, 150, 150, ceil(40*m.aux[0]));
-						ellipse(0, 0, 55+2, 53+2);
-					}
-
-					if(m.type == OMEGA){
-						stroke(50, 150, 150, 70); noFill(); strokeWeight(3);
-						circle(0, 0, 70-3);
-
-						noStroke(); fill(50, 150, 150, 40);
-						circle(0, 0, 70);
-					}
-
-					if(m.type == MIRROR){
-						scale(sqrt(camera.z));
-						fill(200, 50, 50, 30); noStroke();
-						circle(0, 0, RANGE[MIRROR]*2);
-						stroke(200, 50, 50, 150); strokeWeight(2); noFill();
-						arc(0, 0, RANGE[MIRROR]*2, RANGE[MIRROR]*2, -PI/2, -PI/2+PI*2*m.aux[0]);
-					}
-
-					if(m.type == ALLY){
-						scale(sqrt(camera.z));
-						fill(150, 200, 200, 15); noStroke();
-						circle(0, 0, RANGE[ALLY]*2);
-						stroke(150, 200, 200, 150); strokeWeight(2); noFill();
-						arc(0, 0, RANGE[ALLY]*2, RANGE[ALLY]*2, -PI/2, -PI/2+PI*2*m.aux[0]);
-						strokeWeight(1.5);
-						if(-PI/2+PI*2*m.aux[0] > -PI*0.08) arc(0, 0, RANGE[ALLY]*2-6, RANGE[ALLY]*2-6,
-							max(-PI/2, -PI*0.08), min(-PI/2+PI*2*m.aux[0], PI*0.08));
-						if(-PI/2+PI*2*m.aux[0] > PI-PI*0.08) arc(0, 0, RANGE[ALLY]*2-6, RANGE[ALLY]*2-6,
-							max(-PI/2, PI-PI*0.08), min(-PI/2+PI*2*m.aux[0], PI*1.08));
-					}
-
-					pop();
+					if(m.type == ALLY) drawEffect(ALLY, m.aux[0]);
 				}
 			}
 
@@ -733,242 +696,69 @@ function main(){
 
 		const NOW = snapshot ? now : Date.now();
 
-		push();
-		for(let e of emps){
-			noStroke();
-			fill(100, 150, 255, 50*min(1, (e[1]-NOW)/1600));
-			circle(...screenPos(e[0]), RANGE[EMP]*2*camera.z*min(1, (NOW-e[1]+4000)/600));
-			stroke(100, 150, 255, 100); strokeWeight(2*sqrt(camera.z));
-			noFill();
-			if(e[1]-NOW > 800){
-				for(let j=0; j<3; ++j){
-					let a = noise(floor(Date.now()/100), j)*30;
-					beginShape();
-					for(let i=20; i<=RANGE[EMP]*min(1, (Date.now()-e[1]+4000)/600); i+=10){
-						const old = a;
-						a += (noise(floor(Date.now()/100+i), j)*2-1)*PI*0.1;
-
-						vertex(...screenPos([e[0][0]+cos(a)*i, e[0][1]+sin(a)*i]));
-					}
-					endShape();
-				}
-			}
+		for(let e of entities.emp){
+			push(); translate(...screenPos(e[0]));
+			drawEffect(EMP, (e[1]-NOW)/4000);
+			pop();
 		}
-		pop();
-
-		if(!snapshot) emps = emps.filter(x => x[1] > NOW);
 		
-		push();
-		for(let i of imps){
-			noStroke();
-			fill(100, 255, 150, 50*min(1, (i[1]-NOW)/1600));
-			circle(...screenPos(i[0]), RANGE[DISRUPT]*2*camera.z*min(1, (NOW-i[1]+4000)/600));
-			stroke(100, 255, 150, 100*min(1, (i[1]-NOW)/400)); noFill(); strokeWeight(2*sqrt(camera.z));
-			for(let j=0; j<3; ++j){
-				let a = (1-Math.pow(noise(floor(Date.now()/100), j), 2))*
-						(2*(RANGE[DISRUPT]+20)*min(1, (Date.now()-i[1]+4000)/600)-40)+40,
-					b = (noise(floor(Date.now()/100)+100, j)*30)%(PI*2),
-					c = (b+noise(floor(Date.now()/100)+200, j)*PI*2)%(PI*2);
-				arc(...screenPos(i[0]), a*camera.z, a*camera.z, b, c);
-			}
+		for(let i of entities.imp){
+			push(); translate(...screenPos(i[0]));
+			drawEffect(DISRUPT, (i[1]-NOW)/4000);
+			pop();
 		}
-		pop();
 
-		if(!snapshot) imps = imps.filter(x => x[1] > NOW);
-		
 		push(); noStroke();
-		for(let h of heals){
+		for(let h of entities.heal){
 			fill(50, 200, 50, 60*sin((h[1]-NOW)/2000*PI));
 			circle(...screenPos(h[0]), 60*2*camera.z);
 		}
 		pop();
 
-		if(!snapshot) heals = heals.filter(x => x[1] > NOW);
-
 		push(); noFill(); strokeWeight(3*sqrt(camera.z));
-		for(let d of deaths){
+		for(let d of entities.death){
 			stroke(0, 255, 255, 80*Math.min(1, (d[1]-NOW)/800));
 			circle(...screenPos(d[0]), (3000-d[1]+NOW)/50*sqrt(camera.z));
 		}
 		pop();
 
-		if(!snapshot) deaths = deaths.filter(x => x[1] > NOW);
-
 		for(let i of modID){
 			const s = ships[i];
 			for(let m of s.modules){
-				if(m.type == LEAP && m.state < 0){
-					push(); fill(255, 100, 50, 20); noStroke();
-					circle(...screenPos(s.vpos), RANGE[LEAP]*2*camera.z);
-					noFill(); stroke(200, 100, 50); strokeWeight(2*sqrt(camera.z));
-					arc(...screenPos(s.vpos), RANGE[LEAP]*2*camera.z, RANGE[LEAP]*2*camera.z,
-						-PI/2, -PI/2+PI*2*(1+m.state));
-					pop();
-				}
-
-				if(m.type == VENG && m.state < 0){
-					push(); fill(255, 50, 50, 20); noStroke();
-					circle(...screenPos(s.vpos), RANGE[VENG]*2*camera.z);
-					noFill(); stroke(200, 50, 50); strokeWeight(2*sqrt(camera.z));
-					arc(...screenPos(s.vpos), RANGE[VENG]*2*camera.z, RANGE[VENG]*2*camera.z,
-						-PI/2, -PI/2+PI*2*(1+m.state));
-					pop();
-				}
-
-				if(m.type == BARRIER && m.state < 0){
-					push(); strokeWeight(2*sqrt(camera.z));
-					if(m.state < -3/TIME[m.type] || ((-m.state*TIME[m.type])%1 < 0.5)){
-						fill(255, 20); noStroke();
-						for(let i=0; i<6; ++i)
-							arc(...screenPos(s.vpos), RANGE[BARRIER]*2*camera.z, RANGE[BARRIER]*2*camera.z,
-								PI/3*i-PI*0.25+PI*Date.now()/10000, PI/3*i+PI*0.25+PI*Date.now()/10000, OPEN);
-					}
-					stroke(150, 150); noFill();
-					circle(...screenPos(s.vpos), RANGE[BARRIER]*2*camera.z);
-					pop();
-				}
-
-				if(m.type == AMP && m.state < 0){
-					push(); strokeWeight(2*sqrt(camera.z));
-					fill(200, 50, 50, 30); noStroke();
-					circle(...screenPos(s.vpos), RANGE[AMP]*2*camera.z);
-					stroke(200, 50, 50, 100); noFill();
-					circle(...screenPos(s.vpos), RANGE[AMP]*2*camera.z);
-					if(m.state < -3/TIME[m.type] || ((-m.state*TIME[m.type])%1 < 0.5)){
-						strokeWeight(1.5*sqrt(camera.z));
-						circle(...screenPos(s.vpos), (RANGE[AMP]-4)*2*camera.z);
-						strokeWeight(sqrt(camera.z));
-						circle(...screenPos(s.vpos), (RANGE[AMP]-8)*2*camera.z);
-						strokeWeight(0.6*sqrt(camera.z));
-						circle(...screenPos(s.vpos), (RANGE[AMP]-12)*2*camera.z);
-						strokeWeight(0.3*sqrt(camera.z));
-						circle(...screenPos(s.vpos), (RANGE[AMP]-16)*2*camera.z);
-					}
-					pop();
-				}
-
-				if(m.type == SUSPEND && m.state < 0){
-					push(); strokeWeight(2*sqrt(camera.z));
-					fill(100, 150, 200, 30); noStroke();
-					circle(...screenPos(s.vpos), RANGE[SUSPEND]*2*camera.z);
-					stroke(10, 150, 200, 100); noFill();
-					circle(...screenPos(s.vpos), RANGE[SUSPEND]*2*camera.z);
-					if(m.state < -3/TIME[m.type] || ((-m.state*TIME[m.type])%1 < 0.5)){
-						strokeWeight(1.5*sqrt(camera.z));
-						circle(...screenPos(s.vpos), (RANGE[SUSPEND]-4)*2*camera.z);
-						strokeWeight(sqrt(camera.z));
-						circle(...screenPos(s.vpos), (RANGE[SUSPEND]-8)*2*camera.z);
-						strokeWeight(0.6*sqrt(camera.z));
-						circle(...screenPos(s.vpos), (RANGE[SUSPEND]-12)*2*camera.z);
-						strokeWeight(0.3*sqrt(camera.z));
-						circle(...screenPos(s.vpos), (RANGE[SUSPEND]-16)*2*camera.z);
-					}
+				if([LEAP, VENG, BARRIER, AMP, SUSPEND].includes(m.type) && m.state < 0){
+					push(); translate(...screenPos(s.vpos));
+					drawEffect(m.type, m.state);
 					pop();
 				}
 			}
 
 			if(s.fort > 0){
-				push(); stroke(200, 100, 50, 255*min(1, (0.5-abs(s.fort-0.5))*3)); noFill(); strokeWeight(2);
-				translate(...screenPos(s.vpos)); scale(sqrt(camera.z));
-				for(let i=0; i<6; ++i){
-					arc(0, 0, 50, 50, PI/3*i-PI/2-PI/15+Date.now()/2000, PI/3*i-PI/2+PI/15+Date.now()/2000);
-					line(21*sin(PI/3*i+Date.now()/1500), 21*cos(PI/3*i+Date.now()/1500), 17*sin(PI/3*i+Date.now()/1500), 17*cos(PI/3*i+Date.now()/1500));
-				}
+				push(); translate(...screenPos(s.vpos));
+				drawEffect(FORT, s.fort);
 				pop();
 			}
 		}
 
 		for(let i of repairID){
 			if(ships[i].type == REPAIR){
-				push(); fill(50, 200, 50, 20); noStroke();
-				circle(...screenPos(ships[i].vpos), 60*2*camera.z);
+				push(); translate(...screenPos(ships[i].vpos));
+				drawEffect(REPAIR);
 				pop();
 			}
 		}
 
 		for(let s of ships){
-			push(); translate(width/2+(s.vpos[0]-camera.x)*camera.z, height/2+(s.vpos[1]-camera.y)*camera.z);
-			if(dragMove != null && dragMove[2] == s.uid && !s.move.length)
-				rotate(atan2(dragMove[1]-screenPos(s.vpos)[1], dragMove[0]-screenPos(s.vpos)[0]));
-			else rotate(s.rot);
-			scale(sqrt(camera.z));
-			drawShip(s.type, s.team != ID ? (s.type == BS && Number.isInteger(s.team) ? 2 : 1) : 0, s.move.length && !s.emp ? 1 : 0);
-			rotate(-s.rot);
-			if(s.imp){
-				stroke(50, 200, 50); noFill(); strokeWeight(2);
-				arc(0, 0, 35, 35, -PI*0.25, PI*0.25);
-				arc(0, 0, 35, 35, PI-PI*0.25, PI+PI*0.25);
-			}
-			if(s.emp){
-				stroke(255, 50, 50); noFill(); strokeWeight(2);
-				arc(0, 0, 40, 40, -PI*0.25, PI*0.25);
-				arc(0, 0, 40, 40, PI-PI*0.25, PI+PI*0.25);
-			}
-			if(s.ally){
-				stroke(50, 200, 200); noFill(); strokeWeight(2);
-				arc(0, 0, 45, 45, -PI*0.25, PI*0.25);
-				arc(0, 0, 45, 45, PI-PI*0.25, PI+PI*0.25);
-			}
-			if(s.type == TURRET && s.modules[0].state < 1){
-				stroke(50, 150, 200, 150*(1-s.modules[0].state)); noFill(); strokeWeight(2);
-				for(let i=0; i<3; ++i)
-					arc(0, 0, 20, 20, PI*2*i/3+Date.now()/500, PI*2*i/3+PI/3+Date.now()/500);
-			}
-			pop();
-		}
-
-		for(let s of ships){
-			push(); translate(width/2+(s.vpos[0]-camera.x)*camera.z, height/2+(s.vpos[1]-camera.y)*camera.z);
-			scale(sqrt(camera.z));
-
-			const hp = s.hp, max = HP[s.type];
-
-			fill(100, 80); noStroke();
-			if(hp != max) rect(-15, -20, 30, 3);
-
-			if(hp/max > 0.7) fill(50, 150, 50);
-			else if(hp/max > 0.5) fill(150, 150, 50);
-			else if(hp/max > 0.3) fill(200, 100, 0);
-			else fill(150, 50, 50);
-
-			if(hp != max) rect(-15, -20, ceil(30*hp/max), 3);
-
-			if(s.imp == 0) for(let m of s.modules)
-				if(m.type >= ALPHA && m.type <= ALLY)
-					if(m.aux[0] && (m.use || s.type != BS || s.team == ID)){
-						fill(100, 80); noStroke();
-						rect(-15, -25, 30, 3);
-
-						fill(50, 150, 150);
-						rect(-15, -25, ceil(30*m.aux[0]), 3);
-					}
-
-
-			const exp = s.expire;
-
-			if(exp != 1){
-				fill(100, 80); noStroke();
-				rect(-15, -25, 30, 3);
-
-				fill(200, 150, 50);
-				rect(-15, -25, ceil(30*exp), 3);
-
-				fill(50, 150, 150);
-
-				stroke(50, 150, 150); noFill();
-			}
-
+			push(); translate(...screenPos(s.vpos));
+			drawShip2(s);
 			pop();
 		}
 
 		push();
-		for(let b of blasts){
+		for(let b of entities.blast){
 			fill(200, 100, 50, ceil((b[2]-Date.now())*255/2000));
 			circle(...screenPos(b[0]), b[1]*2*camera.z);
 		}
 		pop();
-
-		blasts = blasts.filter(x => x[2] > Date.now());
 
 		{
 			const S = sqrt(camera.z);
@@ -986,7 +776,7 @@ function main(){
 						sol = true;
 
 				for(let m of s.modules)
-					if((m.type >= LASER && m.type <= TURRETD) || (m.type >= SENTINEL && m.type <= COL))
+					if((m.type >= LASER && m.type <= ROCKETD) || (m.type >= SENTINEL && m.type <= COL))
 					if(m.aux.length){
 						let C = [s.vpos[0]+17*Math.cos(s.rot)/S, s.vpos[1]+17*Math.sin(s.rot)/S];
 
@@ -1045,7 +835,7 @@ function main(){
 
 			if(focus && focus[0] == "ship" && shipID != null){
 				for(let m of ships[shipID].modules)
-					if((m.type >= LASER && m.type <= TURRETD) || (m.type >= SENTINEL && m.type <= COL))
+					if((m.type >= LASER && m.type <= ROCKETD) || (m.type >= SENTINEL && m.type <= COL))
 						for(let uid of m.aux){
 							let s = SH(uid);
 							if(s != null){
@@ -1294,6 +1084,11 @@ function stagingUI(){
 		if(localStorage.getItem("save") != null){
 			loadState(localStorage.getItem("save"));
 		}
+		return;
+	}
+
+	if(mouseIn(30, 30, 30, 30)){
+		showGuide = !showGuide;
 		return;
 	}
 

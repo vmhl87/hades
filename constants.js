@@ -16,7 +16,7 @@ const DECOY = ++ct, ROCKET = ++ct, TURRET = ++ct, PHASE = ++ct, WARP = ++ct, REP
 
 const LASER = ++ct, CANNON = ++ct, SPREAD = ++ct, LASER2 = ++ct, DART = ++ct;
 
-/* UNOBTAIN */ const ROCKETD = ++ct, TURRETD = ++ct;
+/* UNOBTAIN */ const TURRETD = ++ct, ROCKETD = ++ct;
 
 // SHIELD TYPES
 
@@ -28,7 +28,7 @@ const EMP = ++ct, DUEL = ++ct, FORT = ++ct, TP = ++ct, AMP = ++ct, LEAP = ++ct, 
 
 /* UNOBTAIN */ const SUSPEND = ++ct, VENG = ++ct, APOCALYPSE = ++ct;
 
-const NULL = 2.71;
+const NULL = 2.71, DEV = 1.618;
 
 let NAME = new Array(ct), HP = new Array(ct), RANGE = new Array(ct).fill(null),
 	TIME = new Array(ct);
@@ -84,7 +84,7 @@ RANGE[TURRETD] = 130;
 for(let i=SENTINEL; i<=COL; ++i) RANGE[i] = 80;
 
 function weaponRange(T){
-	if(T >= LASER && T <= TURRETD) return RANGE[T];
+	if(T >= LASER && T <= ROCKETD) return RANGE[T];
 	if(T >= SENTINEL && T <= COL) return RANGE[T];
 	return null;
 }

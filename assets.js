@@ -729,6 +729,75 @@ function drawShip(T, O, M){
 	pop();
 }
 
+function drawShip2(s){
+	push(); scale(sqrt(camera.z));
+	push();
+	if(dragMove != null && dragMove[2] == s.uid && !s.move.length)
+		rotate(atan2(dragMove[1]-screenPos(s.vpos)[1], dragMove[0]-screenPos(s.vpos)[0]));
+	else rotate(s.rot);
+	drawShip(s.type, s.team != ID ? (s.type == BS && Number.isInteger(s.team) ? 2 : 1) : s.team == DEV, s.move.length && !s.emp ? 1 : 0);
+	pop();
+	if(s.imp){
+		stroke(50, 200, 50); noFill(); strokeWeight(2);
+		arc(0, 0, 35, 35, -PI*0.25, PI*0.25);
+		arc(0, 0, 35, 35, PI-PI*0.25, PI+PI*0.25);
+	}
+	if(s.emp){
+		stroke(255, 50, 50); noFill(); strokeWeight(2);
+		arc(0, 0, 40, 40, -PI*0.25, PI*0.25);
+		arc(0, 0, 40, 40, PI-PI*0.25, PI+PI*0.25);
+	}
+	if(s.ally){
+		stroke(50, 200, 200); noFill(); strokeWeight(2);
+		arc(0, 0, 45, 45, -PI*0.25, PI*0.25);
+		arc(0, 0, 45, 45, PI-PI*0.25, PI+PI*0.25);
+	}
+	if(s.type == TURRET && s.modules[0].state < 1){
+		stroke(50, 150, 200, 150*(1-s.modules[0].state)); noFill(); strokeWeight(2);
+		for(let i=0; i<3; ++i)
+			arc(0, 0, 20, 20, PI*2*i/3+Date.now()/500, PI*2*i/3+PI/3+Date.now()/500);
+	}
+
+	const hp = s.hp, max = HP[s.type];
+
+	fill(100, 80); noStroke();
+	if(hp != max) rect(-15, -20, 30, 3);
+
+	if(hp/max > 0.7) fill(50, 150, 50);
+	else if(hp/max > 0.5) fill(150, 150, 50);
+	else if(hp/max > 0.3) fill(200, 100, 0);
+	else fill(150, 50, 50);
+
+	if(hp != max) rect(-15, -20, ceil(30*hp/max), 3);
+
+	if(s.imp == 0) for(let m of s.modules)
+		if(m.type >= ALPHA && m.type <= ALLY)
+			if(m.aux[0] && (m.use || s.type != BS || s.team == ID)){
+				fill(100, 80); noStroke();
+				rect(-15, -25, 30, 3);
+
+				fill(50, 150, 150);
+				rect(-15, -25, ceil(30*m.aux[0]), 3);
+			}
+
+
+	const exp = s.expire;
+
+	if(exp != 1){
+		fill(100, 80); noStroke();
+		rect(-15, -25, 30, 3);
+
+		fill(200, 150, 50);
+		rect(-15, -25, ceil(30*exp), 3);
+
+		fill(50, 150, 150);
+
+		stroke(50, 150, 150); noFill();
+	}
+
+	pop();
+}
+
 function drawModule(T){
 	if(T == null) return;
 
@@ -1298,7 +1367,7 @@ function drawModule2(T, S){
 	}
 
 	fill(255, 40);
-	if(T >= LASER && T <= TURRETD) fill(255, 50, 50, 60);
+	if(T >= LASER && T <= ROCKETD) fill(255, 50, 50, 60);
 	if(T >= SENTINEL && T <= BOMBER) fill(255, 50, 50, 60);
 	if(T >= ALPHA && T <= ALLY) fill(0, 255, 255, 60);
 	if(T >= EMP && T <= APOCALYPSE) fill(100, 255, 100, 60);
@@ -1315,4 +1384,212 @@ function drawModule2(T, S){
 	if(S != 1 && S >= 0)
 		if(!(T >= LASER && T <= ROCKETD) && (T != DELTA || S != 0.75))
 			rect(-20, 20-40*abs(S), 40, 40*abs(S));
+}
+
+function drawEffect(T, S=null){
+	push();
+
+	if(T == APOCALYPSE){
+		rectMode(CENTER, CENTER);
+		stroke(255, 50, 50, 150); strokeWeight(2); noFill();
+		let m = min(1, ((Date.now()/2000)%1)*2);
+		if(m < 1) rect(0, 0, 300*m, 300*m);
+		strokeWeight(1.5);
+		m = min(1, ((Date.now()/2000-0.1)%1)*2);
+		if(m < 1) rect(0, 0, 300*m, 300*m);
+		strokeWeight(1);
+		m = min(1, ((Date.now()/2000-0.2)%1)*2);
+		if(m < 1) rect(0, 0, 300*m, 300*m);
+	}
+
+	if(T == ALPHA){
+		scale(sqrt(camera.z));
+
+		stroke(50, 150, 150, 50); noFill(); strokeWeight(3);
+		arc(0, 0, 50-3, 50-3, -PI*0.25, PI*0.25);
+		arc(0, 0, 50-3, 50-3, PI-PI*0.25, PI+PI*0.25);
+
+		noStroke(); fill(50, 150, 150, 80);
+		circle(0, 0, 50);
+	}
+
+	if(T == DELTA){
+		scale(sqrt(camera.z));
+
+		if(S){
+			fill(200, 100, 50, 100); noStroke();
+			circle(0, 0, RANGE[DELTA]*2*sqrt(camera.z));
+		}
+
+		stroke(50, 150, 150, 40); noFill(); strokeWeight(3);
+		arc(0, 0, 55-3, 55-3, -PI*0.25+frameCount/30, PI*0.25+frameCount/30);
+		arc(0, 0, 55-3, 55-3, PI-PI*0.25+frameCount/30, PI+PI*0.25+frameCount/30);
+
+		noStroke(); fill(50, 150, 150, 40);
+		circle(0, 0, 55);
+	}
+
+	if(T == PASSIVE){
+		scale(sqrt(camera.z));
+
+		stroke(50, 150, 150, ceil(150*S)); noFill(); strokeWeight(3);
+		arc(0, 0, 55, 53, -PI*0.25, PI*0.25);
+		arc(0, 0, 55, 53, PI-PI*0.25, PI+PI*0.25);
+
+		noStroke(); fill(50, 150, 150, ceil(40*S));
+		ellipse(0, 0, 55+2, 53+2);
+	}
+
+	if(T == OMEGA){
+		scale(sqrt(camera.z));
+
+		stroke(50, 150, 150, 70); noFill(); strokeWeight(3);
+		circle(0, 0, 70-3);
+
+		noStroke(); fill(50, 150, 150, 40);
+		circle(0, 0, 70);
+	}
+	
+	if(T == MIRROR){
+		scale(camera.z);
+		fill(200, 50, 50, 30); noStroke();
+		circle(0, 0, RANGE[MIRROR]*2);
+		stroke(200, 50, 50, 150); strokeWeight(2); noFill();
+		arc(0, 0, RANGE[MIRROR]*2, RANGE[MIRROR]*2, -PI/2, -PI/2+PI*2*S);
+	}
+
+	if(T == ALLY){
+		scale(camera.z);
+
+		fill(150, 200, 200, 15); noStroke();
+		circle(0, 0, RANGE[ALLY]*2);
+		stroke(150, 200, 200, 150); strokeWeight(2); noFill();
+		arc(0, 0, RANGE[ALLY]*2, RANGE[ALLY]*2, -PI/2, -PI/2+PI*2*S);
+		strokeWeight(1.5);
+		if(-PI/2+PI*2*S > -PI*0.08) arc(0, 0, RANGE[ALLY]*2-6, RANGE[ALLY]*2-6,
+			max(-PI/2, -PI*0.08), min(-PI/2+PI*2*S, PI*0.08));
+		if(-PI/2+PI*2*S > PI-PI*0.08) arc(0, 0, RANGE[ALLY]*2-6, RANGE[ALLY]*2-6,
+			max(-PI/2, PI-PI*0.08), min(-PI/2+PI*2*S, PI*1.08));
+	}
+
+	if(T == EMP){
+		scale(camera.z);
+		noStroke();
+		fill(100, 150, 255, 50*min(1, S*2.5));
+		circle(0, 0, RANGE[EMP]*2*min(1, (1-S)*20/3));
+		stroke(100, 150, 255, 100); strokeWeight(2/sqrt(camera.z));
+		noFill();
+		if(S > 0.4){
+			for(let j=0; j<3; ++j){
+				let a = noise(floor(Date.now()/100), j)*30;
+				beginShape();
+				for(let i=20; i<=RANGE[EMP]*min(1, (1-S)*20/3); i+=10){
+					const old = a;
+					a += (noise(floor(Date.now()/100+i), j)*2-1)*PI*0.1;
+
+					vertex(cos(a)*i, sin(a)*i);
+				}
+				endShape();
+			}
+		}
+	}
+
+	if(T == DISRUPT){
+		scale(camera.z);
+		noStroke();
+		fill(100, 255, 150, 50*min(1, S*2.5));
+		circle(0, 0, RANGE[DISRUPT]*2*min(1, (1-S)*20/3));
+		stroke(100, 255, 150, 100*min(1, (1-S)*80/3)); noFill(); strokeWeight(2/sqrt(camera.z));
+		for(let j=0; j<3; ++j){
+			let a = (1-Math.pow(noise(floor(Date.now()/100), j), 2))*
+					(2*(RANGE[DISRUPT]+20)*min(1, (1-S)*20/3)-40)+40,
+				b = (noise(floor(Date.now()/100)+100, j)*30)%(PI*2),
+				c = (b+noise(floor(Date.now()/100)+200, j)*PI*2)%(PI*2);
+			arc(0, 0, a, a, b, c);
+		}
+	}
+
+	if(T == LEAP){
+		scale(camera.z);
+		fill(255, 100, 50, 20); noStroke();
+		circle(0, 0, RANGE[LEAP]*2);
+		noFill(); stroke(200, 100, 50); strokeWeight(2/sqrt(camera.z));
+		arc(0, 0, RANGE[LEAP]*2, RANGE[LEAP]*2, -PI/2, -PI/2+PI*2*(1+S));
+	}
+
+	if(T == VENG){
+		scale(camera.z);
+		fill(255, 50, 50, 20); noStroke();
+		circle(0, 0, RANGE[VENG]*2);
+		noFill(); stroke(200, 50, 50); strokeWeight(2/sqrt(camera.z));
+		arc(0, 0, RANGE[VENG]*2, RANGE[VENG]*2, -PI/2, -PI/2+PI*2*(1+S));
+	}
+
+	if(T == BARRIER){
+		scale(camera.z);
+		strokeWeight(2/sqrt(camera.z));
+		if(S < -3/TIME[BARRIER] || ((-S*TIME[BARRIER])%1 < 0.5)){
+			fill(255, 20); noStroke();
+			for(let i=0; i<6; ++i)
+				arc(0, 0, RANGE[BARRIER]*2, RANGE[BARRIER]*2,
+					PI/3*i-PI*0.25+PI*Date.now()/10000, PI/3*i+PI*0.25+PI*Date.now()/10000, OPEN);
+		}
+		stroke(150, 150); noFill();
+		circle(0, 0, RANGE[BARRIER]*2);
+	}
+
+	if(T == AMP){
+		scale(camera.z);
+		strokeWeight(2/sqrt(camera.z));
+		fill(200, 50, 50, 30); noStroke();
+		circle(0, 0, RANGE[AMP]*2);
+		stroke(200, 50, 50, 100); noFill();
+		circle(0, 0, RANGE[AMP]*2);
+		if(S < -3/TIME[AMP] || ((-S*TIME[AMP])%1 < 0.5)){
+			strokeWeight(1.5/sqrt(camera.z));
+			circle(0, 0, (RANGE[AMP]-4)*2);
+			strokeWeight(1/sqrt(camera.z));
+			circle(0, 0, (RANGE[AMP]-8)*2);
+			strokeWeight(0.6/sqrt(camera.z));
+			circle(0, 0, (RANGE[AMP]-12)*2);
+			strokeWeight(0.3/sqrt(camera.z));
+			circle(0, 0, (RANGE[AMP]-16)*2);
+		}
+	}
+
+	if(T == SUSPEND){
+		scale(camera.z);
+		strokeWeight(2/sqrt(camera.z));
+		fill(100, 150, 200, 30); noStroke();
+		circle(0, 0, RANGE[SUSPEND]*2);
+		stroke(10, 150, 200, 100); noFill();
+		circle(0, 0, RANGE[SUSPEND]*2);
+		if(S < -3/TIME[SUSPEND] || ((-S*TIME[SUSPEND])%1 < 0.5)){
+			strokeWeight(1.5/sqrt(camera.z));
+			circle(0, 0, (RANGE[SUSPEND]-4)*2);
+			strokeWeight(1/sqrt(camera.z));
+			circle(0, 0, (RANGE[SUSPEND]-8)*2);
+			strokeWeight(0.6/sqrt(camera.z));
+			circle(0, 0, (RANGE[SUSPEND]-12)*2);
+			strokeWeight(0.3/sqrt(camera.z));
+			circle(0, 0, (RANGE[SUSPEND]-16)*2);
+		}
+	}
+
+	if(T == FORT){
+		stroke(200, 100, 50, 255*min(1, (0.5-abs(S-0.5))*3)); noFill(); strokeWeight(2);
+		scale(sqrt(camera.z));
+		for(let i=0; i<6; ++i){
+			arc(0, 0, 50, 50, PI/3*i-PI/2-PI/15+Date.now()/2000, PI/3*i-PI/2+PI/15+Date.now()/2000);
+			line(21*sin(PI/3*i+Date.now()/1500), 21*cos(PI/3*i+Date.now()/1500), 17*sin(PI/3*i+Date.now()/1500), 17*cos(PI/3*i+Date.now()/1500));
+		}
+	}
+
+	if(T == REPAIR){
+		scale(camera.z);
+		fill(50, 200, 50, 20); noStroke();
+		circle(0, 0, 60*2);
+	}
+
+	pop();
 }
