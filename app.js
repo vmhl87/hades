@@ -28,7 +28,7 @@ function setup(){
 	//imps = [], sectorDeaths = [], gameID = null, ROWS, COLS, dead = [];
 
 let ships = [], rocks = [], blasts = [], entities = [],
-	gameID = null, ROWS, COLS, dead = [];
+	gameID = null, ROWS, COLS, dead = [], speed = 1, age = 0, last = 0;
 
 socket.on("reset", () => {
 	searching = 0;
@@ -37,6 +37,10 @@ socket.on("reset", () => {
 	select = null;
 	selectMove = null;
 	gameID = null;
+
+	speed = 1;
+	last = 0;
+	age = 0;
 });
 
 socket.on("start", data => {
@@ -69,6 +73,10 @@ socket.on("start", data => {
 	*/
 
 	entities = {blast: [], death: [], heal: [], emp: [], imp: [], sectorDeath: []};
+
+	last = Date.now();
+	speed = 1;
+	age = 0;
 
 	camera.x = 0;
 	camera.y = 0;
@@ -139,6 +147,10 @@ socket.on("state", data => {
 	*/
 
 	entities = data.entities;
+
+	speed = data.speed;
+	last = Date.now();
+	age = data.age;
 });
 
 socket.on("end", () => {
@@ -694,31 +706,32 @@ function main(){
 			pop();
 		}
 
-		const NOW = snapshot ? now : Date.now();
+		const NOW = snapshot ? age : age + (Date.now()-last)*TPS/1000;
 
 		for(let e of entities.emp){
 			push(); translate(...screenPos(e[0]));
-			drawEffect(EMP, (e[1]-NOW)/4000);
+			drawEffect(EMP, (e[1]-NOW)/TPS/4);
 			pop();
 		}
 		
 		for(let i of entities.imp){
 			push(); translate(...screenPos(i[0]));
-			drawEffect(DISRUPT, (i[1]-NOW)/4000);
+			drawEffect(DISRUPT, (i[1]-NOW)/TPS/4);
 			pop();
 		}
 
 		push(); noStroke();
 		for(let h of entities.heal){
-			fill(50, 200, 50, 60*sin((h[1]-NOW)/2000*PI));
+			fill(50, 200, 50, 60*sin((h[1]-NOW)/TPS/2*PI));
 			circle(...screenPos(h[0]), 60*2*camera.z);
 		}
 		pop();
 
 		push(); noFill(); strokeWeight(3*sqrt(camera.z));
 		for(let d of entities.death){
-			stroke(0, 255, 255, 80*Math.min(1, (d[1]-NOW)/800));
-			circle(...screenPos(d[0]), (3000-d[1]+NOW)/50*sqrt(camera.z));
+			stroke(0, 255, 255, 80*Math.min(1, (d[1]-NOW)/0.8/TPS));
+			//circle(...screenPos(d[0]), (3000-d[1]+NOW)/50*sqrt(camera.z));
+			circle(...screenPos(d[0]), 60*(1-(d[1]-NOW)/TPS/3)*sqrt(camera.z));
 		}
 		pop();
 
@@ -755,7 +768,7 @@ function main(){
 
 		push();
 		for(let b of entities.blast){
-			fill(200, 100, 50, ceil((b[2]-Date.now())*255/2000));
+			fill(200, 100, 50, ceil((b[2]-NOW)*255/2/TPS));
 			circle(...screenPos(b[0]), b[1]*2*camera.z);
 		}
 		pop();

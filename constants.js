@@ -1,4 +1,4 @@
-const SECTOR_COLLAPSE_TIME = 40;
+const SECTOR_COLLAPSE_TIME = 40, TPS = 4;
 
 let ct = 0;
 

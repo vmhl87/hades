@@ -467,13 +467,15 @@ class Game{
 		this.uid = ++UID;
 		this.entities = {blast: [], death: [], heal: [], emp: [], imp: [], sectorDeath: []};
 		this.lifetime = TPS*6;
-		this.age = 0;
 		this.loneBSTimer = Math.random();
 		this.sectors = new Array(ROWS*COLS);
 		for(let i=0; i<ROWS*COLS; ++i)
 			this.sectors[i] = [];
 		this.dead = new Array(ROWS*COLS).fill(0);
 		this.aliveCount = ROWS*COLS;
+
+		this.age = 0;
+		this.speed = 1;
 	}
 
 	addShip(type, team, modules, pos, move = []){
@@ -573,7 +575,7 @@ class Game{
 						x.emp = 1;
 
 			//this.ev.push(["emp", [...this.ships[s].pos]]);
-			this.entities.emp.push([[...this.ships[s].pos], Date.now() + 4000]);
+			this.entities.emp.push([[...this.ships[s].pos], this.age+4*TPS]);
 		}
 
 		if(T == DISRUPT){
@@ -583,7 +585,7 @@ class Game{
 						x.imp = 1;
 
 			//this.ev.push(["imp", [...this.ships[s].pos]]);
-			this.entities.imp.push([[...this.ships[s].pos], Date.now() + 4000]);
+			this.entities.imp.push([[...this.ships[s].pos], this.age+4*TPS]);
 		}
 
 		if(T == FORT) this.ships[s].fort = 1;
@@ -618,12 +620,12 @@ class Game{
 
 	explode(pos, range, str){
 		//this.ev.push(["explode", [[...pos], range, str]]);
-		this.entities.blast.push([[...pos], range, Date.now() + 200*str]);
+		this.entities.blast.push([[...pos], range, this.age+0.2*str*TPS]);
 	}
 
 	die(pos){
 		//this.ev.push(["die", pos]);
-		this.entities.death.push([[...pos], Date.now() + 2000]);
+		this.entities.death.push([[...pos], this.age+3*TPS]);
 	}
 
 	updateModules(s){
@@ -1347,7 +1349,7 @@ class Game{
 						if(Math.floor((s.pos[0]+150*COLS)/300)+Math.floor((s.pos[1]+150*ROWS)/300)*COLS == i)
 							s.hp = 0;
 					//this.ev.push(["deadSector", i]);
-					this.entities.sectorDeath.push([i, Date.now() + 4000]);
+					this.entities.sectorDeath.push([i, this.age+4*TPS]);
 				}
 			}
 
@@ -1362,7 +1364,7 @@ class Game{
 						x.heal(2000);
 
 				//this.ev.push(["heal", [...s.pos]]);
-				this.entities.heal.push([[...s.pos], Date.now() + 2000]);
+				this.entities.heal.push([[...s.pos], this.age+2*TPS]);
 			}
 
 			if(s.expire == 0){
@@ -1374,7 +1376,7 @@ class Game{
 							x.heal(500);
 
 					//this.ev.push(["heal", [...s.pos]]);
-					this.entities.heal.push([[...s.pos], Date.now() + 2000]);
+					this.entities.heal.push([[...s.pos], this.age+2*TPS]);
 				}
 			}
 		}
@@ -1495,9 +1497,9 @@ class Game{
 		this.ships = this.ships.filter(x => x.hp > 0);
 
 		for(let k of Object.keys(this.entities))
-			this.entities[k] = this.entities[k].filter(x => x[x.length-1] > Date.now());
+			this.entities[k] = this.entities[k].filter(x => x[x.length-1] >= this.age);
 
-		for(let p of this.players) p.emit("state", {s: q, entities: this.entities, dead: this.dead});
+		for(let p of this.players) p.emit("state", {s: q, entities: this.entities, dead: this.dead, age: this.age, speed: this.speed});
 
 		++this.age;
 	}

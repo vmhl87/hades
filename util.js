@@ -432,8 +432,12 @@ function updateTouch(){
 
 			const P = [(touches[0].x+touches[1].x)/2, (touches[0].y+touches[1].y)/2];
 
+			const old = [camera.x, camera.y];
+
 			camera.x = offset[2][0] + (offset[3][0]-P[0])/camera.z;
 			camera.y = offset[2][1] + (offset[3][1]-P[1])/camera.z;
+
+			scrollVel = [(camera.x-old[0])*camera.z, (camera.y-old[1])*camera.z];
 
 		}else{
 			lockID = touches[0].id+touches[1].id;
@@ -494,7 +498,7 @@ function windowResized(){
 
 function saveState(){
 	return JSON.stringify({
-		ships, rocks, entities, ROWS, COLS, ID: ID, now: Date.now()
+		ships, rocks, entities, ROWS, COLS, ID, age
 	});
 }
 
@@ -509,9 +513,9 @@ function loadState(STATE){
 	ROWS = S.ROWS;
 	COLS = S.COLS;
 	ID = S.ID;
-	now = S.now;
-	dead = S.dead;
-	sectorDeaths = S.sectorDeaths;
+	age = S.age;
+
+	speed = 1;
 
 	staging = 0;
 	connected = 1;
