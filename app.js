@@ -680,13 +680,15 @@ function main(){
 			}
 		}
 
+		const NOW = snapshot ? age : age + (Date.now()-last)*TPS/1000/speed;
+
 		for(let i of bsID){
 			const s = ships[i];
 			if(s.imp == 0){
 				push(); translate(width/2+(s.vpos[0]-camera.x)*camera.z, height/2+(s.vpos[1]-camera.y)*camera.z);
 
 				for(let m of s.modules) if(Array.isArray(m.aux) && m.aux.length && m.aux[0] &&
-					(m.aux[1] > 3/TIME[m.type] || (m.aux[1]*TIME[m.type])%1 < 0.5) || m.type == PASSIVE){
+					(m.aux[1] > 3/TIME[m.type] || ((Date.now()/1000)%1 < 0.5)) || m.type == PASSIVE){
 
 					if(m.type == ALPHA) drawEffect(ALPHA);
 
@@ -705,8 +707,6 @@ function main(){
 
 			pop();
 		}
-
-		const NOW = snapshot ? age : age + (Date.now()-last)*TPS/1000;
 
 		for(let e of entities.emp){
 			push(); translate(...screenPos(e[0]));
@@ -1042,7 +1042,7 @@ function main(){
 		if(mouseIn(30, 30, 30, 30)){
 			textAlign(LEFT, CENTER); textSize(17);
 			fill(50, 200, 200, 80); noStroke();
-			text(snapshot ? "EXIT SNAPSHOT" : "EXIT GAME", 60, 28);
+			text(snapshot ? "EXIT SNAPSHOT" : "ABANDON GAME", 60, 28);
 		}
 		pop();
 

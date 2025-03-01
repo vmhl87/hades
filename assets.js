@@ -1528,7 +1528,7 @@ function drawEffect(T, S=null){
 	if(T == BARRIER){
 		scale(camera.z);
 		strokeWeight(2/sqrt(camera.z));
-		if(S < -3/TIME[BARRIER] || ((-S*TIME[BARRIER])%1 < 0.5)){
+		if(S < -3/TIME[BARRIER] || ((Date.now()/1000)%1 < 0.5)){
 			fill(255, 20); noStroke();
 			for(let i=0; i<6; ++i)
 				arc(0, 0, RANGE[BARRIER]*2, RANGE[BARRIER]*2,
@@ -1545,7 +1545,7 @@ function drawEffect(T, S=null){
 		circle(0, 0, RANGE[AMP]*2);
 		stroke(200, 50, 50, 100); noFill();
 		circle(0, 0, RANGE[AMP]*2);
-		if(S < -3/TIME[AMP] || ((-S*TIME[AMP])%1 < 0.5)){
+		if(S < -3/TIME[AMP] || ((Date.now()/1000)%1 < 0.5)){
 			strokeWeight(1.5/sqrt(camera.z));
 			circle(0, 0, (RANGE[AMP]-4)*2);
 			strokeWeight(1/sqrt(camera.z));
@@ -1564,7 +1564,7 @@ function drawEffect(T, S=null){
 		circle(0, 0, RANGE[SUSPEND]*2);
 		stroke(10, 150, 200, 100); noFill();
 		circle(0, 0, RANGE[SUSPEND]*2);
-		if(S < -3/TIME[SUSPEND] || ((-S*TIME[SUSPEND])%1 < 0.5)){
+		if(S < -3/TIME[SUSPEND] || ((Date.now()/1000)%1 < 0.5)){
 			strokeWeight(1.5/sqrt(camera.z));
 			circle(0, 0, (RANGE[SUSPEND]-4)*2);
 			strokeWeight(1/sqrt(camera.z));

@@ -93,7 +93,7 @@ class Ship{
 		if(diff > PI) diff -= PI*2;
 		if(diff < -PI) diff += PI*2;
 
-		let T = MOBILE ? 0.1 : 0.05;
+		let T = (MOBILE ? 0.1 : 0.05) / speed;
 
 		this.rot += diff * T * 2;
 		if(this.rot > PI*2) this.rot -= PI*2;

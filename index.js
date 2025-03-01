@@ -52,12 +52,12 @@ const Ship = Module.Ship, Game = Module.Game;
 
 const COLS = Module.COLS, ROWS = Module.ROWS, TPS = Module.TPS;
 
-let games = [], queue = [];
+let games = [], queue = [], TIME = 0;
 
 function tick(game){
 	if(game) game.update();
 	else{
-		for(let g of games){
+		for(let g of games) if(TIME%g.speed == 0){
 			tick(g);
 
 			if(g.lifetime == 0){
@@ -70,6 +70,8 @@ function tick(game){
 		}
 
 		games = games.filter(x => x.lifetime > 0);
+
+		++TIME;
 	}
 }
 
