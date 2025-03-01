@@ -9,8 +9,6 @@ function preload(){
 	font = loadFont('Ubuntu-Regular.ttf');
 }
 
-let showGuide = false;
-
 function setup(){
 	createCanvas(windowWidth, windowHeight);
 	textAlign(CENTER, CENTER);
@@ -168,7 +166,7 @@ function main(){
 
 	if(staging){
 		fill(200); noStroke();
-		push(); translate(width/2, height/2-100);
+		push(); translate(width/2+15, height/2-100);
 		scale(5); drawShip(BS, 0, 2);
 		pop();
 
@@ -426,6 +424,8 @@ function main(){
 				if(MOBILE) pop();
 			}
 		}
+
+		if(showGuide) drawGuide();
 
 		if(SECDISP[0]){
 			--SECDISP[0];
@@ -1105,6 +1105,11 @@ function stagingUI(){
 		return;
 	}
 
+	if(showGuide && mouseIn(width/2, height/2, 150, min(height-120, 500)/2)){
+		controlGuide();
+		return;
+	}
+
 	if(chooseModule == -1){
 		if(mouseIn(width/2, height/2+150, 60, 30)){
 			if(!searching){
@@ -1296,6 +1301,11 @@ function click(){
 				focus = ["ship", s.uid];
 				return;
 			}
+
+	if(focus && mouseIn(width/2, height, focus[0] == "rock" ? 55 : 150, 20)){
+		focus = null;
+		return;
+	}
 
 	if(focus && shipID != null && selectMove == null && !snapshot){
 		for(let i=0; i<ships[shipID].modules.length; ++i){

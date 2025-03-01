@@ -508,6 +508,8 @@ function loadState(STATE){
 	ships = [];
 	for(let x of S.ships) ships.push(new Ship(x));
 
+	rocks = S.rocks;
+
 	entities = S.entities;
 
 	ROWS = S.ROWS;

@@ -20,7 +20,7 @@ const LASER = ++ct, CANNON = ++ct, SPREAD = ++ct, LASER2 = ++ct, DART = ++ct;
 
 // SHIELD TYPES
 
-const ALPHA = ++ct, DELTA = ++ct, PASSIVE = ++ct, OMEGA = ++ct, MIRROR = ++ct, ALLY = ++ct;
+const ALPHA = ++ct, DELTA = ++ct, OMEGA = ++ct, PASSIVE = ++ct, MIRROR = ++ct, ALLY = ++ct;
 
 // MODULE TYPES
 

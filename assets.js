@@ -829,7 +829,7 @@ function drawModule(T){
 		}
 	}
 
-	push(); strokeWeight(2);
+	push(); strokeWeight(2); noFill();
 
 	// WEAPON
 

@@ -30,6 +30,11 @@ app.get("/assets.js", (req, res) => {
 	res.sendFile(path.join(__dirname, "assets.js"));
 });
 
+app.get("/guide.js", (req, res) => {
+	res.set("Content-Type", "application/javascript");
+	res.sendFile(path.join(__dirname, "guide.js"));
+});
+
 app.get("/p5.min.js", (req, res) => {
 	res.set("Content-Type", "application/javascript");
 	res.sendFile(path.join(__dirname, "p5.min.js"));
