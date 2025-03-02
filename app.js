@@ -3,7 +3,8 @@ let font = null;
 let modules = [null, null, null, null, null];
 
 let searching = 0, staging = 1, chooseModule = -1,
-	connected = 0, snapshot = 0, ID = null, now = null;
+	connected = 0, snapshot = 0, ID = null, now = null,
+	queueSize = 0;
 
 function preload(){
 	font = loadFont('Ubuntu-Regular.ttf');
@@ -161,6 +162,8 @@ socket.on("end", () => {
 	gameID = null;
 });
 
+socket.on("queueSize", x => queueSize = max(0, x));
+
 function main(){
 	background(0, 10, 25);
 
@@ -293,18 +296,26 @@ function main(){
 
 		if(chooseModule == -1){
 			if(searching){
-				fill(100 + (sin(frameCount/30)/2+0.5)*50);
-				textSize(25); text("SCANNING", width/2, height/2 + 150);
+				textSize(18);
+				const T = queueSize.toString() + " PLAYER" + (queueSize == 1 ? "" : "S") + " IN QUEUE  -  ";
+				const D = textWidth(T), E = textWidth("START");
+				fill(200);
+				text(T, width/2 - E/2, height/2 + 150);
+				fill(mouseIn(width/2+D/2, height/2+150, E/2+30, 15) ? 255 : 200);
+				text("START", width/2 + D/2, height/2 + 150);
 
-				fill(mouseIn(width/2, height/2+200, 60, 15) ? 255 : 200);
-				textSize(15); text("CANCEL", width/2, height/2 + 200);
+				textSize(15);
 
-				fill(mouseIn(width/2, height/2+230, 60, 15) ? 255 : 200);
-				textSize(15); text("SOLO", width/2, height/2 + 230);
+				fill(mouseIn(width/2, height/2+200, textWidth("LEAVE QUEUE")+30, 15) ? 255 : 200);
+				text("LEAVE QUEUE", width/2, height/2 + 200);
+
+				fill(mouseIn(width/2, height/2+230, textWidth("SOLO")+30, 15) ? 255 : 200);
+				text("SOLO", width/2, height/2 + 230);
 
 			}else{
-				fill(mouseIn(width/2, height/2+150, 60, 30) ? 255 : 200);
-				textSize(25); text("START", width/2, height/2 + 150);
+				textSize(25);
+				fill(mouseIn(width/2, height/2+150, textWidth("ENTER QUEUE")+30, 30) ? 255 : 200);
+				text("ENTER QUEUE", width/2, height/2 + 150);
 			}
 
 		}else{
@@ -1034,18 +1045,6 @@ function main(){
 			pop();
 		}
 
-		push();
-		stroke(50, 200, 200, mouseIn(30, 30, 30, 30) ? 80 : 60); strokeWeight(3);
-		line(20, 20, 40, 40);
-		line(20, 40, 27, 33);
-		line(33, 27, 40, 20);
-		if(mouseIn(30, 30, 30, 30)){
-			textAlign(LEFT, CENTER); textSize(17);
-			fill(50, 200, 200, 80); noStroke();
-			text(snapshot ? "EXIT SNAPSHOT" : "ABANDON GAME", 60, 28);
-		}
-		pop();
-
 		if(!snapshot){
 			push();
 			stroke(50, 200, 200, mouseIn(width-30, 30, 30, 30) ? 80 : 60); strokeWeight(3);
@@ -1072,6 +1071,19 @@ function main(){
 			let shipInArena = false;
 
 			for(let s of ships) if(s.team == ID && s.type == BS) shipInArena = true;
+
+			push();
+			stroke(50, 200, 200, mouseIn(30, 30, 30, 30) ? 80 : 60); strokeWeight(3);
+			line(20, 20, 40, 40);
+			line(20, 40, 27, 33);
+			line(33, 27, 40, 20);
+			if(mouseIn(30, 30, 30, 30)){
+				textAlign(LEFT, CENTER); textSize(17);
+				fill(50, 200, 200, 80); noStroke();
+				text(snapshot ? "EXIT SNAPSHOT" : (shipInArena ? "ABANDON GAME" : "EXIT TO MENU"), 60, 28);
+			}
+			pop();
+
 
 			if(focus == null && shipInArena){
 				push();
@@ -1111,14 +1123,28 @@ function stagingUI(){
 	}
 
 	if(chooseModule == -1){
-		if(mouseIn(width/2, height/2+150, 60, 30)){
+		push();
+		textSize(18);
+		const T = queueSize.toString() + " OTHER PLAYER" + (queueSize == 1 ? "" : "S") + " IN QUEUE  -  ";
+		const D = textWidth(T), E = textWidth("START GAME");
+		pop();
+
+		if(mouseIn(width/2+D/2, height/2+150, E/2+30, 15)){
+			if(searching){
+				searching = 0;
+				staging = 0;
+				begin();
+			}
+		}
+
+		if(mouseIn(width/2, height/2+150, 120, 30)){
 			if(!searching){
 				searching = 1;
 				start();
 			}
 		}
 
-		if(mouseIn(width/2, height/2+200, 60, 15)){
+		if(mouseIn(width/2, height/2+200, 120, 15)){
 			if(searching){
 				searching = 0;
 				cancel();

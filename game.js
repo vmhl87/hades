@@ -56,6 +56,7 @@ DAMAGE[MIRROR] = 3;
 DAMAGE[FORT] = 0.6;
 DAMAGE[VENG] = 7000;
 DAMAGE[DELTA] = 900;
+DAMAGE[LEAP] = 3000;
 
 LASER_DAMAGE[LASER] = [160, 350, 600];
 LASER_DAMAGE[LASER2] = [184, 312, 800];
@@ -678,7 +679,12 @@ class Game{
 				for(let x of this.ships)
 					if(x.team != s.team)
 						if(_dist(x.pos, s.pos) < RANGE[LEAP])
-							x.hurt(5000, s.team);
+							x.hurt(DAMAGE[LEAP], s.team);
+
+				for(let x of this.ships) if(x.team != s.team)
+					for(let m of x.modules) if(m.type == BARRIER && m.state < 0)
+						if(_dist(x.pos, s.pos) < RANGE[BARRIER])
+							s.hurt(DAMAGE[BARRIER], x.team);
 
 				this.explode([...s.pos], RANGE[LEAP], 9);
 				s.pos = s.tp.slice(0, 2);

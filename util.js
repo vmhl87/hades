@@ -8,6 +8,10 @@ function cancel(){
 	socket.emit("dequeue");
 }
 
+function begin(){
+	socket.emit("begin");
+}
+
 function solo(){
 	socket.emit("solo", modules);
 }
@@ -312,7 +316,7 @@ function draw(){
 				moved = true;
 				if(focus != null && focus[0] == "ship" && select != null && select[0] == "ship" && focus[1] == select[1] &&
 					selectMove == null && !snapshot)
-						for(let s of ships) if(s.uid == focus[1] && s.team == ID && !s.wait && s.type == BS){
+						for(let s of ships) if(s.uid == focus[1] && s.team == ID && !s.wait && s.type == BS && s.tp == null){
 							dragMove = [mouseX, mouseY, s.uid];
 							selectMove = ["ship", s.uid];
 						}
@@ -375,7 +379,7 @@ function updateTouch(){
 				P.first = [t.x, t.y];
 				if(focus != null && focus[0] == "ship" && select != null && select[0] == "ship" && focus[1] == select[1] &&
 					selectMove == null && touches.length == 1 && !snapshot)
-						for(let s of ships) if(s.uid == focus[1] && s.team == ID && !s.wait && s.type == BS){
+						for(let s of ships) if(s.uid == focus[1] && s.team == ID && !s.wait && s.type == BS && s.tp == null){
 							dragMove = [t.x, t.y, s.uid, t.id];
 							selectMove = ["ship", s.uid];
 						}

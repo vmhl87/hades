@@ -117,6 +117,7 @@ function startGame(Q){
 	games.push(g);
 }
 
+/*
 let roundStart = null;
 
 function checkStartGame(){
@@ -130,6 +131,7 @@ function checkStartGame(){
 }
 
 setInterval(checkStartGame, 500, null);
+*/
 
 io.on("connect", (socket) => {
 	socket.on("error", e => {
@@ -149,10 +151,13 @@ io.on("connect", (socket) => {
 			let m = [];
 			for(let q of queue) m.push(q.s.id);
 			console.log(" =>", m);
+			io.emit("queueSize", queue.length);
+			/*
 			if(queue.length >= 2){
 				roundStart = Date.now()+3000;
 				console.log("pushing back");
 			}else roundStart = null;
+			*/
 		}
 
 		for(let g of games){
@@ -168,13 +173,21 @@ io.on("connect", (socket) => {
 	socket.on("quit", () => {
 		console.log("quit " + socket.id);
 
+		let ct = 0;
+
 		for(let g of games){
 			for(let s of g.ships){
 				if(s.type == 1 && s.team == socket.id){
 					console.log(" => killing ships");
 					s.hp = 0;
+					++ct;
 				}
 			}
+		}
+
+		if(!ct) for(let g of games){
+			g.players = g.players.filter(x => x.id != socket.id);
+			socket.emit("end");
 		}
 	});
 
@@ -184,10 +197,13 @@ io.on("connect", (socket) => {
 		let m = [];
 		for(let q of queue) m.push(q.s.id);
 		console.log(" =>", m);
+		io.emit("queueSize", queue.length);
+		/*
 		if(queue.length >= 2){
 			roundStart = Date.now()+3000;
 			console.log("pushing back");
 		}
+		*/
 	});
 
 	socket.on("dequeue", () => {
@@ -196,10 +212,19 @@ io.on("connect", (socket) => {
 		let m = [];
 		for(let q of queue) m.push(q.s.id);
 		console.log(" =>", m);
+		/*
 		if(queue.length >= 2){
 			roundStart = Date.now()+3000;
 			console.log("pushing back");
 		}else roundStart = null;
+		*/
+	});
+
+	socket.on("begin", () => {
+		if(queue.length){
+			startGame(queue);
+			queue = [];
+		}
 	});
 
 	socket.on("solo", modules => {
