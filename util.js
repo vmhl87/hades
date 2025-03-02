@@ -16,7 +16,56 @@ function solo(){
 	socket.emit("solo", modules, user);
 }
 
+function setupLogin(){
+	const usernameBox = document.getElementById("username");
+	const passwordBox = document.getElementById("password");
+
+	usernameBox.addEventListener("input", () => {
+		usernameBox.value = usernameBox.value.toUpperCase();
+	});
+
+	usernameBox.addEventListener("keypress", event => {
+		if(event.key == "Enter"){
+			passwordBox.focus();
+		}
+	});
+
+	passwordBox.addEventListener("keypress", event => {
+		if(event.key == "Enter"){
+			user[0] = usernameBox.value;
+			user[1] = passwordBox.value;
+			localStorage.setItem("user", JSON.stringify(user));
+			usernameBox.value = "";
+			passwordBox.value = "";
+			savedUser = true;
+			document.getElementById("login-overlay").style.display = "none";
+		}
+	});
+
+	const saveButton = document.getElementById("save");
+
+	saveButton.addEventListener("click", () => {
+		user[0] = usernameBox.value;
+		user[1] = passwordBox.value;
+		localStorage.setItem("user", JSON.stringify(user));
+		usernameBox.value = "";
+		passwordBox.value = "";
+		savedUser = true;
+		document.getElementById("login-overlay").style.display = "none";
+	});
+
+	const cancelButton = document.getElementById("cancel");
+
+	cancelButton.addEventListener("click", () => {
+		usernameBox.value = "";
+		passwordBox.value = "";
+		document.getElementById("login-overlay").style.display = "none";
+	});
+}
+
 function mouseIn(x, y, w, h){
+	if(document.getElementById("login-overlay").style.display != "none") return false;
+
 	if(MOBILE){
 		for(const [k, v] of posTouches)
 			if(!movedTouches.has(k))
@@ -196,6 +245,8 @@ let posTouches = new Map(), movedTouches = new Set();
 let dragMove = null;
 
 function mousePressed(){
+	if(document.getElementById("login-overlay").style.display != "none") return;
+
 	if(!MOBILE){
 		moved = false;
 		startMouseX = mouseX;
@@ -248,6 +299,8 @@ function mobileClick(P){
 }
 
 function mouseReleased(){
+	if(document.getElementById("login-overlay").style.display != "none") return;
+
 	if(MOBILE) return;
 
 	if(mouseButton == RIGHT) return;

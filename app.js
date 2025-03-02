@@ -31,6 +31,8 @@ function setup(){
 		savedUser = true;
 	}
 
+	setupLogin();
+
 	for(let element of document.getElementsByClassName("p5Canvas"))
 		element.addEventListener("contextmenu", e => e.preventDefault())
 }
@@ -147,10 +149,10 @@ function main(){
 		textSize(18); textAlign(CENTER, CENTER);
 		const A = user[0] + "  -  ", B = (savedUser ? "SIGN OUT" : "SIGN IN");
 		const C = textWidth(A), D = textWidth(B);
-		text(A, width/2-D/2, height/2-200);
-		const H = mouseIn(width/2+C/2, height/2-200, D/2, 10);
+		text(A, width/2-D/2, height/2-190);
+		const H = mouseIn(width/2+C/2, height/2-190, D/2, 10);
 		textSize(H ? 19 : 18); fill(H ? 255 : 200);
-		text(B, width/2+C/2, height/2-200);
+		text(B, width/2+C/2, height/2-190);
 		translate(width/2+15, height/2-100);
 		scale(5); drawShip(BS, 0, 2);
 		pop();
@@ -1162,7 +1164,7 @@ function stagingUI(){
 		textSize(18); textAlign(CENTER, CENTER);
 		const A = user[0] + "  -  ", B = (savedUser ? "SIGN OUT" : "SIGN IN");
 		const C = textWidth(A), D = textWidth(B);
-		const H = mouseIn(width/2+C/2, height/2-200, D/2, 10);
+		const H = mouseIn(width/2+C/2, height/2-190, D/2, 10);
 		pop();
 
 		if(H){
@@ -1172,10 +1174,8 @@ function stagingUI(){
 				savedUser = false;
 
 			}else{
-				user[0] = prompt("username").toUpperCase();
-				user[1] = prompt("password");
-				localStorage.setItem("user", JSON.stringify(user));
-				savedUser = true;
+				document.getElementById("login-overlay").style.display = "block";
+				document.getElementById("username").focus();
 			}
 		}
 	}
