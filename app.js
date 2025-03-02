@@ -1134,6 +1134,7 @@ function stagingUI(){
 				searching = 0;
 				staging = 0;
 				begin();
+				return;
 			}
 		}
 
@@ -1141,6 +1142,7 @@ function stagingUI(){
 			if(!searching){
 				searching = 1;
 				start();
+				return;
 			}
 		}
 
@@ -1148,6 +1150,7 @@ function stagingUI(){
 			if(searching){
 				searching = 0;
 				cancel();
+				return;
 			}
 		}
 
@@ -1157,6 +1160,7 @@ function stagingUI(){
 				cancel();
 				solo();
 				staging = 0;
+				return;
 			}
 		}
 
