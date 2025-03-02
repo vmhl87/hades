@@ -31,7 +31,7 @@ const EMP = ++ct, DUEL = ++ct, FORT = ++ct, TP = ++ct, AMP = ++ct, LEAP = ++ct, 
 const NULL = 2.71, DEV = 1.618;
 
 let NAME = new Array(ct), HP = new Array(ct), RANGE = new Array(ct).fill(null),
-	TIME = new Array(ct);
+	TIME = new Array(ct), ACTIVATED = new Array(ct);
 
 TIME[ALPHA] = 6;
 TIME[DELTA] = 45;
@@ -114,6 +114,30 @@ RANGE[DARTP] = 40;
 RANGE[ROCKETP] = 70;
 RANGE[STRIKEP] = 70;
 RANGE[BOMBERP] = 100;
+
+ACTIVATED[ALPHA] = true;
+ACTIVATED[DELTA] = true;
+ACTIVATED[OMEGA] = true;
+ACTIVATED[MIRROR] = true;
+ACTIVATED[ALLY] = true;
+
+ACTIVATED[EMP] = true;
+ACTIVATED[FORT] = true;
+ACTIVATED[TP] = true;
+ACTIVATED[AMP] = true;
+ACTIVATED[LEAP] = true;
+ACTIVATED[BARRIER] = true;
+ACTIVATED[STRIKE] = true;
+ACTIVATED[RIPPLE] = true;
+ACTIVATED[DISRUPT] = true;
+ACTIVATED[SUSPEND] = true;
+
+ACTIVATED[DECOY] = true;
+ACTIVATED[REPAIR] = true;
+ACTIVATED[ROCKET] = true;
+ACTIVATED[TURRET] = true;
+ACTIVATED[PHASE] = true;
+ACTIVATED[WARP] = true;
 
 const LOCMOD = [DECOY, REPAIR, ROCKET, TP, STRIKE, RIPPLE, WARP];
 

@@ -135,38 +135,48 @@ function main(){
 		pop();
 
 		if(localStorage.getItem("save") != null && !searching){
-			push();
-			stroke(50, 200, 200, mouseIn(width-30, 30, 30, 30) ? 80 : 60); strokeWeight(3);
+			push(); translate(width-30, 30);
+			const H = mouseIn(width-30, 30, 30, 30);
+			stroke(50, 200, 200, H ? 80 : 60); strokeWeight(3);
+			if(H) scale(1.1);
 			noFill();
 			beginShape();
-			vertex(width-27, 20);
-			vertex(width-27, 40);
-			vertex(width-20, 33);
+			vertex(3, -10);
+			vertex(3, 10);
+			vertex(10, 3);
 			endShape();
 			beginShape();
-			vertex(width-40, 27);
-			vertex(width-33, 20);
-			vertex(width-33, 40);
+			vertex(-10, -3);
+			vertex(-3, -10);
+			vertex(-3, 10);
 			endShape();
-			if(mouseIn(width-30, 30, 30, 30)){
-				textAlign(RIGHT, CENTER); textSize(17);
+			pop();
+			push();
+			if(H){
+				textAlign(RIGHT, CENTER); textSize(18);
 				fill(50, 200, 200, 80); noStroke();
 				text("VIEW SNAPSHOT", width-60, 28);
 			}
 			pop();
 		}
 
-		push();
-		stroke(50, 200, 200, mouseIn(30, 30, 30, 30) ? 80 : 60); strokeWeight(3);
-		line(20, 20, 40, 20);
-		line(20, 30, 40, 30);
-		line(20, 40, 40, 40);
-		if(mouseIn(30, 30, 30, 30)){
-			textAlign(LEFT, CENTER); textSize(17);
-			fill(50, 200, 200, 80); noStroke();
-			text("GUIDE", 60, 28);
-		}
-		pop();
+		{
+			push(); translate(30, 30);
+			const H = mouseIn(30, 30, 30, 30);
+			stroke(50, 200, 200, H ? 80 : 60); strokeWeight(3);
+			if(H) scale(1.1);
+			line(-10, -10, 10, -10);
+			line(-10, 0, 10, 0);
+			line(-10, 10, 10, 10);
+			pop();
+			push();
+			if(H){
+				textAlign(LEFT, CENTER); textSize(18);
+				fill(50, 200, 200, 80); noStroke();
+				text("GUIDE", 60, 28);
+			}
+			pop();
+		};
 
 		{
 			let pick = null;
@@ -263,22 +273,26 @@ function main(){
 				const D = textWidth(T), E = textWidth("START");
 				fill(200);
 				text(T, width/2 - E/2, height/2 + 150);
-				fill(mouseIn(width/2+D/2, height/2+150, E/2+30, 15) ? 255 : 200);
+				let H = mouseIn(width/2+D/2, height/2+150, E/2+30, 15);
+				fill(H ? 255 : 200); textSize(H ? 19 : 18);
 				text("START", width/2 + D/2, height/2 + 150);
 
 				textSize(15);
-
-				fill(mouseIn(width/2, height/2+200, textWidth("LEAVE QUEUE")+30, 15) ? 255 : 200);
+				H = mouseIn(width/2, height/2+200, textWidth("LEAVE QUEUE")+30, 15);
+				fill(H ? 255 : 200); textSize(H ? 16 : 15);
 				text("LEAVE QUEUE", width/2, height/2 + 200);
 
 				if(queueSize > (open ? 1 : 0)){
-					fill(mouseIn(width/2, height/2+230, textWidth("SOLO")+30, 15) ? 255 : 200);
+					textSize(15);
+					H = mouseIn(width/2, height/2+230, textWidth("SOLO")+30, 15);
+					fill(H ? 255 : 200); textSize(H ? 16 : 15);
 					text("SOLO", width/2, height/2 + 230);
 				}
 
 			}else{
 				textSize(25);
-				fill(mouseIn(width/2, height/2+150, textWidth("ENTER QUEUE")+30, 30) ? 255 : 200);
+				const H = mouseIn(width/2, height/2+150, textWidth("ENTER QUEUE")+30, 30);
+				fill(H ? 255 : 200); textSize(H ? 27 : 25);
 				text("ENTER QUEUE", width/2, height/2 + 150);
 			}
 
@@ -853,8 +867,9 @@ function main(){
 				fill(20, 40, 60); noStroke(); rect(width/2+77, height-51, 65, 22);
 				pop();
 
-				push(); textSize(14); textAlign(CENTER, CENTER);
-				fill(mouseIn(width/2+77+65/2, height-42, 40, 20) ? 255 : 200);
+				push(); textAlign(CENTER, CENTER);
+				const H = mouseIn(width/2+77+65/2, height-42, 40, 20);
+				fill(H ? 255 : 200); textSize(H ? 15 : 14);
 				text("CANCEL", width/2+77+65/2, height-42);
 				pop();
 
@@ -906,12 +921,15 @@ function main(){
 							}
 
 					for(let i=0; i<ships[shipID].modules.length; ++i){
-						push(); translate(width/2+25-25*ships[shipID].modules.length+50*i, height-120-10-25);
+						const H = mouseIn(width/2+25-25*ships[shipID].modules.length+50*i, height-120-10-25, 25, 20);
+
+						push(); translate(width/2+25-25*ships[shipID].modules.length+50*i,
+							height-120-10-25 - (H && ships[shipID].modules[i].state == 1 && ACTIVATED[ships[shipID].modules[i].type] ? 2 : 0));
 						const S = ships[shipID], M = S.modules[i];
 						drawModule2(M.use || S.type != BS || S.team == ID ? M.type : NULL, ships[shipID].modules[i].state);
 						pop();
 
-						if(!MOBILE && mouseIn(width/2+25-25*ships[shipID].modules.length+50*i, height-120-10-25, 25, 20) && mouseIsPressed){
+						if(!MOBILE && H && mouseIsPressed){
 							const T = M.use || S.type != BS || S.team == ID ? M.type : NULL;
 
 							if(MODULE_NAME[T] != null){
@@ -945,37 +963,49 @@ function main(){
 
 					push(); strokeWeight(2);
 					if(canStop){
+						push(); translate(width/2-115, height-50);
 						if(canMove){
-							if(mouseIn(width/2-117, height-50, 20, 20)) stroke(15, 45, 55);
-							else stroke(10, 35, 40);
+							if(mouseIn(width/2-117, height-50, 20, 20)){
+								stroke(15, 45, 55);
+								scale(1.1);
+							}else stroke(10, 35, 40);
 						}else stroke(7, 30, 40);
-						line(width/2-130, height-45, width/2-125, height-40);
-						line(width/2-125, height-40, width/2-105, height-60);
+						line(-15, 5, -10, 10);
+						line(-10, 10, 10, -10);
 
 						if(canMove){
 							if(mouseIn(width/2-117, height-50, 20, 20)) stroke(30, 90, 110);
 							else stroke(20, 70, 80);
 						}else stroke(10, 40, 60);
 						const wait = 25-floor(ships[shipID].wait[2]*25);
-						line(width/2-130, height-45, width/2-130+min(5, wait), height-45+min(5, wait));
+						line(-15, 5, -15+min(5, wait), 5+min(5, wait));
 						if(wait >= 5)
-							line(width/2-125, height-40, width/2-125+wait-5, height-40-wait+5);
+							line(-10, 10, -10+wait-5, 10-wait+5);
+						pop();
 
 					}else{
+						push(); translate(width/2-115, height-50);
 						if(canMove){
-							if(mouseIn(width/2-117, height-50, 20, 20)) stroke(30, 90, 110);
-							else stroke(20, 70, 80);
+							if(mouseIn(width/2-117, height-50, 20, 20)){
+								stroke(30, 90, 110);
+								scale(1.1);
+							}else stroke(20, 70, 80);
 						}else stroke(10, 40, 60);
-						line(width/2-130, height-50, width/2-105, height-50);
-						line(width/2-115, height-60, width/2-105, height-50);
-						line(width/2-115, height-40, width/2-105, height-50);
+						line(-15, 0, 10, 0);
+						line(0, -10, 10, 0);
+						line(0, 10, 10, 0);
+						pop();
 					}
+					push(); translate(width/2-70, height-50);
 					if(canMove && (canStop || ships[shipID].move.length > 1)){
-						if(mouseIn(width/2-70, height-50, 20, 20)) stroke(30, 90, 110);
-						else stroke(20, 70, 80);
+						if(mouseIn(width/2-70, height-50, 20, 20)){
+							stroke(30, 90, 110);
+							scale(1.1);
+						}else stroke(20, 70, 80);
 					}else stroke(10, 40, 60);
-					line(width/2-80, height-60, width/2-60, height-40);
-					line(width/2-80, height-40, width/2-60, height-60);
+					line(-10, -10, 10, 10);
+					line(-10, 10, 10, -10);
+					pop();
 					if(GOD){
 						if(mouseIn(width/2-23, height-50, 20, 20)) stroke(30, 90, 110);
 						else stroke(20, 70, 80);
@@ -1010,21 +1040,25 @@ function main(){
 		}
 
 		if(!snapshot){
-			push();
-			stroke(50, 200, 200, mouseIn(width-30, 30, 30, 30) ? 80 : 60); strokeWeight(3);
+			push(); translate(width-30, 30);
+			const H = mouseIn(width-30, 30, 30, 30);
+			stroke(50, 200, 200, H ? 80 : 60); strokeWeight(3);
+			if(H) scale(1.1);
 			noFill();
 			beginShape();
-			vertex(width-27, 20);
-			vertex(width-27, 40);
-			vertex(width-20, 33);
+			vertex(3, -10);
+			vertex(3, 10);
+			vertex(10, 3);
 			endShape();
 			beginShape();
-			vertex(width-40, 27);
-			vertex(width-33, 20);
-			vertex(width-33, 40);
+			vertex(-10, -3);
+			vertex(-3, -10);
+			vertex(-3, 10);
 			endShape();
-			if(mouseIn(width-30, 30, 30, 30)){
-				textAlign(RIGHT, CENTER); textSize(17);
+			pop();
+			push();
+			if(H){
+				textAlign(RIGHT, CENTER); textSize(18);
 				fill(50, 200, 200, 80); noStroke();
 				text("SAVE SNAPSHOT", width-60, 28);
 			}
@@ -1036,28 +1070,42 @@ function main(){
 
 			for(let s of ships) if(s.team == ID && s.type == BS) shipInArena = true;
 
-			push();
-			stroke(50, 200, 200, mouseIn(30, 30, 30, 30) ? 80 : 60); strokeWeight(3);
-			line(20, 20, 40, 40);
-			line(20, 40, 27, 33);
-			line(33, 27, 40, 20);
-			if(mouseIn(30, 30, 30, 30)){
-				textAlign(LEFT, CENTER); textSize(17);
-				fill(50, 200, 200, 80); noStroke();
-				text(snapshot ? "EXIT SNAPSHOT" : (shipInArena ? "ABANDON GAME" : "EXIT TO MENU"), 60, 28);
-			}
-			pop();
-
+			{
+				push(); translate(30, 30);
+				const H = mouseIn(30, 30, 30, 30);
+				stroke(50, 200, 200, H ? 80 : 60); strokeWeight(3);
+				if(H) scale(1.1);
+				line(-10, -10, 10, 10);
+				line(-10, 10, -3, 3);
+				line(3, -3, 10, -10);
+				pop();
+				push();
+				if(H){
+					textAlign(LEFT, CENTER); textSize(18);
+					fill(50, 200, 200, 80); noStroke();
+					text(snapshot ? "EXIT SNAPSHOT" : (shipInArena ? "ABANDON GAME" : "EXIT TO MENU"), 60, 28);
+				}
+				pop();
+			};
 
 			if(focus == null && shipInArena){
-				push();
-				stroke(50, 200, 200, mouseIn(width-30, height-30, 30, 30) ? 80 : 60); strokeWeight(3);
-				line(width-20, height-20, width-23, height-23);
-				line(width-20, height-40, width-23, height-37);
-				line(width-40, height-20, width-37, height-23);
-				line(width-40, height-40, width-37, height-37);
+				push(); translate(width-30, height-30);
+				const H = mouseIn(width-30, height-30, 30, 30);
+				stroke(50, 200, 200, H ? 80 : 60); strokeWeight(3);
+				if(H) scale(1.1);
+				line(10, 10, 7, 7);
+				line(10, -10, 7, -7);
+				line(-10, 10, -7, 7);
+				line(-10, -10, -7, -7);
 				noFill(); strokeWeight(2);
-				circle(width-30, height-30, 6);
+				circle(0, 0, 6);
+				pop();
+				push();
+				if(H){
+					textAlign(RIGHT, CENTER); textSize(18);
+					fill(50, 200, 200, 80); noStroke();
+					text("FOCUS BATTLESHIP", width-60, height-32);
+				}
 				pop();
 			}
 		};
@@ -1378,7 +1426,6 @@ function click(){
 		}else if(shipID != null && ships[shipID].modules[selectMove[1].i].type == RIPPLE && select != null && select[1] != selectMove[1].s){
 			for(let s of ships) if(s.uid == select[1])
 				if(_dist(ships[shipID].vpos, s.vpos) < RANGE[RIPPLE]
-					// TODO modification to ripple
 					&& (ships[shipID].team == s.team || s.team == CERB)){
 					socket.emit("activateModule", {gameID: gameID, shipID: selectMove[1].s,
 						i: selectMove[1].i, loc: select[1]});
@@ -1396,13 +1443,6 @@ function click(){
 
 function keyReleased(){
 	if(!staging && connected){
-		/*
-		if(key == 'R' && !snapshot){
-			localStorage.setItem("save", saveState());
-			return;
-		}
-		*/
-
 		if(key == 'w'){
 			for(let s of ships){
 				if(s.type == BS && s.team == ID){
@@ -1439,7 +1479,6 @@ function keyReleased(){
 					socket.emit("cancelMove", {gameID: gameID, shipID: focus[1]});
 					ships[shipID].wait = null;
 				}
-				//if(GOD && key == 'w') god();
 				if(canMove && key == 'e'){
 					if(canStop) socket.emit("confirmMove", {gameID: gameID, shipID: focus[1]});
 					else selectMove = ["ship", focus[1]];

@@ -1371,7 +1371,7 @@ function drawModule2(T, S){
 	if(T >= SENTINEL && T <= BOMBER) fill(255, 50, 50, 60);
 	if(T >= ALPHA && T <= ALLY) fill(0, 255, 255, 60);
 	if(T >= EMP && T <= APOCALYPSE) fill(100, 255, 100, 60);
-	if(T >= DECOY && T <= REPAIR) fill(255, 100, 0, 60);
+	if(T >= DECOY && T <= REPAIR) fill(255, 150, 0, 60);
 
 	rect(-20, -20, 40, 40);
 
