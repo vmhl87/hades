@@ -2,9 +2,16 @@ let font = null;
 
 let modules = [null, null, null, null, null];
 
+function genUser(){
+	return [
+		"GUEST" + Math.floor(Math.random()*1000).toString(),
+		Math.floor(Math.random()*1000000).toString()
+	];
+}
+
 let searching = 0, staging = 1, chooseModule = -1,
 	connected = 0, snapshot = 0, ID = null, now = null,
-	queueSize = 0, open = 0;
+	queueSize = 0, open = 0, user = genUser(), savedUser = false;
 
 function preload(){
 	font = loadFont('Ubuntu-Regular.ttf');
@@ -17,6 +24,11 @@ function setup(){
 
 	if(localStorage.getItem("modules")){
 		modules = JSON.parse(localStorage.getItem("modules"));
+	}
+
+	if(localStorage.getItem("user")){
+		user = JSON.parse(localStorage.getItem("user"));
+		savedUser = true;
 	}
 
 	for(let element of document.getElementsByClassName("p5Canvas"))
@@ -72,11 +84,12 @@ socket.on("start", data => {
 	camera.z = 1;
 
 	for(let s of data.ships)
-		if(s.type == BS && s.team == socket.id){
+		if(s.type == BS && s.team[0] == socket.id){
 			camera.x = s.pos[0];
 			camera.y = s.pos[1];
 		}
 
+	selectMove = null;
 	focus = null;
 
 	ID = socket.id;
@@ -130,7 +143,15 @@ function main(){
 
 	if(staging){
 		fill(200); noStroke();
-		push(); translate(width/2+15, height/2-100);
+		push();
+		textSize(18); textAlign(CENTER, CENTER);
+		const A = user[0] + "  -  ", B = (savedUser ? "SIGN OUT" : "SIGN IN");
+		const C = textWidth(A), D = textWidth(B);
+		text(A, width/2-D/2, height/2-200);
+		const H = mouseIn(width/2+C/2, height/2-200, D/2, 10);
+		textSize(H ? 19 : 18); fill(H ? 255 : 200);
+		text(B, width/2+C/2, height/2-200);
+		translate(width/2+15, height/2-100);
 		scale(5); drawShip(BS, 0, 2);
 		pop();
 
@@ -251,7 +272,7 @@ function main(){
 			drawModule(modules[3]);
 			pop();
 
-			fill(255, 100, 0, searching ? 60 :
+			fill(255, 150, 0, searching ? 60 :
 				(mouseIn(width/2+100, height/2+50, 20, 20) || chooseModule == 4 ? 80 : 60));
 			rect(width/2 + 80, height/2 - 20 + 50, 40, 40);
 			push(); translate(width/2+100, height/2 + 50);
@@ -442,6 +463,7 @@ function main(){
 				found = true;
 			}
 			if(!found){
+				selectMove = null;
 				focus = null;
 				shipID = null;
 			}
@@ -894,7 +916,8 @@ function main(){
 
 					push(); textAlign(LEFT, TOP); textSize(18);
 					fill(200); noStroke(); text(
-						focus[0] == "rock" ? "ASTEROID" : NAME[ships[shipID].type],
+						focus[0] == "rock" ? "ASTEROID" : NAME[ships[shipID].type] +
+							(ships[shipID].user != null ? "  [" + ships[shipID].user + "]" : ""),
 						width/2-150 + 10, height-120 + 10);
 					pop();
 
@@ -1134,6 +1157,29 @@ function stagingUI(){
 		return;
 	}
 
+	if(!searching){
+		push();
+		textSize(18); textAlign(CENTER, CENTER);
+		const A = user[0] + "  -  ", B = (savedUser ? "SIGN OUT" : "SIGN IN");
+		const C = textWidth(A), D = textWidth(B);
+		const H = mouseIn(width/2+C/2, height/2-200, D/2, 10);
+		pop();
+
+		if(H){
+			if(savedUser){
+				user = genUser();
+				localStorage.removeItem("user");
+				savedUser = false;
+
+			}else{
+				user[0] = prompt("username").toUpperCase();
+				user[1] = prompt("password");
+				localStorage.setItem("user", JSON.stringify(user));
+				savedUser = true;
+			}
+		}
+	}
+
 	if(chooseModule == -1){
 		push();
 		textSize(18);
@@ -1338,6 +1384,7 @@ function click(){
 			found = true;
 		}
 		if(!found){
+			selectMove = null;
 			focus = null;
 			shipID = null;
 		}
@@ -1352,6 +1399,7 @@ function click(){
 			}
 
 	if(focus && mouseIn(width/2, height, focus[0] == "rock" ? 55 : 150, 20)){
+		selectMove = null;
 		focus = null;
 		return;
 	}

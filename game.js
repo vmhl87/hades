@@ -1422,7 +1422,7 @@ class Game{
 							if(this.sectors[X].length){
 								const J = this.sectors[X][Math.floor(Math.random()*this.sectors[X].length)];
 								const P = this.rocks[J];
-								this.addShip(SENTINEL+I, CERB, [SENTINEL+I, SENTINEL+I == COL ? APOCALYPSE : null], [P[0], P[1]-300*ROWS*10], []);
+								this.addShip(SENTINEL+I, [CERB, null], [SENTINEL+I, SENTINEL+I == COL ? APOCALYPSE : null], [P[0], P[1]-300*ROWS*10], []);
 								this.ships[this.ships.length-1].dock = J;
 								if(SENTINEL+I != INT) for(let i=0; i<this.sectors.length; ++i)
 									if(this.sectors[i].includes(J)) this.ships[this.ships.length-1].ai[1] = i;
@@ -1471,7 +1471,7 @@ class Game{
 
 							const I = Math.floor(Math.random()*MODS.length);
 							
-							this.addShip(BS, -(++UID), MODS[I], [P[0], P[1]+300*ROWS*10], []);
+							this.addShip(BS, [-(++UID), null], MODS[I], [P[0], P[1]+300*ROWS*10], []);
 							this.ships[this.ships.length-1].dock = J;
 						}
 					}
@@ -1561,7 +1561,7 @@ class Game{
 	alive(){
 		let S = new Set();
 		for(let p of this.players) S.add(p.id);
-		return this.ships.filter(x => x.type == BS && S.has(x.team)).length > 0;
+		return this.ships.filter(x => x.type == BS && !Number.isInteger(x.team[0])).length > 0;
 	}
 }
 

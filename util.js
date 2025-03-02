@@ -1,7 +1,7 @@
 const socket = io();
 
 function start(){
-	socket.emit("enqueue", modules);
+	socket.emit("enqueue", modules, user);
 }
 
 function cancel(){
@@ -13,7 +13,7 @@ function begin(){
 }
 
 function solo(){
-	socket.emit("solo", modules);
+	socket.emit("solo", modules, user);
 }
 
 function mouseIn(x, y, w, h){
@@ -47,7 +47,8 @@ class Ship{
 	constructor(dat){
 		this.type = dat.type;
 		this.hp = dat.hp;
-		this.team = dat.team;
+		this.team = dat.team[0];
+		this.user = dat.team[1];
 		this.modules = dat.modules;
 		this.pos = dat.pos;
 		this.move = dat.move;

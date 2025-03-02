@@ -732,6 +732,12 @@ function drawShip(T, O, M){
 function drawShip2(s){
 	push(); scale(sqrt(camera.z));
 	push();
+	/*
+	if(s.user != null && s.type == BS){
+		fill(200); noStroke(); textSize(8);
+		textAlign(CENTER, CENTER); text(s.user, 0, 20);
+	}
+	*/
 	if(dragMove != null && dragMove[2] == s.uid && !s.move.length)
 		rotate(atan2(dragMove[1]-screenPos(s.vpos)[1], dragMove[0]-screenPos(s.vpos)[0]));
 	else rotate(s.rot);

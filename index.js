@@ -107,9 +107,17 @@ function spawnBS(n){
 function startGame(Q){
 	const g = new Game(Q.map(x => x.s));
 	const p = spawnBS(Q.length);
-	for(let i=0; i<Q.length; ++i)
-		g.addShip(1, Q[i].s.id, Q[i].modules,
+
+	let A = new Map();
+
+	for(let i=0; i<Q.length; ++i){
+		const R = Q[i].u[0];
+		const N = A.has(R) ? R + " (" + A.get(R).toString() + ")" : R;
+		A.set(R, A.has(R) ? A.has(R)+1 : 1);
+		g.addShip(1, [Q[i].s.id, N], Q[i].modules,
 			[300*(p[i][0]-COLS/2+0.5), 300*(p[i][1]-ROWS/2+0.5)]);
+	}
+
 	g.start();
 	games.push(g);
 }
@@ -130,7 +138,7 @@ io.on("connect", (socket) => {
 			console.log("dequeued player", socket.id);
 			queue = queue.filter(x => x.s.id != socket.id);
 			let m = [];
-			for(let q of queue) m.push(q.s.id);
+			for(let q of queue) m.push(q.u[0]);
 			console.log(" =>", m);
 			io.emit("queueSize", queue.length);
 		}
@@ -144,7 +152,6 @@ io.on("connect", (socket) => {
 			}
 
 			g.players = g.players.filter(x => x.id != socket.id);
-			if(g.players.length == 0) g.lifetime = 0;
 		}
 	});
 
@@ -155,7 +162,7 @@ io.on("connect", (socket) => {
 
 		for(let g of games){
 			for(let s of g.ships){
-				if(s.type == 1 && s.team == socket.id){
+				if(s.type == 1 && s.team[0] == socket.id){
 					console.log(" => killing ships");
 					s.hp = 0;
 					++ct;
@@ -163,19 +170,18 @@ io.on("connect", (socket) => {
 			}
 		}
 
-		if(!ct) for(let g of games){
-			g.players = g.players.filter(x => x.id != socket.id);
+		if(!ct){
 			socket.emit("end");
-
-			if(g.players.length == 0) g.lifetime = 0;
+			for(let g of games)
+				g.players = g.players.filter(x => x.id != socket.id);
 		}
 	});
 
-	socket.on("enqueue", modules => {
+	socket.on("enqueue", (modules, user) => {
 		console.log("enqueued player", socket.id, "with", modules);
-		queue.push({s: socket, modules: modules});
+		queue.push({s: socket, modules: modules, u: user});
 		let m = [];
-		for(let q of queue) m.push(q.s.id);
+		for(let q of queue) m.push(q.u[0]);
 		console.log(" =>", m);
 		io.emit("queueSize", queue.length);
 	});
@@ -184,7 +190,7 @@ io.on("connect", (socket) => {
 		console.log("dequeued player", socket.id);
 		queue = queue.filter(x => x.s.id != socket.id);
 		let m = [];
-		for(let q of queue) m.push(q.s.id);
+		for(let q of queue) m.push(q.u[0]);
 		console.log(" =>", m);
 		io.emit("queueSize", queue.length);
 	});
@@ -197,9 +203,9 @@ io.on("connect", (socket) => {
 		}
 	});
 
-	socket.on("solo", modules => {
+	socket.on("solo", (modules, user) => {
 		console.log("solo match started by", socket.id, "with", modules);
-		startGame([{s: socket, modules: modules}]);
+		startGame([{s: socket, modules: modules, u: user}]);
 	});
 
 	socket.on("move", data => {
