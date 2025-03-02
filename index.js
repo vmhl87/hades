@@ -167,6 +167,9 @@ io.on("connect", (socket) => {
 					s.hp = 0;
 				}
 			}
+
+			g.players = g.players.filter(x => x.id != socket.id);
+			if(g.players.length == 0) g.lifetime = 0;
 		}
 	});
 
@@ -188,6 +191,8 @@ io.on("connect", (socket) => {
 		if(!ct) for(let g of games){
 			g.players = g.players.filter(x => x.id != socket.id);
 			socket.emit("end");
+
+			if(g.players.length == 0) g.lifetime = 0;
 		}
 	});
 

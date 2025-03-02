@@ -4,7 +4,7 @@ let modules = [null, null, null, null, null];
 
 let searching = 0, staging = 1, chooseModule = -1,
 	connected = 0, snapshot = 0, ID = null, now = null,
-	queueSize = 0;
+	queueSize = 1, open = 0;
 
 function preload(){
 	font = loadFont('Ubuntu-Regular.ttf');
@@ -32,6 +32,7 @@ let ships = [], rocks = [], blasts = [], entities = [],
 socket.on("reset", () => {
 	searching = 0;
 	staging = 1;
+	open = 0;
 	connected = 0;
 	select = null;
 	selectMove = null;
@@ -46,6 +47,7 @@ socket.on("start", data => {
 	chooseModule = -1;
 	searching = 0;
 	staging = 0;
+	open = 0;
 	connected = 1;
 	select = null;
 	selectMove = null;
@@ -155,6 +157,7 @@ socket.on("state", data => {
 socket.on("end", () => {
 	chooseModule = -1;
 	searching = 0;
+	open = 0;
 	staging = 1;
 	connected = 0;
 	select = null;
@@ -162,7 +165,7 @@ socket.on("end", () => {
 	gameID = null;
 });
 
-socket.on("queueSize", x => queueSize = max(0, x));
+socket.on("queueSize", x => queueSize = max(1, x));
 
 function main(){
 	background(0, 10, 25);
@@ -309,8 +312,10 @@ function main(){
 				fill(mouseIn(width/2, height/2+200, textWidth("LEAVE QUEUE")+30, 15) ? 255 : 200);
 				text("LEAVE QUEUE", width/2, height/2 + 200);
 
-				fill(mouseIn(width/2, height/2+230, textWidth("SOLO")+30, 15) ? 255 : 200);
-				text("SOLO", width/2, height/2 + 230);
+				if(queueSize > 1){
+					fill(mouseIn(width/2, height/2+230, textWidth("SOLO")+30, 15) ? 255 : 200);
+					text("SOLO", width/2, height/2 + 230);
+				}
 
 			}else{
 				textSize(25);
@@ -1133,7 +1138,8 @@ function stagingUI(){
 			if(searching){
 				searching = 0;
 				staging = 0;
-				begin();
+				if(open) begin();
+				else solo();
 				return;
 			}
 		}
@@ -1141,7 +1147,12 @@ function stagingUI(){
 		if(mouseIn(width/2, height/2+150, 120, 30)){
 			if(!searching){
 				searching = 1;
-				start();
+				setTimeout(() => {
+					if(searching){
+						start();
+						open = 1;
+					}
+				}, 2000);
 				return;
 			}
 		}
@@ -1149,15 +1160,15 @@ function stagingUI(){
 		if(mouseIn(width/2, height/2+200, 120, 15)){
 			if(searching){
 				searching = 0;
-				cancel();
+				if(open) cancel();
 				return;
 			}
 		}
 
-		if(mouseIn(width/2, height/2+230, 60, 15)){
+		if(mouseIn(width/2, height/2+230, 60, 15) && queueSize > 1){
 			if(searching){
 				searching = 0;
-				cancel();
+				if(open) cancel();
 				solo();
 				staging = 0;
 				return;
