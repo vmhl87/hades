@@ -4,7 +4,7 @@ let modules = [null, null, null, null, null];
 
 let searching = 0, staging = 1, chooseModule = -1,
 	connected = 0, snapshot = 0, ID = null, now = null,
-	queueSize = 1, open = 0;
+	queueSize = 0, open = 0;
 
 function preload(){
 	font = loadFont('Ubuntu-Regular.ttf');
@@ -22,9 +22,6 @@ function setup(){
 	for(let element of document.getElementsByClassName("p5Canvas"))
 		element.addEventListener("contextmenu", e => e.preventDefault())
 }
-
-//let ships = [], rocks = [], blasts = [], deaths = [], heals = [], emps = [],
-	//imps = [], sectorDeaths = [], gameID = null, ROWS, COLS, dead = [];
 
 let ships = [], rocks = [], blasts = [], entities = [],
 	gameID = null, ROWS, COLS, dead = [], speed = 1, age = 0, last = 0;
@@ -63,15 +60,6 @@ socket.on("start", data => {
 		ships.push(new Ship(s));
 
 	rocks = data.rocks;
-
-	/*
-	blasts = [];
-	deaths = [];
-	heals = [];
-	emps = [];
-	imps = [];
-	sectorDeaths = [];
-	*/
 
 	entities = {blast: [], death: [], heal: [], emp: [], imp: [], sectorDeath: []};
 
@@ -117,36 +105,6 @@ socket.on("state", data => {
 		ships.push(new Ship(d));
 	}
 
-	/*
-	for(let e of data.ev){
-		const T = e[0], D = e[1];
-
-		if(T == "explode"){
-			blasts.push([D[0], D[1], Date.now() + 200*D[2]]);
-		}
-
-		if(T == "die"){
-			deaths.push([D, Date.now() + 3000]);
-		}
-
-		if(T == "heal"){
-			heals.push([D, Date.now() + 2000]);
-		}
-
-		if(T == "emp"){
-			emps.push([D, Date.now() + 4000]);
-		}
-
-		if(T == "imp"){
-			imps.push([D, Date.now() + 4000]);
-		}
-
-		if(T == "deadSector"){
-			sectorDeaths.push([D, Date.now() + 4000]);
-		}
-	}
-	*/
-
 	entities = data.entities;
 
 	speed = data.speed;
@@ -165,7 +123,7 @@ socket.on("end", () => {
 	gameID = null;
 });
 
-socket.on("queueSize", x => queueSize = max(1, x));
+socket.on("queueSize", x => queueSize = x);
 
 function main(){
 	background(0, 10, 25);
@@ -300,7 +258,8 @@ function main(){
 		if(chooseModule == -1){
 			if(searching){
 				textSize(18);
-				const T = queueSize.toString() + " PLAYER" + (queueSize == 1 ? "" : "S") + " IN QUEUE  -  ";
+				const Q = max(1, queueSize);
+				const T = Q.toString() + " PLAYER" + (Q == 1 ? "" : "S") + " IN QUEUE  -  ";
 				const D = textWidth(T), E = textWidth("START");
 				fill(200);
 				text(T, width/2 - E/2, height/2 + 150);
@@ -312,7 +271,7 @@ function main(){
 				fill(mouseIn(width/2, height/2+200, textWidth("LEAVE QUEUE")+30, 15) ? 255 : 200);
 				text("LEAVE QUEUE", width/2, height/2 + 200);
 
-				if(queueSize > 1){
+				if(queueSize > (open ? 1 : 0)){
 					fill(mouseIn(width/2, height/2+230, textWidth("SOLO")+30, 15) ? 255 : 200);
 					text("SOLO", width/2, height/2 + 230);
 				}
@@ -1161,11 +1120,12 @@ function stagingUI(){
 			if(searching){
 				searching = 0;
 				if(open) cancel();
+				open = 0;
 				return;
 			}
 		}
 
-		if(mouseIn(width/2, height/2+230, 60, 15) && queueSize > 1){
+		if(mouseIn(width/2, height/2+230, 60, 15) && queueSize > (open ? 1 : 0)){
 			if(searching){
 				searching = 0;
 				if(open) cancel();
@@ -1336,7 +1296,7 @@ function click(){
 		
 	}else shipID = null;
 
-	if(!focus && mouseIn(width-30, height-30, 30, 30))
+	if((!focus || MOBILE) && mouseIn(width-30, height-30, 30, 30))
 		for(let s of ships)
 			if(s.team == ID && s.type == BS){
 				focus = ["ship", s.uid];
@@ -1436,9 +1396,20 @@ function click(){
 
 function keyReleased(){
 	if(!staging && connected){
+		/*
 		if(key == 'R' && !snapshot){
 			localStorage.setItem("save", saveState());
 			return;
+		}
+		*/
+
+		if(key == 'w'){
+			for(let s of ships){
+				if(s.type == BS && s.team == ID){
+					focus = ["ship", s.uid];
+					return;
+				}
+			}
 		}
 
 		if(focus && shipID != null && selectMove == null){
@@ -1468,7 +1439,7 @@ function keyReleased(){
 					socket.emit("cancelMove", {gameID: gameID, shipID: focus[1]});
 					ships[shipID].wait = null;
 				}
-				if(GOD && key == 'w') god();
+				//if(GOD && key == 'w') god();
 				if(canMove && key == 'e'){
 					if(canStop) socket.emit("confirmMove", {gameID: gameID, shipID: focus[1]});
 					else selectMove = ["ship", focus[1]];

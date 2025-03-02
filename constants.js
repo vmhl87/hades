@@ -91,7 +91,7 @@ function weaponRange(T){
 
 RANGE[DELTA] = 55;
 RANGE[MIRROR] = 90;
-RANGE[ALLY] = 90;
+RANGE[ALLY] = 140;
 
 RANGE[EMP] = 80;
 RANGE[TP] = 400;
@@ -191,7 +191,7 @@ STATS[DELTA] = "HP: 2250, DPS: 900\nRange: 55m";
 STATS[PASSIVE] = "HP: 3500, Recharge time: 30s";
 STATS[OMEGA] = "HP: 4700";
 STATS[MIRROR] = "HP: 1000, Multiplier: 300%\nRange: 90m";
-STATS[ALLY] = "HP: 1500\nRange: 90m";
+STATS[ALLY] = "HP: 2000\nRange: 140m";
 
 STATS[EMP] = "Effect time: 6s\nRange: 80m";
 STATS[DUEL] = "Multiplier: 150%";

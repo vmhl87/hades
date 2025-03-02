@@ -105,9 +105,6 @@ function spawnBS(n){
 }
 
 function startGame(Q){
-	let m = [];
-	for(let q of Q) m.push(q.s.id);
-	console.log("starting new game:", m);
 	const g = new Game(Q.map(x => x.s));
 	const p = spawnBS(Q.length);
 	for(let i=0; i<Q.length; ++i)
@@ -116,22 +113,6 @@ function startGame(Q){
 	g.start();
 	games.push(g);
 }
-
-/*
-let roundStart = null;
-
-function checkStartGame(){
-	if(roundStart != null){
-		if(roundStart < Date.now()){
-			roundStart = null;
-			startGame(queue);
-			queue = [];
-		}
-	}
-}
-
-setInterval(checkStartGame, 500, null);
-*/
 
 io.on("connect", (socket) => {
 	socket.on("error", e => {
@@ -152,12 +133,6 @@ io.on("connect", (socket) => {
 			for(let q of queue) m.push(q.s.id);
 			console.log(" =>", m);
 			io.emit("queueSize", queue.length);
-			/*
-			if(queue.length >= 2){
-				roundStart = Date.now()+3000;
-				console.log("pushing back");
-			}else roundStart = null;
-			*/
 		}
 
 		for(let g of games){
@@ -203,12 +178,6 @@ io.on("connect", (socket) => {
 		for(let q of queue) m.push(q.s.id);
 		console.log(" =>", m);
 		io.emit("queueSize", queue.length);
-		/*
-		if(queue.length >= 2){
-			roundStart = Date.now()+3000;
-			console.log("pushing back");
-		}
-		*/
 	});
 
 	socket.on("dequeue", () => {
@@ -217,18 +186,14 @@ io.on("connect", (socket) => {
 		let m = [];
 		for(let q of queue) m.push(q.s.id);
 		console.log(" =>", m);
-		/*
-		if(queue.length >= 2){
-			roundStart = Date.now()+3000;
-			console.log("pushing back");
-		}else roundStart = null;
-		*/
+		io.emit("queueSize", queue.length);
 	});
 
 	socket.on("begin", () => {
 		if(queue.length){
 			startGame(queue);
 			queue = [];
+			io.emit("queueSize", queue.length);
 		}
 	});
 
