@@ -313,7 +313,7 @@ class Ship{
 				m.state = 0;
 		}
 
-		if(type == BS && Number.isInteger(team) && team < 0){
+		if(type == BS && Number.isInteger(team[0]) && team[0] < 0){
 			this.ai = [Math.random(), 0];
 		}
 
@@ -571,7 +571,7 @@ class Game{
 
 		if(T == EMP){
 			for(let x of this.ships)
-				if(x.team != this.ships[s].team)
+				if(x.team[0] != this.ships[s].team[0])
 					if(_dist(x.pos, this.ships[s].pos) < RANGE[EMP])
 						x.emp = 1;
 
@@ -581,7 +581,7 @@ class Game{
 
 		if(T == DISRUPT){
 			for(let x of this.ships)
-				if(x.team != this.ships[s].team)
+				if(x.team[0] != this.ships[s].team[0])
 					if(_dist(x.pos, this.ships[s].pos) < RANGE[DISRUPT])
 						x.imp = 1;
 
@@ -613,7 +613,7 @@ class Game{
 				this.ships[s].pos = [...x.pos];
 				x.pos = [...P];
 
-				if(x.team == CERB && x.move.length > 1)
+				if(x.team[0] == CERB && x.move.length > 1)
 					x.move = x.move.slice(0, 1);
 			}
 		}
@@ -660,41 +660,41 @@ class Game{
 			const S = s.modules[i].state;
 
 			if(T == TP && S == 0){
-				for(let x of this.ships) if(x.team != s.team)
+				for(let x of this.ships) if(x.team[0] != s.team[0])
 					for(let m of x.modules) if(m.type == BARRIER && m.state < 0)
 						if(_dist(x.pos, s.pos) < RANGE[BARRIER])
-							s.hurt(DAMAGE[BARRIER], x.team);
+							s.hurt(DAMAGE[BARRIER], x.team[0]);
 
 				s.pos = s.tp.slice(0, 2);
 				s.dock = s.tp[2];
 				s.tp = null;
 
-				for(let x of this.ships) if(x.team != s.team)
+				for(let x of this.ships) if(x.team[0] != s.team[0])
 					for(let m of x.modules) if(m.type == BARRIER && m.state < 0)
 						if(_dist(x.pos, s.pos) < RANGE[BARRIER])
-							s.hurt(DAMAGE[BARRIER], x.team);
+							s.hurt(DAMAGE[BARRIER], x.team[0]);
 			}
 
 			if(T == LEAP && S == 0){
 				for(let x of this.ships)
-					if(x.team != s.team)
+					if(x.team[0] != s.team[0])
 						if(_dist(x.pos, s.pos) < RANGE[LEAP])
-							x.hurt(DAMAGE[LEAP], s.team);
+							x.hurt(DAMAGE[LEAP], s.team[0]);
 
-				for(let x of this.ships) if(x.team != s.team)
+				for(let x of this.ships) if(x.team[0] != s.team[0])
 					for(let m of x.modules) if(m.type == BARRIER && m.state < 0)
 						if(_dist(x.pos, s.pos) < RANGE[BARRIER])
-							s.hurt(DAMAGE[BARRIER], x.team);
+							s.hurt(DAMAGE[BARRIER], x.team[0]);
 
 				this.explode([...s.pos], RANGE[LEAP], 9);
 				s.pos = s.tp.slice(0, 2);
 				s.dock = s.tp[2];
 				s.tp = null;
 
-				for(let x of this.ships) if(x.team != s.team)
+				for(let x of this.ships) if(x.team[0] != s.team[0])
 					for(let m of x.modules) if(m.type == BARRIER && m.state < 0)
 						if(_dist(x.pos, s.pos) < RANGE[BARRIER])
-							s.hurt(DAMAGE[BARRIER], x.team);
+							s.hurt(DAMAGE[BARRIER], x.team[0]);
 			}
 
 			if([LASER, LASER2, COL].includes(T)){
@@ -724,7 +724,7 @@ class Game{
 
 					let count = 0;
 
-					for(let x of this.ships) if(x.team != s.team){
+					for(let x of this.ships) if(x.team[0] != s.team[0]){
 						if(Math.abs(300*X-150*COLS+150 - x.pos[0]) < 300 && Math.abs(300*Y-150*ROWS+150 - x.pos[1]) < 300){
 							this.addShip(BOMBERP, s.team, [], [...s.pos], [[...x.pos, null]]);
 							s.modules[i].state = 0;
@@ -779,14 +779,14 @@ class Game{
 
 				if(s.modules[i].aux[2] == 1 && s.imp == 0)
 					for(let x of this.ships)
-						if(x.team != s.team)
+						if(x.team[0] != s.team[0])
 							if(_dist(x.pos, s.pos) < RANGE[DELTA])
-								x.hurt(DAMAGE[DELTA]/TPS, s.team);
+								x.hurt(DAMAGE[DELTA]/TPS, s.team[0]);
 			}
 
 			if(T == ALLY && s.modules[i].aux[0] > 0 && s.imp == 0){
 				for(let x of this.ships)
-					if(x.team == s.team && x.uid != s.uid)
+					if(x.team[0] == s.team[0] && x.uid != s.uid)
 						if(_dist(x.pos, s.pos) < RANGE[ALLY])
 							if(x.ally == null || x.ally[0] == null || x.ally[0].modules[x.ally[1]].aux[0] < s.modules[i].aux[0])
 								x.ally = [s, i];
@@ -815,9 +815,9 @@ class Game{
 			if(T == MIRROR){
 				if(s.modules[i].blast[0] > 0){
 					for(let x of this.ships)
-						if(x.team != s.team)
+						if(x.team[0] != s.team[0])
 							if(_dist(x.pos, s.pos) < RANGE[MIRROR])
-								x.hurt(s.modules[i].blast[0]*DAMAGE[MIRROR], s.team);
+								x.hurt(s.modules[i].blast[0]*DAMAGE[MIRROR], s.team[0]);
 
 					s.modules[i].blast[0] = 0;
 				}
@@ -829,9 +829,9 @@ class Game{
 			if(T == VENG){
 				if(S == 0){
 					for(let x of this.ships)
-						if(x.team != s.team)
+						if(x.team[0] != s.team[0])
 							if(_dist(x.pos, s.pos) < RANGE[VENG])
-								x.hurt(DAMAGE[VENG], s.team);
+								x.hurt(DAMAGE[VENG], s.team[0]);
 
 					this.explode([...s.pos], RANGE[VENG], 9);
 				}
@@ -892,7 +892,7 @@ class Game{
 
 		for(let s of this.ships) for(let m of s.modules)
 			if(m.type == BARRIER && m.state < 0)
-				for(let x of this.ships) if(x.team != s.team && x.type != STRIKEP)
+				for(let x of this.ships) if(x.team[0] != s.team[0] && x.type != STRIKEP)
 					if(_dist(x.pos, s.pos) < RANGE[BARRIER])
 						locked.add(x.uid);
 		
@@ -901,7 +901,7 @@ class Game{
 		let using = new Array(this.rocks.length).fill(false),
 			priority = new Array(this.rocks.length).fill(false);
 		
-		for(let s of this.ships) if(s.team != CERB && [BS, DECOY, REPAIR, ROCKET, WARP].includes(s.type)){
+		for(let s of this.ships) if(s.team[0] != CERB && [BS, DECOY, REPAIR, ROCKET, WARP].includes(s.type)){
 			if(s.type == DECOY){
 				if(s.move.length) priority[s.move[0][2]] = true;
 				else priority[s.dock] = true;
@@ -1110,7 +1110,7 @@ class Game{
 		for(let s of this.ships) s.suspend = 1;
 
 		for(let s of this.ships) for(let m of s.modules) if(m.type == SUSPEND && m.state < 0){
-			for(let x of this.ships) if(_dist(x.pos, s.pos) < RANGE[SUSPEND] && x.team != s.team)
+			for(let x of this.ships) if(_dist(x.pos, s.pos) < RANGE[SUSPEND] && x.team[0] != s.team[0])
 				x.suspend = 0.5;
 		}
 
@@ -1142,7 +1142,7 @@ class Game{
 					(![CANNON, TURRETD].includes(m.type) || m.state == 1)){
 					let targets = [], decoys = [];
 
-					for(let x of this.ships) if(x.team != s.team)
+					for(let x of this.ships) if(x.team[0] != s.team[0])
 						if(_dist(x.pos, s.pos) < RANGE[m.type] && (![DART, ROCKETD].includes(m.type)
 							|| [BS, DECOY, REPAIR, ROCKET, TURRET, PHASE, WARP].includes(x.type)))
 							if(m.type != ROCKETD || _dist(x.pos, s.pos) > 60){
@@ -1221,7 +1221,7 @@ class Game{
 							amp[M.get(x.uid)] = DAMAGE[AMP];
 					}
 					if(m.type == SUSPEND && m.state < 0){
-						for(let x of this.ships) if(_dist(x.pos, s.pos) < RANGE[SUSPEND] && x.team != s.team)
+						for(let x of this.ships) if(_dist(x.pos, s.pos) < RANGE[SUSPEND] && x.team[0] != s.team[0])
 							sol[M.get(x.uid)] = DAMAGE[SUSPEND];
 					}
 				}
@@ -1257,7 +1257,7 @@ class Game{
 
 						if(D != null)
 							for(let x of m.aux) if(M.has(x)){
-								this.ships[M.get(x)].hurt(D*amp[M.get(s.uid)]*sol[M.get(s.uid)]/TPS, s.team);
+								this.ships[M.get(x)].hurt(D*amp[M.get(s.uid)]*sol[M.get(s.uid)]/TPS, s.team[0]);
 							}
 					}
 		}
@@ -1288,32 +1288,32 @@ class Game{
 					for(let x of this.ships)
 						if(x.uid == s.ai)
 							if(_dist(x.pos, s.pos) < RANGE[DARTP])
-								x.hurt(4000, s.team);
+								x.hurt(4000, s.team[0]);
 				}
 
 				if(s.type == ROCKETP){
 					s.hp = -1;
 					this.explode(s.pos, RANGE[ROCKETP], 5);
 					for(let x of this.ships)
-						if(x.team != s.team)
+						if(x.team[0] != s.team[0])
 							if(_dist(x.pos, s.pos) < RANGE[ROCKETP])
-								x.hurt(1000, s.team);
+								x.hurt(1000, s.team[0]);
 				}
 
 				if(s.type == STRIKEP){
 					s.hp = -1;
 					this.explode(s.pos, RANGE[STRIKEP], 7);
 					for(let x of this.ships)
-						if(x.team != s.team)
+						if(x.team[0] != s.team[0])
 							if(_dist(x.pos, s.pos) < RANGE[STRIKEP])
-								x.hurt(3000, s.team);
+								x.hurt(3000, s.team[0]);
 				}
 
 				if(s.type == BOMBERP){
 					s.hp = -1;
 					this.explode(s.pos, RANGE[BOMBERP], 5);
 					for(let x of this.ships)
-						if(x.team != s.team)
+						if(x.team[0] != s.team[0])
 							if(_dist(x.pos, s.pos) < RANGE[BOMBERP])
 								x.hurt(2000);
 				}
@@ -1325,23 +1325,23 @@ class Game{
 			if(s.type == STRIKEP){
 				this.explode(s.pos, RANGE[STRIKEP], 1);
 				for(let x of this.ships)
-					if(x.team != s.team)
+					if(x.team[0] != s.team[0])
 						if(_dist(x.pos, s.pos) < RANGE[STRIKEP])
-							x.hurt(500, s.team);
+							x.hurt(500, s.team[0]);
 			}
 
 			if(s.type == ROCKETP){
 				this.explode(s.pos, RANGE[ROCKETP], 1);
 				for(let x of this.ships)
-					if(x.team != s.team)
+					if(x.team[0] != s.team[0])
 						if(_dist(x.pos, s.pos) < RANGE[ROCKETP])
-							x.hurt(200, s.team);
+							x.hurt(200, s.team[0]);
 			}
 
 			if(s.type == BOMBERP){
 				this.explode(s.pos, 40, 3);
 				for(let x of this.ships)
-					if(x.team != s.team)
+					if(x.team[0] != s.team[0])
 						if(_dist(x.pos, s.pos) < 40)
 							x.hurt(500);
 			}
@@ -1365,7 +1365,7 @@ class Game{
 			}
 
 			if(s.type == REPAIR && s.hp == 0){
-				for(let x of this.ships) if(x.team == s.team && x.uid != s.uid)
+				for(let x of this.ships) if(x.team[0] == s.team[0] && x.uid != s.uid)
 					if(_dist(x.pos, s.pos) < RANGE[REPAIR])
 						x.heal(2000);
 
@@ -1377,7 +1377,7 @@ class Game{
 				s.hp = 0;
 
 				if(s.type == REPAIR){
-					for(let x of this.ships) if(x.team == s.team && x.uid != s.uid)
+					for(let x of this.ships) if(x.team[0] == s.team[0] && x.uid != s.uid)
 						if(_dist(x.pos, s.pos) < RANGE[REPAIR])
 							x.heal(500);
 

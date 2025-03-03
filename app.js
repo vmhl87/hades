@@ -1153,13 +1153,13 @@ function stagingUI(){
 		return;
 	}
 
-	if(mouseIn(30, 30, 30, 30)){
-		showGuide = !showGuide;
+	if(showGuide && mouseIn(width/2, height/2, 150, min(height-120, 500)/2)){
+		controlGuide();
 		return;
 	}
 
-	if(showGuide && mouseIn(width/2, height/2, 150, min(height-120, 500)/2)){
-		controlGuide();
+	if(mouseIn(30, 30, 30, 30)){
+		showGuide = !showGuide;
 		return;
 	}
 
