@@ -656,11 +656,10 @@ function main(){
 		for(let s of ships){
 			const H = focus != null && focus[0] == "ship" && focus[1] == s.uid;
 
-			stroke(100, 200, 200, H ? 50 : 25);
-
 			if(s.move.length){
 				push(); translate(width/2, height/2);
 				translate(-camera.x*camera.z, -camera.y*camera.z);
+				stroke(100, 200, 200, H ? 50 : 25);
 				strokeWeight(4*sqrt(camera.z)); noFill();
 				beginShape();
 				vertex(s.vpos[0]*camera.z, s.vpos[1]*camera.z);
@@ -674,6 +673,7 @@ function main(){
 			if(s.wait){
 				push();
 				strokeWeight(4*sqrt(camera.z)); noFill();
+				stroke(200, 100, 100, H ? 50 : 25);
 				line(...screenPos(s.pos), ...screenPos(s.wait));
 				pop();
 			}
@@ -681,6 +681,7 @@ function main(){
 			if(dragMove != null && dragMove[2] == s.uid){
 				push();
 				strokeWeight(4*sqrt(camera.z)); noFill();
+				stroke(200, 100, 100, 50);
 				if(s.move.length)
 					line(...screenPos(s.move[s.move.length-1].slice(0, 2)), dragMove[0], dragMove[1]);
 				else line(...screenPos(s.pos), dragMove[0], dragMove[1]);
@@ -812,7 +813,7 @@ function main(){
 
 						if([LASER, LASER2, COL].includes(m.type)){
 							fill(200, 100, 50, 150); noStroke();
-							circle(...screenPos(C), 12*S*(5+sin(frameCount/20))/5);
+							circle(...screenPos(C), 12*S*(5+sin(Date.now()/16/20))/5);
 						}
 
 						for(let uid of m.aux){
@@ -821,7 +822,7 @@ function main(){
 
 							if([LASER, LASER2, COL].includes(m.type)){
 								fill(200, 100, 50, 150); noStroke();
-								circle(...screenPos(x.vpos), 7*S*(8+sin(frameCount/20))/8);
+								circle(...screenPos(x.vpos), 7*S*(8+sin(Date.now()/16/20))/8);
 								if(m.state < 0.6){
 									stroke(200, 100, 50); strokeWeight(2*S);
 									line(...screenPos(C), ...screenPos(x.vpos));
@@ -837,7 +838,7 @@ function main(){
 
 							}else if(m.type == TURRETD){
 								fill(50, 150, 200, 150); noStroke();
-								circle(...screenPos(x.vpos), 7*S*(8+sin(frameCount/20))/8);
+								circle(...screenPos(x.vpos), 7*S*(8+sin(Date.now()/16/20))/8);
 								let R = [x.vpos[0]-s.vpos[0], x.vpos[1]-s.vpos[1]],
 									D = _dist(x.vpos, s.vpos);
 								R[0] /= D; R[1] /= D;
@@ -848,7 +849,7 @@ function main(){
 
 							}else if([CANNON, SPREAD, SENTINEL, GUARD, INT].includes(m.type)){
 								stroke(200, 100, 50); strokeWeight(2*S);
-								const L = (((frameCount+x.uid*6+s.uid*3)/20) % 1) * 0.9;
+								const L = (((Date.now()/16+x.uid*6+s.uid*3)/20) % 1) * 0.9;
 								line(...screenPos(_lerp(C, x.vpos, L)),
 									...screenPos(_lerp(C, x.vpos, L+0.1)));
 							}

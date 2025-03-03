@@ -729,6 +729,21 @@ function drawShip(T, O, M){
 	pop();
 }
 
+function drawShip3(s){
+	drawShip2({
+		type: s.type,
+		team: s.team || DEV,
+		imp: s.imp || 0,
+		emp: s.emp || 0,
+		ally: s.ally || 0,
+		hp: s.hp || HP[s.type],
+		modules: s.modules || [],
+		rot: s.rot || 0,
+		move: s.move || [],
+		expire: s.expire || 1,
+	});
+}
+
 function drawShip2(s){
 	push(); scale(sqrt(camera.z));
 	push();
@@ -741,7 +756,7 @@ function drawShip2(s){
 	if(dragMove != null && dragMove[2] == s.uid && !s.move.length)
 		rotate(atan2(dragMove[1]-screenPos(s.vpos)[1], dragMove[0]-screenPos(s.vpos)[0]));
 	else rotate(s.rot);
-	drawShip(s.type, s.team != ID ? (s.type == BS && Number.isInteger(s.team) ? 2 : 1) : s.team == DEV, s.move.length && !s.emp ? 1 : 0);
+	drawShip(s.type, s.team != ID && s.team != DEV ? (s.type == BS && Number.isInteger(s.team) ? 2 : 1) : 0, s.move.length && !s.emp ? 1 : 0);
 	pop();
 	if(s.imp){
 		stroke(50, 200, 50); noFill(); strokeWeight(2);
@@ -785,7 +800,6 @@ function drawShip2(s){
 				fill(50, 150, 150);
 				rect(-15, -25, ceil(30*m.aux[0]), 3);
 			}
-
 
 	const exp = s.expire;
 

@@ -77,19 +77,31 @@ function mouseIn(x, y, w, h){
 }
 
 function wrap(T, W){
-	const S = T.split(' ');
-	let res = "", line = "", b = false;
+	function _wrap(T, W){
+		const S = T.split(' ');
+		let res = "", line = "", b = false;
 
-	for(let i=0; i<S.length; ++i){
-		const L = line + (b ? ' ' : '') + S[i];
-		b = true;
-		if(textWidth(L) > W){
-			res += (res.length ? '\n' : '') + line;
-			line = S[i];
-		}else line = L;
+		for(let i=0; i<S.length; ++i){
+			const L = line + (b ? ' ' : '') + S[i];
+			b = true;
+			if(textWidth(L) > W){
+				res += (res.length ? '\n' : '') + line;
+				line = S[i];
+			}else line = L;
+		}
+
+		return res + (res.length ? '\n' : '') + line;
 	}
 
-	return res + (res.length ? '\n' : '') + line;
+	let res = "", f = false;
+
+	for(let x of T.split('\n')){
+		if(f) res += '\n';
+		res += _wrap(x, W);
+		f = true;
+	}
+
+	return res;
 }
 
 class Ship{
@@ -187,12 +199,14 @@ let gestureStart = [0, 0, 0];
 
 window.addEventListener("gesturestart", function (e) {
 	e.preventDefault();
+	if(MOBILE) return;
 
 	gestureStart = [e.pageX - camera.x, e.pageY - camera.y, camera.z];
 });
 
 window.addEventListener("gesturechange", function (e) {
 	e.preventDefault();
+	if(MOBILE) return;
 
 	camera.z = gestureStart[2] * e.scale;
 
@@ -202,6 +216,7 @@ window.addEventListener("gesturechange", function (e) {
 
 window.addEventListener("gestureend", function (e) {
 	e.preventDefault();
+	if(MOBILE) return;
 });
 
 function _dist(a, b){
@@ -291,7 +306,7 @@ function mobileClick(P){
 		lastMouse.push([Date.now(), P.last]);
 		if(lastMouse.length > 3) lastMouse = lastMouse.slice(1);
 
-		if(lastMouse.length == 3 && lastMouse[0][0] > Date.now()-2000
+		if(!showGuide && lastMouse.length == 3 && lastMouse[0][0] > Date.now()-2000
 			&& _dist(lastMouse[1][1], [width/2, height/2-250]) < 200
 			&& abs(atan2(lastMouse[0][1][0]-lastMouse[1][1][0], lastMouse[0][1][1]-lastMouse[1][1][1])+PI/4) < 1
 			&& abs(atan2(lastMouse[1][1][0]-lastMouse[2][1][0], lastMouse[1][1][1]-lastMouse[2][1][1])+PI*3/4) < 1
@@ -335,7 +350,7 @@ function mouseReleased(){
 		lastMouse.push([Date.now(), [mouseX, mouseY]]);
 		if(lastMouse.length > 3) lastMouse = lastMouse.slice(1);
 
-		if(lastMouse.length == 3 && lastMouse[0][0] > Date.now()-2000
+		if(!showGuide && lastMouse.length == 3 && lastMouse[0][0] > Date.now()-2000
 			&& _dist(lastMouse[1][1], [width/2, height/2-250]) < 200
 			&& abs(atan2(lastMouse[0][1][0]-lastMouse[1][1][0], lastMouse[0][1][1]-lastMouse[1][1][1])+PI/4) < 1
 			&& abs(atan2(lastMouse[1][1][0]-lastMouse[2][1][0], lastMouse[1][1][1]-lastMouse[2][1][1])+PI*3/4) < 1

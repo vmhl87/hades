@@ -184,6 +184,7 @@ let showGuide = false, guideUI = {};
 	info(guideUI.warp).push("Warp Drones");
 
 	guideUI.now = guideUI.start;
+	guideUI.time = Date.now();
 };
 
 function drawGuide(){
@@ -225,7 +226,7 @@ function drawGuide(){
 			const C = guideUI.tree[N.child[i]];
 			let bound = 0;
 
-			const S = N.child.length*40 > min(height-120, 500)-90 ? 0.75 : 1;
+			const S = N.child.length*40 > min(height-120, 500)-40 ? 0.75 : 1;
 
 			textSize(S*15);
 
@@ -283,40 +284,45 @@ function drawGuide(){
 		const P = guideUI.now;
 		const Y = height/2-min(height-120, 500)/2 + 90;
 
+		function _text(T, x, y, w, h){
+			let n = 15;
+
+			textSize(n); fill(200);
+
+			while(font.textBounds(wrap(T, w), 0, 0).h > min(h, height/2+min(height-120, 500)/2-20 - y))
+				textSize(--n);
+
+			text(wrap(T, w), x, y);
+		}
+
 		if(P == guideUI.info){
 			push(); textAlign(LEFT, TOP);
-			textSize(15);
-			text(BODY.info, width/2-120, Y, 240, 1000);
+			_text(BODY.info, width/2-120, Y, 240, 1000);
 			pop();
 
 		}else if(P == guideUI.movement){
 			push(); textAlign(LEFT, TOP);
-			textSize(15);
-			text(BODY.movement, width/2-120, Y, 240, 1000);
+			_text(BODY.movement, width/2-120, Y, 240, 1000);
 			pop();
 
 		}else if(P == guideUI.combat){
 			push(); textAlign(LEFT, TOP);
-			textSize(15);
-			text(BODY.combat, width/2-120, Y, 240, 1000);
+			_text(BODY.combat, width/2-120, Y, 240, 1000);
 			pop();
 
 		}else if(P == guideUI.modules){
 			push(); textAlign(LEFT, TOP);
-			textSize(15);
-			text(BODY.modules, width/2-120, Y, 240, 1000);
+			_text(BODY.modules, width/2-120, Y, 240, 1000);
 			pop();
 
 		}else if(P == guideUI.quickMatch){
 			push(); textAlign(LEFT, TOP);
-			textSize(15);
-			text(BODY.quickMatch, width/2-120, Y, 240, 1000);
+			_text(BODY.quickMatch, width/2-120, Y, 240, 1000);
 			pop();
 
 		}else if(P == guideUI.arena){
 			push(); textAlign(LEFT, TOP);
-			textSize(15);
-			text(BODY.arena, width/2-120, Y, 240, 1000);
+			_text(BODY.arena, width/2-120, Y, 240, 1000);
 			pop();
 
 		}else if(P == guideUI.battleship){
@@ -333,8 +339,7 @@ function drawGuide(){
 			drawShip(BS, 2, 0);
 			pop();
 			push(); textAlign(LEFT, TOP);
-			textSize(15);
-			text(BODY.battleship, width/2-120, Y+50, 240, 1000);
+			_text(BODY.battleship, width/2-120, Y+50, 240, 1000);
 			pop();
 
 		}else if(P == guideUI.sentinel){
@@ -343,8 +348,7 @@ function drawGuide(){
 			drawShip(SENTINEL, 1, 0);
 			pop();
 			push(); textAlign(LEFT, TOP);
-			textSize(15);
-			text(BODY.sentinel, width/2-120, Y+50, 240, 1000);
+			_text(BODY.sentinel, width/2-120, Y+50, 240, 1000);
 			pop();
 
 		}else if(P == guideUI.guardian){
@@ -353,8 +357,7 @@ function drawGuide(){
 			drawShip(GUARD, 1, 0);
 			pop();
 			push(); textAlign(LEFT, TOP);
-			textSize(15);
-			text(BODY.guardian, width/2-120, Y+50, 240, 1000);
+			_text(BODY.guardian, width/2-120, Y+50, 240, 1000);
 			pop();
 
 		}else if(P == guideUI.interceptor){
@@ -363,8 +366,7 @@ function drawGuide(){
 			drawShip(INT, 1, 0);
 			pop();
 			push(); textAlign(LEFT, TOP);
-			textSize(15);
-			text(BODY.interceptor, width/2-120, Y+50, 240, 1000);
+			_text(BODY.interceptor, width/2-120, Y+50, 240, 1000);
 			pop();
 
 		}else if(P == guideUI.colossus){
@@ -373,8 +375,7 @@ function drawGuide(){
 			drawShip(COL, 1, 0);
 			pop();
 			push(); textAlign(LEFT, TOP);
-			textSize(15);
-			text(BODY.colossus, width/2-120, Y+50, 240, 1000);
+			_text(BODY.colossus, width/2-120, Y+50, 240, 1000);
 			pop();
 
 		}else if(P == guideUI.bomber){
@@ -382,9 +383,156 @@ function drawGuide(){
 			rotate(PI*1.85);
 			drawShip(BOMBER, 1, 0);
 			pop();
+
+			push(); translate(width/2-60*cos(PI*0.1), Y+10-60*sin(PI*0.1));
+			rotate(PI*1.1);
+			drawShip(BOMBERP, 1, 1);
+			pop();
+			push(); translate(width/2+60*cos(PI*0.1), Y+10+60*sin(PI*0.1));
+			rotate(PI*0.1);
+			drawShip(BOMBERP, 1, 1);
+			pop();
+
+			push(); translate(width/2+60*cos(PI*0.1), Y+10-60*sin(PI*0.1));
+			rotate(-PI*0.1);
+			drawShip(BOMBERP, 1, 1);
+			pop();
+			push(); translate(width/2-60*cos(PI*0.1), Y+10+60*sin(PI*0.1));
+			rotate(PI*0.9);
+			drawShip(BOMBERP, 1, 1);
+			pop();
+
+			push(); translate(width/2-70, Y+10);
+			rotate(PI);
+			drawShip(BOMBERP, 1, 1);
+			pop();
+			push(); translate(width/2+70, Y+10);
+			drawShip(BOMBERP, 1, 1);
+			pop();
+
 			push(); textAlign(LEFT, TOP);
-			textSize(15);
-			text(BODY.bomber, width/2-120, Y+50, 240, 1000);
+			_text(BODY.bomber, width/2-120, Y+50, 240, 1000);
+			pop();
+
+		}else if(P == guideUI.laser){
+			const T = 12;
+			const O = (((Date.now()-guideUI.time)/1000) % (T+2)) - 1;
+
+			const H1 = O < 1.5 ? 0 : (O-1.5)*60;
+			const H2 = O < 1.5 ? 0 : (O < 6 ? (O-1.5)*160 : (O < 10 ? 880+(O-6)*300 : 2080+(O-10)*600));
+
+			push(); translate(width/2, Y+40);
+			drawShip3({type: BS, rot: PI*1.85, hp: HP[BS] - H1});
+			pop();
+
+			const P = O < 2 ? -40 + (O-2)*30 : -40;
+
+			push();
+			stroke(100, 200, 200, 60); strokeWeight(3);
+			line(width/2 + P, Y+10, width/2 - 40, Y+10);
+			translate(width/2 + P, Y+10);
+			drawShip3({type: GUARD, hp: HP[GUARD] - H2,
+				rot: O < 2.2 ? 0 : (O < 2.5 ? PI*(2-0.15*(O-2.2)*1/0.3) : PI*1.85)});
+			pop();
+
+			const P1 = [width/2 + 17*cos(PI*1.85), Y+40 + 17*sin(PI*1.85)];
+			const P2 = [width/2 + P + 8, Y+10];
+
+			push();
+			if(dist(0, 40, P, 30) < 80){
+				fill(200, 100, 50, 150); noStroke();
+				circle(...P1, 12*(5+sin(Date.now()/16/20))/5);
+				circle(width/2 + P, Y+10, 7*(8+sin(Date.now()/16/20))/8);
+				if(O < 6){
+					stroke(200, 100, 50); strokeWeight(2);
+					line(...P1, width/2 + P, Y+10);
+				}else if(O < 10){
+					stroke(200, 100, 50); strokeWeight(4);
+					line(...P1, width/2 + P, Y+10);
+				}else{
+					stroke(200, 100, 50); strokeWeight(6);
+					line(...P1, width/2 + P, Y+10);
+					stroke(255, 150, 100); strokeWeight(3);
+					line(...P1, width/2 + P, Y+10);
+				}
+				stroke(200, 100, 50); strokeWeight(2);
+				const L = ((Date.now()/16/20) % 1) * 0.9;
+				line(..._lerp(P2, [width/2, Y+40], L),
+					..._lerp(P2, [width/2, Y+40], L+0.1));
+			}
+			pop();
+
+			if(O < 0){
+				fill(0, 20, 30, (-O)*255); noStroke();
+				rect(width/2-140, Y-40, 280, 180);
+			}
+
+			if(O > T){
+				fill(0, 20, 30, (O-T)*255); noStroke();
+				rect(width/2-140, Y-40, 280, 180);
+			}
+
+			push(); textAlign(LEFT, TOP);
+			_text(INFO[LASER] + "\n\n" + STATS[LASER], width/2-120, Y+120, 240, 1000);
+			pop();
+
+		}else if(P == guideUI.emp){
+			const T = 9;
+			const O = (((Date.now()-guideUI.time)/1000) % (T+2)) - 1;
+
+			const H1 = O <= 0.5 ? 0 : (O <= 1 ? (O-0.5)*100 : (O < 8 ? (50 + (O-8)*100) : 50));
+			const H2 = O <= 0.5 ? 0 : (O < 6 ? (O-0.5)*160 : (O < 8 ? 880+(O-6)*500 : 1880));
+
+			push(); translate(width/2, Y+40);
+			if(O > 1 && O < 5) drawEffect(EMP, 1-(O-1)/4);
+			drawShip3({type: BS, rot: PI*1.85, hp: HP[BS] - H1});
+			pop();
+
+			const P = O <= 1 ? -40 + (O-1)*40 : (O >= 7 ? -40 + (O-7)*40 : -40);
+
+			push();
+			stroke(100, 200, 200, 60); strokeWeight(3);
+			line(width/2 + P, Y, width/2 + 130, Y);
+			translate(width/2 + P, Y);
+			drawShip3({type: INT, emp: O > 1 && O < 7, hp: HP[INT] - H2});
+			pop();
+
+			const P1 = [width/2 + 17*cos(PI*1.85), Y+40 + 17*sin(PI*1.85)];
+			const P2 = [width/2 + P + 17, Y];
+
+			push();
+			if(dist(0, 40, P, 0) < 80){
+				fill(200, 100, 50, 150); noStroke();
+				circle(...P1, 12*(5+sin(Date.now()/16/20))/5);
+				circle(width/2 + P, Y, 7*(8+sin(Date.now()/16/20))/8);
+				if(O < 6){
+					stroke(200, 100, 50); strokeWeight(2);
+					line(...P1, width/2 + P, Y);
+				}else if(O < 10){
+					stroke(200, 100, 50); strokeWeight(4);
+					line(...P1, width/2 + P, Y);
+				}
+				if(O <= 1 || O >= 7){
+					stroke(200, 100, 50); strokeWeight(2);
+					const L = ((Date.now()/16/20) % 1) * 0.9;
+					line(..._lerp(P2, [width/2, Y+40], L),
+						..._lerp(P2, [width/2, Y+40], L+0.1));
+				}
+			}
+			pop();
+
+			if(O < 0){
+				fill(0, 20, 30, (-O)*255); noStroke();
+				rect(width/2-140, Y-40, 280, 180);
+			}
+
+			if(O > T){
+				fill(0, 20, 30, (O-T)*255); noStroke();
+				rect(width/2-140, Y-40, 280, 180);
+			}
+
+			push(); textAlign(LEFT, TOP);
+			_text(INFO[EMP] + "\n\n" + STATS[EMP], width/2-120, Y+150, 240, 1000);
 			pop();
 		}
 	}
@@ -396,6 +544,7 @@ function controlGuide(){
 	if(mouseIn(width/2-150 + 40, height/2-min(height-120, 500)/2 + 30, 40, 20)){
 		if(N.par != null) guideUI.now = N.par;
 		else showGuide = false;
+		guideUI.time = Date.now();
 		return;
 	}
 
@@ -405,7 +554,7 @@ function controlGuide(){
 			const C = guideUI.tree[N.child[i]];
 			let bound = 0;
 
-			const S = N.child.length*40 > min(height-120, 500)-90 ? 0.75 : 1;
+			const S = N.child.length*40 > min(height-120, 500)-40 ? 0.75 : 1;
 
 			textSize(S*15);
 
@@ -423,6 +572,7 @@ function controlGuide(){
 			const Y = height/2-min(height-120, 500)/2 + 90 + S*40*i;
 			if(mouseIn(width/2, Y, 20+bound/2, S*20)){
 				guideUI.now = N.child[i];
+				guideUI.time = Date.now();
 				return;
 			}
 		}
@@ -442,10 +592,10 @@ const BODY = {
 	quickMatch: "Quick Match is the default gamemode and the only one currently available. Battleships compete within a 5x5 sector map populated by all Cerberus variations as well as Lone Battleships. All player-controlled battleships are hostile to one another.",
 	arena: "Nothing to see here yet!",
 
-	battleship: "Battleships are powerful combat vessels which may equip one Weapon, one Shield, two Modules, and one Drone. With a 7k health pool, they can absorb significant damage.\n\nIn addition to player controlled Battleships, several computer controlled Lone Battleships may jump into the arena at various points throughout the round. These ships are characterized by their darker red color.",
-	sentinel: "Cerberus Sentinels are dangerous, equipping powerful cannons that deal 200 DPS, but have a small 1.2k health pool. When hidden behind other enemy ships, Sentinels can pose a significant threat.\n\nSentinels do not leave their assigned sectors.",
-	guardian: "Cerberus Guardians deal the lowest damage out of any ship in the game at 60 DPS. However, they have a high health pool of 8k, and can be dangerous by protecting other enemy ships from fire.\n\nGuardians do not leave their assigned sectors.",
+	battleship: "Battleships are powerful combat vessels which may equip one Weapon, one Shield, two Modules, and one Drone. With a 7k health pool, they can absorb significant damage.\n\nIn addition to player controlled Battleships, several computer controlled Lone Battleships may jump into the arena at various points throughout the round. Some Lone Battleships equip an unobtainable VENGEANCE module. Lone Battleships are differentiated by their darker red color.",
+	sentinel: "Cerberus Sentinels are dangerous, equipping powerful cannons that deal 200 DPS, but have a small 1.2k health pool. When hidden behind other enemy ships, Sentinels can pose a significant threat.\n\nSentinels do not leave their assigned sector.",
+	guardian: "Cerberus Guardians deal the lowest damage out of any ship in the game at 60 DPS. However, they have a high health pool of 8k, and can be dangerous by protecting other enemy ships from fire.\n\nGuardians do not leave their assigned sector.",
 	interceptor: "Cerberus Interceptors deal 100 DPS to up to four targets in range, rendering Decoy Drones useless. Despite their high health pool of 9k, Interceptors do not actively pursue player ships and are thus not a threat.\n\nInterceptors are not limited to any sector and patrol the map at random.",
-	colossus: "",
-	bomber: "",
+	colossus: "Cerberus Colossus equip a laser weapon that initially deals low damage (60 DPS) but slowly increases (to a maximum of 600 DPS). With a massive 20k health pool, Colossus are difficult to take down.\n\nColossus additionally equip a special APOCALYPSE module that triggers upon their death. Once triggered, a 40-second countdown initiates, upon which one to five sectors in the arena implode. All ships caught in the blast are instantly destroyed, and the resulting sector glows red for the rest of the game, damaging all ships within them (150 DPS).\n\nColossus do not leave their assigned sector.",
+	bomber: "Cerberus Bombers equip a Rocket Barrage weapon that periodically (every 24 seconds) fires one rocket at every enemy ship within range. In addition to their significant health pool of 16k, Bombers actively pathfind away from enemy ships and thus are quite difficult to kill.\n\nBombers do not leave their assigned sector.",
 };
