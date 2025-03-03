@@ -183,6 +183,27 @@ function mouseWheel(e){
 	}
 }
 
+let gestureStart = [0, 0, 0];
+
+window.addEventListener("gesturestart", function (e) {
+	e.preventDefault();
+
+	gestureStart = [e.pageX - camera.x, e.pageY - camera.y, camera.z];
+});
+
+window.addEventListener("gesturechange", function (e) {
+	e.preventDefault();
+
+	camera.z = gestureStart[2] * e.scale;
+
+	camera.x = e.pageX - gestureStart[0];
+	camera.y = e.pageY - gestureStart[1];
+})
+
+window.addEventListener("gestureend", function (e) {
+	e.preventDefault();
+});
+
 function _dist(a, b){
 	return sqrt((a[0]-b[0])*(a[0]-b[0]) + (a[1]-b[1])*(a[1]-b[1]));
 }

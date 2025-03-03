@@ -111,9 +111,28 @@ function startGame(Q){
 	let A = new Map();
 
 	for(let i=0; i<Q.length; ++i){
-		const R = Q[i].u[0];
-		const N = A.has(R) ? R + " (" + A.get(R).toString() + ")" : R;
-		A.set(R, A.has(R) ? A.has(R)+1 : 1);
+		const R = Q[i].u;
+		//const N = A.has(R) ? R + " (" + A.get(R).toString() + ")" : R;
+		//A.set(R, A.has(R) ? A.has(R)+1 : 1);
+
+		let N = R[0];
+
+		if(A.has(R[0])){
+			let B = A.get(R[0]), C = 0;
+
+			if(B.has(R[1])) C = B.get(R[1]);
+			else{
+				C = B.size;
+				B.set(R[1], C);
+			}
+
+			if(C) N += " (" + C.toString() + ")";
+
+		}else{
+			A.set(R[0], new Map());
+			A.get(R[0]).set(R[1], 0);
+		}
+
 		g.addShip(1, [Q[i].s.id, N], Q[i].modules,
 			[300*(p[i][0]-COLS/2+0.5), 300*(p[i][1]-ROWS/2+0.5)]);
 	}
