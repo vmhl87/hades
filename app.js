@@ -315,7 +315,7 @@ function main(){
 			}else{
 				textSize(25);
 				const H = mouseIn(width/2, height/2+150, textWidth("ENTER QUEUE")+30, 30);
-				fill(H ? 255 : 200); textSize(H ? 27 : 25);
+				fill(H ? 255 : 200); textSize(H ? 26 : 25);
 				text("ENTER QUEUE", width/2, height/2 + 150);
 			}
 
@@ -654,10 +654,14 @@ function main(){
 		}
 
 		for(let s of ships){
+			const H = focus != null && focus[0] == "ship" && focus[1] == s.uid;
+
+			stroke(100, 200, 200, H ? 50 : 25);
+
 			if(s.move.length){
 				push(); translate(width/2, height/2);
 				translate(-camera.x*camera.z, -camera.y*camera.z);
-				stroke(100, 200, 200, 30); strokeWeight(4*sqrt(camera.z)); noFill();
+				strokeWeight(4*sqrt(camera.z)); noFill();
 				beginShape();
 				vertex(s.vpos[0]*camera.z, s.vpos[1]*camera.z);
 				vertex(s.pos[0]*camera.z, s.pos[1]*camera.z);
@@ -669,14 +673,14 @@ function main(){
 
 			if(s.wait){
 				push();
-				stroke(255, 50, 50, 30); strokeWeight(4*sqrt(camera.z)); noFill();
+				strokeWeight(4*sqrt(camera.z)); noFill();
 				line(...screenPos(s.pos), ...screenPos(s.wait));
 				pop();
 			}
 
 			if(dragMove != null && dragMove[2] == s.uid){
 				push();
-				stroke(255, 50, 50, 30); strokeWeight(4*sqrt(camera.z)); noFill();
+				strokeWeight(4*sqrt(camera.z)); noFill();
 				if(s.move.length)
 					line(...screenPos(s.move[s.move.length-1].slice(0, 2)), dragMove[0], dragMove[1]);
 				else line(...screenPos(s.pos), dragMove[0], dragMove[1]);
@@ -686,7 +690,7 @@ function main(){
 			if(s.tp){
 				push(); translate(width/2, height/2);
 				translate(-camera.x*camera.z, -camera.y*camera.z);
-				stroke(255, 255, 50, 30); strokeWeight(4*sqrt(camera.z)); noFill();
+				stroke(255, 255, 50, H ? 50 : 25); strokeWeight(4*sqrt(camera.z)); noFill();
 				line(s.pos[0]*camera.z, s.pos[1]*camera.z,
 					s.tp[0]*camera.z, s.tp[1]*camera.z);
 				pop();
