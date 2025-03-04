@@ -17,6 +17,7 @@ let showGuide = false, guideUI = {};
 	guideUI.movement = ct++;
 	guideUI.combat = ct++;
 	guideUI.modules = ct++;
+	guideUI.keyboardShortcuts = ct++;
 
 	guideUI.quickMatch = ct++;
 	guideUI.arena = ct++;
@@ -71,7 +72,7 @@ let showGuide = false, guideUI = {};
 	for(let x=guideUI.info; x<=guideUI.drone; ++x)
 		subpage(guideUI.start, x);
 
-	for(let x=guideUI.movement; x<=guideUI.modules; ++x)
+	for(let x=guideUI.movement; x<=guideUI.keyboardShortcuts; ++x)
 		subpage(guideUI.gameplay, x);
 
 	for(let x=guideUI.quickMatch; x<=guideUI.arena; ++x)
@@ -110,6 +111,7 @@ let showGuide = false, guideUI = {};
 	info(guideUI.movement).push("Movement");
 	info(guideUI.combat).push("Combat");
 	info(guideUI.modules).push("Modules");
+	info(guideUI.keyboardShortcuts).push("Keyboard Shortcuts");
 
 	info(guideUI.quickMatch).push("Quick Match");
 	info(guideUI.arena).push("Arena");
@@ -315,6 +317,11 @@ function drawGuide(){
 			_text(BODY.modules, width/2-120, Y, 240, 1000);
 			pop();
 
+		}else if(P == guideUI.keyboardShortcuts){
+			push(); textAlign(LEFT, TOP);
+			_text(BODY.keyboardShortcuts, width/2-120, Y, 240, 1000);
+			pop();
+
 		}else if(P == guideUI.quickMatch){
 			push(); textAlign(LEFT, TOP);
 			_text(BODY.quickMatch, width/2-120, Y, 240, 1000);
@@ -432,7 +439,8 @@ function drawGuide(){
 			line(width/2 + P, Y+10, width/2 - 40, Y+10);
 			translate(width/2 + P, Y+10);
 			drawShip3({type: GUARD, hp: HP[GUARD] - H2,
-				rot: O < 2.2 ? 0 : (O < 2.5 ? PI*(2-0.15*(O-2.2)*1/0.3) : PI*1.85)});
+				rot: O < 2.2 ? 0 : (O < 2.5 ? PI*(2-0.15*(O-2.2)*1/0.3) : PI*1.85),
+				move: O < 2.2 ? [3] : null});
 			pop();
 
 			const P1 = [width/2 + 17*cos(PI*1.85), Y+40 + 17*sin(PI*1.85)];
@@ -474,6 +482,222 @@ function drawGuide(){
 
 			push(); textAlign(LEFT, TOP);
 			_text(INFO[LASER] + "\n\n" + STATS[LASER], width/2-120, Y+120, 240, 1000);
+			pop();
+
+		}else if(P == guideUI.cannon){
+			const T = 12;
+			const O = (((Date.now()-guideUI.time)/1000) % (T+2)) - 1;
+
+			const H1 = O < 1.5 ? 0 : (O-1.5)*60;
+			const H2 = O < 1.5 ? 0 : (O-1.5)*284;
+
+			push(); translate(width/2, Y+40);
+			drawShip3({type: BS, rot: PI*1.85, hp: HP[BS] - H1});
+			pop();
+
+			const P = O < 2 ? -40 + (O-2)*30 : -40;
+
+			push();
+			stroke(100, 200, 200, 60); strokeWeight(3);
+			line(width/2 + P, Y+10, width/2 - 40, Y+10);
+			translate(width/2 + P, Y+10);
+			drawShip3({type: GUARD, hp: HP[GUARD] - H2,
+				rot: O < 2.2 ? 0 : (O < 2.5 ? PI*(2-0.15*(O-2.2)*1/0.3) : PI*1.85),
+				move: O < 2.2 ? [3] : null});
+			pop();
+
+			const P1 = [width/2 + 17*cos(PI*1.85), Y+40 + 17*sin(PI*1.85)];
+			const P2 = [width/2 + P + 8, Y+10];
+
+			push();
+			if(dist(0, 40, P, 30) < 80){
+				stroke(200, 100, 50); strokeWeight(2);
+				let L = ((Date.now()/16/20) % 1) * 0.9;
+				line(..._lerp(P2, [width/2, Y+40], L),
+					..._lerp(P2, [width/2, Y+40], L+0.1));
+				L = ((Date.now()/16/20 + 0.4) % 1) * 0.9;
+				line(..._lerp(P1, [width/2 + P, Y+10], L),
+					..._lerp(P1, [width/2 + P, Y+10], L+0.1));
+			}
+			pop();
+
+			if(O < 0){
+				fill(0, 20, 30, (-O)*255); noStroke();
+				rect(width/2-140, Y-40, 280, 180);
+			}
+
+			if(O > T){
+				fill(0, 20, 30, (O-T)*255); noStroke();
+				rect(width/2-140, Y-40, 280, 180);
+			}
+
+			push(); textAlign(LEFT, TOP);
+			_text(INFO[CANNON] + "\n\n" + STATS[CANNON], width/2-120, Y+120, 240, 1000);
+			pop();
+
+		}else if(P == guideUI.spreadCannon){
+			const T = 12;
+			const O = (((Date.now()-guideUI.time)/1000) % (T+2)) - 1;
+
+			const H1 = (O < 1.5 ? 0 : (O-1.5)*60) + O*120;
+			const H2 = O < 1.5 ? 0 : (O-1.5)*210;
+			const H3 = O*210;
+
+			push(); translate(width/2, Y+40);
+			drawShip3({type: BS, rot: PI*1.85, hp: HP[BS] - H1});
+			pop();
+
+			const P = O < 2 ? -40 + (O-2)*30 : -40;
+
+			push();
+			stroke(100, 200, 200, 60); strokeWeight(3);
+			line(width/2 + P, Y+10, width/2 - 40, Y+10);
+			translate(width/2 + P, Y+10);
+			drawShip3({type: GUARD, hp: HP[GUARD] - H2,
+				rot: O < 2.2 ? 0 : (O < 2.5 ? PI*(2-0.15*(O-2.2)*1/0.3) : PI*1.85),
+				move: O < 2.2 ? [3] : null});
+			pop();
+			push();
+			translate(width/2 + 50, Y+60);
+			drawShip3({type: GUARD, hp: HP[GUARD] - H3, rot: PI*1.85});
+			pop();
+			push();
+			translate(width/2 -10, Y+80);
+			drawShip3({type: GUARD, hp: HP[GUARD] - H3, rot: PI*1.85});
+			pop();
+
+			const P1 = [width/2 + 17*cos(PI*1.85), Y+40 + 17*sin(PI*1.85)];
+			const P2 = [width/2 + P + 8, Y+10];
+
+			push();
+			stroke(200, 100, 50); strokeWeight(2);
+			let L = 0;
+			if(dist(0, 40, P, 30) < 80){
+				L = ((Date.now()/16/20) % 1) * 0.9;
+				line(..._lerp(P2, [width/2, Y+40], L),
+					..._lerp(P2, [width/2, Y+40], L+0.1));
+				L = ((Date.now()/16/20 + 0.4) % 1) * 0.9;
+				line(..._lerp(P1, [width/2 + P, Y+10], L),
+					..._lerp(P1, [width/2 + P, Y+10], L+0.1));
+			}
+			L = ((Date.now()/16/20 + 0.1) % 1) * 0.9;
+			line(..._lerp(P1, [width/2 + 50, Y+60], L),
+				..._lerp(P1, [width/2 + 50, Y+60], L+0.1));
+			L = ((Date.now()/16/20 + 0.7) % 1) * 0.9;
+			line(..._lerp(P1, [width/2 - 10, Y+80], L),
+				..._lerp(P1, [width/2 - 10, Y+80], L+0.1));
+			L = ((Date.now()/16/20 + 0.2) % 1) * 0.9;
+			line(..._lerp([width/2 + 56, Y+56], [width/2, Y+40], L),
+				..._lerp([width/2 + 56, Y+56], [width/2, Y+40], L+0.1));
+			L = ((Date.now()/16/20 + 0.8) % 1) * 0.9;
+			line(..._lerp([width/2 - 4, Y+76], [width/2, Y+40], L),
+				..._lerp([width/2 - 4, Y+76], [width/2, Y+40], L+0.1));
+			pop();
+
+			if(O < 0){
+				fill(0, 20, 30, (-O)*255); noStroke();
+				rect(width/2-140, Y-40, 280, 180);
+			}
+
+			if(O > T){
+				fill(0, 20, 30, (O-T)*255); noStroke();
+				rect(width/2-140, Y-40, 280, 180);
+			}
+
+			push(); textAlign(LEFT, TOP);
+			_text(INFO[SPREAD] + "\n\n" + STATS[SPREAD], width/2-120, Y+120, 240, 1000);
+			pop();
+
+		}else if(P == guideUI.dualLaser){
+			const T = 12;
+			const O = (((Date.now()-guideUI.time)/1000) % (T+2)) - 1;
+
+			const H1 = (O < 1.5 ? 0 : (O-1.5)*60) + O*60;
+			const H2 = O < 1.5 ? 0 : (O < 4.5 ? (O-1.5)*185 : (O < 7.5 ? 3*185 + (O-4.5)*450 : 3*185 + 3*450 + (O-7.5)*800));
+			const H3 = O < 4.5 ? O*185 : (O < 7.5 ? 4.5*185 + (O-4.5)*450 : 4.5*185 + 3*450 + (O-7.5)*800);
+
+			push(); translate(width/2, Y+40);
+			drawShip3({type: BS, rot: PI*1.85, hp: HP[BS] - H1});
+			pop();
+
+			const P = O < 2 ? -40 + (O-2)*30 : -40;
+
+			push();
+			stroke(100, 200, 200, 60); strokeWeight(3);
+			line(width/2 + P, Y+10, width/2 - 40, Y+10);
+			translate(width/2 + P, Y+10);
+			drawShip3({type: GUARD, hp: HP[GUARD] - H2,
+				rot: O < 2.2 ? 0 : (O < 2.5 ? PI*(2-0.15*(O-2.2)*1/0.3) : PI*1.85),
+				move: O < 2.2 ? [3] : null});
+			pop();
+			push();
+			translate(width/2 -10, Y+80);
+			drawShip3({type: GUARD, hp: HP[GUARD] - H3, rot: PI*1.85});
+			pop();
+
+			const P1 = [width/2 + 17*cos(PI*1.85), Y+40 + 17*sin(PI*1.85)];
+			const P2 = [width/2 + P + 8, Y+10];
+
+			push();
+			fill(200, 100, 50, 150); noStroke();
+			circle(...P1, 12*(5+sin(Date.now()/16/20))/5);
+			let L = 0;
+			if(dist(0, 40, P, 30) < 80){
+				fill(200, 100, 50, 150); noStroke();
+				circle(width/2 + P, Y+10, 7*(8+sin(Date.now()/16/20))/8);
+				stroke(200, 100, 50); strokeWeight(2);
+				L = ((Date.now()/16/20) % 1) * 0.9;
+				line(..._lerp(P2, [width/2, Y+40], L),
+					..._lerp(P2, [width/2, Y+40], L+0.1));
+				if(O < 4.5){
+					stroke(200, 100, 50); strokeWeight(2);
+					line(...P1, width/2 + P, Y+10);
+				}else if(O < 7.5){
+					stroke(200, 100, 50); strokeWeight(4);
+					line(...P1, width/2 + P, Y+10);
+				}else{
+					stroke(200, 100, 50); strokeWeight(6);
+					line(...P1, width/2 + P, Y+10);
+					stroke(255, 150, 100); strokeWeight(3);
+					line(...P1, width/2 + P, Y+10);
+				}
+			}
+			fill(200, 100, 50, 150); noStroke();
+			circle(width/2 - 10, Y+80, 7*(8+sin(Date.now()/16/20))/8);
+			stroke(200, 100, 50); strokeWeight(2);
+			L = ((Date.now()/16/20 + 0.7) % 1) * 0.9;
+			line(..._lerp(P1, [width/2 - 10, Y+80], L),
+				..._lerp(P1, [width/2 - 10, Y+80], L+0.1));
+			if(O < 4.5){
+				stroke(200, 100, 50); strokeWeight(2);
+				line(...P1, width/2 - 10, Y+80);
+			}else if(O < 7.5){
+				stroke(200, 100, 50); strokeWeight(4);
+				line(...P1, width/2 - 10, Y+80);
+			}else{
+				stroke(200, 100, 50); strokeWeight(6);
+				line(...P1, width/2 - 10, Y+80);
+				stroke(255, 150, 100); strokeWeight(3);
+				line(...P1, width/2 - 10, Y+80);
+			}
+			stroke(200, 100, 50); strokeWeight(2);
+			L = ((Date.now()/16/20 + 0.8) % 1) * 0.9;
+			line(..._lerp([width/2 - 4, Y+76], [width/2, Y+40], L),
+				..._lerp([width/2 - 4, Y+76], [width/2, Y+40], L+0.1));
+			pop();
+
+			if(O < 0){
+				fill(0, 20, 30, (-O)*255); noStroke();
+				rect(width/2-140, Y-40, 280, 180);
+			}
+
+			if(O > T){
+				fill(0, 20, 30, (O-T)*255); noStroke();
+				rect(width/2-140, Y-40, 280, 180);
+			}
+
+			push(); textAlign(LEFT, TOP);
+			_text(INFO[LASER2] + "\n\n" + STATS[LASER2], width/2-120, Y+120, 240, 1000);
 			pop();
 
 		}else if(P == guideUI.emp){
@@ -588,6 +812,7 @@ const BODY = {
 	movement: "Ships in Hades' Star cannot move arbitrarily. Players may only direct their Battleship and drones to move towards locations of asteroids, and once a ship has started moving, it cannot be cancelled.\n\nIn order to move, select your Battleship by clicking on it, and either press the arrow in the control dialog or drag your ship to the desired location. The ship then begins a 10-second countdown before departing, allowing you to cancel the movement. If you wish to depart immediately, press the arrow again (it should now turn into a check mark).",
 	combat: "Weapons auto-target and auto-activate without the need for player input. Each Weapon has a specific range, and begins firing on enemy ships that come within its range, up to its maximum number of targets.\n\nA Weapon will not stop firing upon an enemy ship until it is out of range, or a module such as Decoy Drone has been used to forcibly switch targeting.\n\nSelecting any Ship will display a circle representing its attack radius (or blast radius in the case of rockets) as well as any radii of nearby enemies.",
 	modules: "Many shields, modules, and drones must be manually activated. To trigger them, select the owner Ship, and click on the relevant icon in the control dialog. Once activated, the module will take some time to recharge before it can be used again.\n\nSome modules, such as Teleport, require the player to select a destination upon activation.\n\nThe modules of enemy Battleships are not visible until they have been used. In the case of automatically activated modules, such as Weapons, they reveal once the Ship has begun firing upon an enemy.",
+	keyboardShortcuts: "W - select your Battleship\n\nE - select movement destination\n\nX - cancel movement\n\nA/S/D/F/G - activate slot 1/2/3/4/5",
 
 	quickMatch: "Quick Match is the default gamemode and the only one currently available. Battleships compete within a 5x5 sector map populated by all Cerberus variations as well as Lone Battleships. All player-controlled battleships are hostile to one another.",
 	arena: "Nothing to see here yet!",

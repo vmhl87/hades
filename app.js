@@ -209,7 +209,7 @@ function main(){
 
 			if(chooseModule != -1) pick = chooseModule < 0 ? chooseModule+10 : chooseModule;
 
-			if(pick != null && (!MOBILE || !ALLMODULE)){
+			if(pick != null && (!MOBILE || !ALLMODULE) && !showGuide){
 				const I = INFO[modules[pick]];
 
 				if(I != null){
