@@ -86,7 +86,7 @@ socket.on("start", data => {
 	camera.z = 1;
 
 	for(let s of data.ships)
-		if(s.type == BS && s.team[0] == socket.id){
+		if(s.type == BS && s.team == socket.id){
 			camera.x = s.pos[0];
 			camera.y = s.pos[1];
 		}

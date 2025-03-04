@@ -164,7 +164,7 @@ io.on("connect", (socket) => {
 
 		for(let g of games){
 			for(let s of g.ships){
-				if(s.type == 1 && s.team == socket.id){
+				if(s.type == 1 && s.team[0] == socket.id){
 					console.log(" => killing ships");
 					s.hp = 0;
 				}
