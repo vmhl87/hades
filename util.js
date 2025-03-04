@@ -108,8 +108,8 @@ class Ship{
 	constructor(dat){
 		this.type = dat.type;
 		this.hp = dat.hp;
-		this.team = dat.team[0];
-		this.user = dat.team[1];
+		this.team = dat.team;
+		this.user = dat.user;
 		this.modules = dat.modules;
 		this.pos = dat.pos;
 		this.move = dat.move;

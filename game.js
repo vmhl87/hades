@@ -349,7 +349,8 @@ class Ship{
 		return {
 			type: this.type,
 			hp: this.hp,
-			team: this.team,
+			team: this.team[0],
+			user: this.team[1],
 			modules: this.modules,
 			pos: this.pos,
 			move: this.move,
@@ -407,7 +408,7 @@ class Ship{
 	}
 
 	_hurt(x, src = null){
-		this.hp = Math.max(0, this.hp-dmg);
+		this.hp = Math.max(0, this.hp-x);
 
 		if(this.hp == 0 && src != null) this.kill = src;
 	}
