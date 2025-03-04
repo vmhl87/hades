@@ -403,7 +403,11 @@ class Ship{
 			dmg -= rem;
 		}
 
-		if(dmg) this.hp = Math.max(0, this.hp-dmg);
+		if(dmg) this._hurt(dmg, src);
+	}
+
+	_hurt(x, src = null){
+		this.hp = Math.max(0, this.hp-dmg);
 
 		if(this.hp == 0 && src != null) this.kill = src;
 	}
@@ -662,8 +666,10 @@ class Game{
 			if(T == TP && S == 0){
 				for(let x of this.ships) if(x.team[0] != s.team[0])
 					for(let m of x.modules) if(m.type == BARRIER && m.state < 0)
-						if(_dist(x.pos, s.pos) < RANGE[BARRIER])
-							s.hurt(DAMAGE[BARRIER], x.team[0]);
+						if(_dist(x.pos, s.pos) < RANGE[BARRIER]){
+							s.hurt(DAMAGE[BARRIER]/2, x.team[0]);
+							s._hurt(DAMAGE[BARRIER]/2, x.team[0]);
+						}
 
 				s.pos = s.tp.slice(0, 2);
 				s.dock = s.tp[2];
@@ -671,8 +677,10 @@ class Game{
 
 				for(let x of this.ships) if(x.team[0] != s.team[0])
 					for(let m of x.modules) if(m.type == BARRIER && m.state < 0)
-						if(_dist(x.pos, s.pos) < RANGE[BARRIER])
-							s.hurt(DAMAGE[BARRIER], x.team[0]);
+						if(_dist(x.pos, s.pos) < RANGE[BARRIER]){
+							s.hurt(DAMAGE[BARRIER]/2, x.team[0]);
+							s._hurt(DAMAGE[BARRIER]/2, x.team[0]);
+						}
 			}
 
 			if(T == LEAP && S == 0){
@@ -683,8 +691,10 @@ class Game{
 
 				for(let x of this.ships) if(x.team[0] != s.team[0])
 					for(let m of x.modules) if(m.type == BARRIER && m.state < 0)
-						if(_dist(x.pos, s.pos) < RANGE[BARRIER])
-							s.hurt(DAMAGE[BARRIER], x.team[0]);
+						if(_dist(x.pos, s.pos) < RANGE[BARRIER]){
+							s.hurt(DAMAGE[BARRIER]/2, x.team[0]);
+							s._hurt(DAMAGE[BARRIER]/2, x.team[0]);
+						}
 
 				this.explode([...s.pos], RANGE[LEAP], 9);
 				s.pos = s.tp.slice(0, 2);
@@ -693,8 +703,10 @@ class Game{
 
 				for(let x of this.ships) if(x.team[0] != s.team[0])
 					for(let m of x.modules) if(m.type == BARRIER && m.state < 0)
-						if(_dist(x.pos, s.pos) < RANGE[BARRIER])
-							s.hurt(DAMAGE[BARRIER], x.team[0]);
+						if(_dist(x.pos, s.pos) < RANGE[BARRIER]){
+							s.hurt(DAMAGE[BARRIER]/2, x.team[0]);
+							s._hurt(DAMAGE[BARRIER]/2, x.team[0]);
+						}
 			}
 
 			if([LASER, LASER2, COL].includes(T)){
@@ -746,7 +758,7 @@ class Game{
 								I = j;
 
 						if(I != null){
-							this.addShip(DARTP, s.team, [], [...s.pos], [[...this.ships[I].pos,
+							this.addShip(DARTP, s.team, [], [s.pos[0], s.pos[1]+5], [[...this.ships[I].pos,
 								this.ships[I].move.length ? null : this.ships[I].dock]]);
 							this.ships[this.ships.length-1].ai = s.modules[i].aux[0];
 							s.modules[i].state = 0;
