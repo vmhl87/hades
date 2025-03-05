@@ -612,6 +612,8 @@ function main(){
 					let D = 0;
 					for(let x of s.modules) if(weaponRange(x.type) != null)
 						D = max(D, weaponRange(x.type));
+					if([DARTP, ROCKETP, STRIKEP, BOMBERP].includes(s.type))
+						D = max(D, RANGE[s.type]);
 					if(D == 0) continue;
 					let near = _dist(ships[shipID].vpos, s.vpos) < D+30;
 
