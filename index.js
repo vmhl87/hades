@@ -1,7 +1,7 @@
 // -- server setup --
 
 const app = require("express")();
-const server = app.listen(process.env.PORT || 3232);
+const server = app.listen(process.env.PORT || 3231);
 const path = require("path");
 
 const io = require("socket.io")(server, {pingTimeout: 300000});
