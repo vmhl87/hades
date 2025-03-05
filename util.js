@@ -219,6 +219,12 @@ window.addEventListener("gestureend", function (e) {
 	if(MOBILE) return;
 });
 
+window.addEventListener('wheel', function(e) {
+	e.preventDefault();
+	mouseWheel(e);
+
+}, {passive: false})
+
 function _dist(a, b){
 	return sqrt((a[0]-b[0])*(a[0]-b[0]) + (a[1]-b[1])*(a[1]-b[1]));
 }

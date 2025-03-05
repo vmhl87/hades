@@ -1,6 +1,6 @@
 let font = null;
 
-let modules = [null, null, null, null, null];
+let modules = [LASER, ALPHA, EMP, DUEL, DECOY];
 
 function genUser(){
 	return [
@@ -49,6 +49,7 @@ socket.on("reset", () => {
 	selectMove = null;
 	gameID = null;
 
+	camera = {x: 0, y: 0, z: 1};
 	speed = 1;
 	last = 0;
 	age = 0;
@@ -136,6 +137,7 @@ socket.on("end", () => {
 	select = null;
 	selectMove = null;
 	gameID = null;
+	camera = {x: 0, y: 0, z: 1};
 });
 
 socket.on("queueSize", x => queueSize = x);
