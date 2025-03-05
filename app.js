@@ -609,26 +609,31 @@ function main(){
 				push();
 				noFill(); stroke(90, 70, 70, 100);
 				for(let s of ships) if(s.team != ships[shipID].team){
-					let near = _dist(ships[shipID].vpos, s.vpos) < 130;
+					let D = 0;
+					for(let x of s.modules) if(weaponRange(x.type) != null)
+						D = max(D, weaponRange(x.type));
+					if(D == 0) continue;
+					let near = _dist(ships[shipID].vpos, s.vpos) < D+30;
+
 					if([DARTP, ROCKETP, STRIKEP, BOMBERP].includes(s.type))
 						if(_dist(ships[shipID].vpos, s.move[s.move.length-1]) < RANGE[s.type]+20)
 							circle(...screenPos(s.move[s.move.length-1]), RANGE[s.type]*2*camera.z);
 					if(ships[shipID].wait){
-						if(_linedist(ships[shipID].vpos, ships[shipID].wait, s.vpos) < 130) near = true;
+						if(_linedist(ships[shipID].vpos, ships[shipID].wait, s.vpos) < D+30) near = true;
 						if([DARTP, ROCKETP, STRIKEP, BOMBERP].includes(s.type))
 							if(_linedist(ships[shipID].vpos, ships[shipID].wait,
 								s.move[s.move.length-1]) < RANGE[s.type]+20)
 								circle(...screenPos(s.move[s.move.length-1]), RANGE[s.type]*2*camera.z);
 					}
 					if(ships[shipID].move.length){
-						if(_linedist(ships[shipID].vpos, ships[shipID].move[0], s.vpos) < 130) near = true;
+						if(_linedist(ships[shipID].vpos, ships[shipID].move[0], s.vpos) < D+30) near = true;
 						if([DARTP, ROCKETP, STRIKEP, BOMBERP].includes(s.type))
 							if(_linedist(ships[shipID].vpos, ships[shipID].move[0],
 								s.move[s.move.length-1]) < RANGE[s.type]+20)
 								circle(...screenPos(s.move[s.move.length-1]), RANGE[s.type]*2*camera.z);
 					}
 					for(let i=0; i<ships[shipID].move.length-1; ++i){
-						if(_linedist(ships[shipID].move[i], ships[shipID].move[i+1], s.vpos) < 130) near = true;
+						if(_linedist(ships[shipID].move[i], ships[shipID].move[i+1], s.vpos) < D+30) near = true;
 						if([DARTP, ROCKETP, STRIKEP, BOMBERP].includes(s.type))
 							if(_linedist(ships[shipID].move[i], ships[shipID].move[i+1],
 								s.move[s.move.length-1]) < RANGE[s.type]+20)
@@ -956,7 +961,9 @@ function main(){
 						const H = mouseIn(width/2+25-25*ships[shipID].modules.length+50*i, height-120-10-25, 25, 20);
 
 						push(); translate(width/2+25-25*ships[shipID].modules.length+50*i,
-							height-120-10-25 - (H && ships[shipID].modules[i].state == 1 && ACTIVATED[ships[shipID].modules[i].type] ? 2 : 0));
+							height-120-10-25 - (H && ships[shipID].modules[i].state == 1 && ACTIVATED[ships[shipID].modules[i].type] && (
+								ships[shipID].type != BS || ships[shipID].modules[i].use || ships[shipID].team == ID
+							)? 2 : 0));
 						const S = ships[shipID], M = S.modules[i];
 						drawModule2(M.use || S.type != BS || S.team == ID ? M.type : NULL, ships[shipID].modules[i].state);
 						pop();
