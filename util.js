@@ -488,7 +488,7 @@ function updateTouch(){
 		}else posTouches.set(t.id, {first: [t.x, t.y], last: [t.x, t.y], orig: [t.x, t.y]});
 	}
 
-	if(!staging) if(touches.length == 1){
+	if(touches.length == 1 && !staging){
 		if(ctlState == 1 || ctlState == 0){
 			if(movedTouches.has(touches[0].id)){
 				ctlState = 1;
@@ -518,7 +518,7 @@ function updateTouch(){
 			}
 		}
 
-	}else if(touches.length == 2){
+	}else if(touches.length == 2 && !staging){
 		if(dragMove != null) selectMove = null;
 		dragMove = null;
 
