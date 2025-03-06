@@ -76,20 +76,22 @@ function mouseIn(x, y, w, h){
 	}else return abs(mouseX-x) < w && abs(mouseY-y) < h;
 }
 
-function _wrap(T, W){
-	const S = T.split(' ');
-	let res = "", line = "", b = false;
+function _wrap(Z, W){
+	const S = Z.split(' ');
+	let R = "", line = "";
 
-	for(let i=0; i<S.length; ++i){
-		const L = line + (b ? ' ' : '') + S[i];
-		b = true;
+	for(let X of S){
+		const L = line + (line.length ? ' ' : "") + X;
 		if(textWidth(L) > W){
-			res += (res.length ? '\n' : '') + line;
-			line = S[i];
+			R += (R.length ? '\n' : "") + line;
+			line = X;
 		}else line = L;
 	}
 
-	return res + (res.length ? '\n' : '') + line;
+	if(line.length)
+		R += (R.length ? '\n' : '') + line;
+
+	return R;
 }
 
 function wrap(T, W){
