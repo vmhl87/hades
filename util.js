@@ -76,26 +76,26 @@ function mouseIn(x, y, w, h){
 	}else return abs(mouseX-x) < w && abs(mouseY-y) < h;
 }
 
-function wrap(T, W){
-	function _wrap(T, W){
-		const S = T.split(' ');
-		let res = "", line = "", b = false;
+function _wrap(T, W){
+	const S = T.split(' ');
+	let res = "", line = "", b = false;
 
-		for(let i=0; i<S.length; ++i){
-			const L = line + (b ? ' ' : '') + S[i];
-			b = true;
-			if(textWidth(L) > W){
-				res += (res.length ? '\n' : '') + line;
-				line = S[i];
-			}else line = L;
-		}
-
-		return res + (res.length ? '\n' : '') + line;
+	for(let i=0; i<S.length; ++i){
+		const L = line + (b ? ' ' : '') + S[i];
+		b = true;
+		if(textWidth(L) > W){
+			res += (res.length ? '\n' : '') + line;
+			line = S[i];
+		}else line = L;
 	}
 
+	return res + (res.length ? '\n' : '') + line;
+}
+
+function wrap(T, W){
 	let res = "", f = false;
 
-	for(let x of T.split('\n')){
+	for(const x of T.split('\n')){
 		if(f) res += '\n';
 		res += _wrap(x, W);
 		f = true;
