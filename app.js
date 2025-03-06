@@ -1407,14 +1407,14 @@ function click(){
 		
 	}else shipID = null;
 
-	if((!focus || MOBILE) && mouseIn(width-30, height-30, 30, 30))
+	if((!focus || MOBILE) && mouseIn(width-30, height-30, 30, 30) && selectMove == null)
 		for(let s of ships)
 			if(s.team == ID && s.type == BS){
 				focus = ["ship", s.uid];
 				return;
 			}
 
-	if(focus && mouseIn(width/2, height, focus[0] == "rock" ? 55 : 150, 20)){
+	if(focus && mouseIn(width/2, height, focus[0] == "rock" ? 55 : 150, 20) && selectMove == null){
 		selectMove = null;
 		focus = null;
 		return;

@@ -495,7 +495,7 @@ class Game{
 			if(T == DELTA)
 				this.ships[s].modules[dat.i].aux = [1, 1, 1];
 
-			else if(T >= ALPHA && T <= ALLY)
+			else if(T >= ALPHA && T <= ALLY && T != PASSIVE)
 				this.ships[s].modules[dat.i].aux = [1, 1];
 
 			this.ships[s].modules[dat.i].state = -1;
