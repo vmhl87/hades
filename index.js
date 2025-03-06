@@ -4,7 +4,7 @@ const app = require("express")();
 const server = app.listen(process.env.PORT || 3231);
 const path = require("path");
 
-const io = require("socket.io")(server, {pingTimeout: 300000});
+const io = require("socket.io")(server);
 
 app.get("/", (x, res) => {
 	res.sendFile(path.join(__dirname, "index.html"));
