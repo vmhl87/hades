@@ -106,10 +106,13 @@ function wrap(T, W){
 	return res;
 }
 
+let timeframes = [0, 0];
+
 class Ship{
 	constructor(dat){
 		this.type = dat.type;
 		this.hp = dat.hp;
+		this.mhp = dat.mhp;
 		this.team = dat.team;
 		this.user = dat.user;
 		this.modules = dat.modules;
@@ -118,6 +121,7 @@ class Ship{
 		this.wait = dat.wait;
 		this.tp = dat.tp;
 		this.vpos = [...this.pos];
+		this.vvpos = [...this.pos];
 		this.rot = PI;
 		this.uid = dat.uid;
 		this.dock = dat.dock;
@@ -132,7 +136,7 @@ class Ship{
 	}
 
 	decode(dat){
-		this.hp = dat.hp
+		this.hp = dat.hp;
 		this.modules = dat.modules;
 		this.pos = dat.pos;
 		this.move = dat.move;
@@ -167,8 +171,18 @@ class Ship{
 		if(this.rot > PI*2) this.rot -= PI*2;
 		if(this.rot < -PI*2) this.rot += PI*2;
 
+		/*
 		this.vpos[0] = lerp(this.vpos[0], this.pos[0], T);
 		this.vpos[1] = lerp(this.vpos[1], this.pos[1], T);
+		*/
+
+		const F = last+500, OLD = timeframes[1], NEW = timeframes[0];
+
+		this.vvpos[0] = lerp(this.vvpos[0], this.pos[0], (NEW-OLD)/(F-OLD));
+		this.vvpos[1] = lerp(this.vvpos[1], this.pos[1], (NEW-OLD)/(F-OLD));
+
+		this.vpos[0] = lerp(this.vpos[0], this.vvpos[0], T*5);
+		this.vpos[1] = lerp(this.vpos[1], this.vvpos[1], T*5);
 	}
 }
 
@@ -402,6 +416,9 @@ function echo(...x){
 let scrollVel = [0, 0];
 
 function draw(){
+	timeframes[1] = timeframes[0];
+	timeframes[0] = Date.now();
+
 	if(touches.length && !MOBILE){
 		MOBILE = true;
 		frameRate(30);

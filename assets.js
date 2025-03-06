@@ -1372,6 +1372,15 @@ function drawModule(T){
 	pop();
 }
 
+function _moduleColor(T){
+	if(T >= LASER && T <= ROCKETD) return [255, 50, 50];
+	if(T >= SENTINEL && T <= BOMBER) return [255, 50, 50];
+	if(T >= ALPHA && T <= ALLY) return [0, 255, 255];
+	if(T >= EMP && T <= APOCALYPSE) return [100, 255, 100];
+	if(T >= DECOY && T <= REPAIR) return [255, 150, 0];
+	return [255];
+}
+
 function drawModule2(T, S){
 	fill(0, 10, 25); noStroke();
 	rect(-20, -20, 40, 40);
@@ -1386,12 +1395,16 @@ function drawModule2(T, S){
 		return;
 	}
 
+	/*
 	fill(255, 40);
 	if(T >= LASER && T <= ROCKETD) fill(255, 50, 50, 60);
 	if(T >= SENTINEL && T <= BOMBER) fill(255, 50, 50, 60);
 	if(T >= ALPHA && T <= ALLY) fill(0, 255, 255, 60);
 	if(T >= EMP && T <= APOCALYPSE) fill(100, 255, 100, 60);
 	if(T >= DECOY && T <= REPAIR) fill(255, 150, 0, 60);
+	*/
+
+	fill(..._moduleColor(T), 60);
 
 	rect(-20, -20, 40, 40);
 

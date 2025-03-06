@@ -265,9 +265,10 @@ function IS_WEAPON(T){
 let UID = 0;
 
 class Ship{
-	constructor(type, hp, team, modules, pos, move = []){
+	constructor(type, team, modules, pos, move = []){
 		this.type = type;
-		this.hp = hp;
+		this.hp = HP[type];
+		this.mhp = HP[type];
 		this.team = team;
 		this.modules = [];
 		for(let m of modules) if(m)
@@ -284,6 +285,7 @@ class Ship{
 		this.fort = 0;
 		this.imp = 0;
 		this.ally = null;
+		this.speed = SPEED[type];
 
 		this.ai = null;
 		this.kill = null;
@@ -349,6 +351,7 @@ class Ship{
 		return {
 			type: this.type,
 			hp: this.hp,
+			mhp: this.mhp,
 			team: this.team[0],
 			user: this.team[1],
 			modules: this.modules,
@@ -414,7 +417,7 @@ class Ship{
 	}
 
 	heal(x){
-		this.hp = Math.min(HP[this.type], this.hp+x);
+		this.hp = Math.min(this.mhp, this.hp+x);
 	}
 
 	travel(){
@@ -452,7 +455,8 @@ class Ship{
 				this.pos[1] += dir[1]*dist;
 			}
 
-			let S = SPEED[this.type] * this.suspend;
+			//let S = SPEED[this.type] * this.suspend;
+			let S = this.speed * this.suspend;
 
 			for(let m of this.modules) if(m.type == DELTA && m.aux[2])
 				S *= SPEED[DELTA];
@@ -485,7 +489,7 @@ class Game{
 	}
 
 	addShip(type, team, modules, pos, move = []){
-		this.ships.push(new Ship(type, HP[type], team, modules, pos, move));
+		this.ships.push(new Ship(type, team, modules, pos, move));
 	}
 
 	activateModule(s, dat){
@@ -849,7 +853,7 @@ class Game{
 					this.explode([...s.pos], RANGE[VENG], 9);
 				}
 				
-				if(S == 1 && s.hp <= 2000){
+				if(S == 1 && s.hp <= s.mhp*2/7){
 					s.modules[i].state = -1;
 					s.modules[i].use = true;
 

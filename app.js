@@ -923,7 +923,7 @@ function main(){
 					pop();
 
 				}else if(focus[0] == "ship"){
-					const hp = ships[shipID].hp, max = HP[ships[shipID].type];
+					const hp = ships[shipID].hp, max = ships[shipID].mhp;
 
 					push();
 					fill(0, 20, 30); stroke(50, 200, 200, 50); strokeWeight(3);
@@ -962,38 +962,54 @@ function main(){
 					for(let i=0; i<ships[shipID].modules.length; ++i){
 						const H = mouseIn(width/2+25-25*ships[shipID].modules.length+50*i, height-120-10-25, 25, 20);
 
-						push(); translate(width/2+25-25*ships[shipID].modules.length+50*i,
-							height-120-10-25 - (H && ships[shipID].modules[i].state == 1 && ACTIVATED[ships[shipID].modules[i].type] && (
+						const Y = height-120-10-25 - (H && ships[shipID].modules[i].state == 1 && ACTIVATED[ships[shipID].modules[i].type] && (
 								ships[shipID].type != BS || ships[shipID].modules[i].use || ships[shipID].team == ID
-							)? 2 : 0));
+							)? 2 : 0);
+
+						push(); translate(width/2+25-25*ships[shipID].modules.length+50*i, Y);
 						const S = ships[shipID], M = S.modules[i];
 						drawModule2(M.use || S.type != BS || S.team == ID ? M.type : NULL, ships[shipID].modules[i].state);
 						pop();
 
-						if(!MOBILE && H && mouseIsPressed){
-							const T = M.use || S.type != BS || S.team == ID ? M.type : NULL;
+						if(H){
+							if(!MOBILE && mouseIsPressed){
+								const T = M.use || S.type != BS || S.team == ID ? M.type : NULL;
 
-							if(MODULE_NAME[T] != null){
-								push(); textSize(14);
-								const W = MODULE_NAME[T]+"\n\n"+wrap(INFO[T], 220)+(STATS[T]==null?"":"\n\n"+STATS[T]);
-								const H = font.textBounds(W, 0, 0).h;
-								const P = width/2+25-25*S.modules.length+50*i;
+								if(MODULE_NAME[T] != null){
+									push(); textSize(14);
+									const W = MODULE_NAME[T]+"\n\n"+wrap(INFO[T], 220)+(STATS[T]==null?"":"\n\n"+STATS[T]);
+									const H = font.textBounds(W, 0, 0).h;
+									const P = width/2+25-25*S.modules.length+50*i;
 
-								fill(0, 20, 30); noStroke();
-								rect(width/2-120, height-225-H-10, 240, H+20);
-								triangle(P-10, height-225+10, P, height-225+27, P+10, height-225+10);
-								noFill(); stroke(20, 70, 80); strokeWeight(3);
-								line(width/2-120, height-225-H-10, width/2+120, height-225-H-10);
-								line(width/2-120, height-225-H-10, width/2-120, height-225+10);
-								line(width/2+120, height-225-H-10, width/2+120, height-225+10);
-								line(width/2-120, height-225+10, P-10, height-225+10);
-								line(P-10, height-225+10, P, height-225+27);
-								line(P, height-225+27, P+10, height-225+10);
-								line(P+10, height-225+10, width/2+120, height-225+10);
-								textAlign(LEFT, BOTTOM);
-								fill(150); noStroke();
-								text(W, width/2-110, height-225);
-								pop();
+									fill(0, 20, 30); noStroke();
+									rect(width/2-120, height-225-H-10, 240, H+20);
+									triangle(P-10, height-225+10, P, height-225+27, P+10, height-225+10);
+									noFill(); stroke(20, 70, 80); strokeWeight(3);
+									line(width/2-120, height-225-H-10, width/2+120, height-225-H-10);
+									line(width/2-120, height-225-H-10, width/2-120, height-225+10);
+									line(width/2+120, height-225-H-10, width/2+120, height-225+10);
+									line(width/2-120, height-225+10, P-10, height-225+10);
+									line(P-10, height-225+10, P, height-225+27);
+									line(P, height-225+27, P+10, height-225+10);
+									line(P+10, height-225+10, width/2+120, height-225+10);
+									textAlign(LEFT, BOTTOM);
+									fill(150); noStroke();
+									text(W, width/2-110, height-225);
+									pop();
+								}
+
+							}else if(ACTIVATED[M.type] || [DART, ROCKETD, BOMBER].includes(M.type)){
+								const T = M.use || S.type != BS || S.team == ID ? M.type : NULL;
+
+								if(T != NULL){
+									const RT = M.type >= ALPHA && M.type <= ALLY ? RECHARGE_TIME[T] : RECHARGE_TIME[T]-EFFECT_TIME[T];
+									push(); textSize(14); textAlign(CENTER, BOTTOM); fill(..._moduleColor(T), 150);
+									text((M.state == 1 ? "[READY]" : (
+										M.state < 0 ? ("[ACTIVE] " + ceil(-EFFECT_TIME[T]*M.state) + "s") :
+										("[RECHARGING] " + ceil((RT)*(1-M.state)) + "s"))),
+										width/2+25-25*S.modules.length+50*i, Y-35);
+									pop();
+								}
 							}
 						}
 					}
