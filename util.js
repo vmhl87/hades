@@ -68,7 +68,7 @@ function mouseIn(x, y, w, h){
 
 	if(MOBILE){
 		for(const [k, v] of posTouches)
-			if(!movedTouches.has(k))
+			if(!movedTouches.has(k) || (touches.length == 1 && staging))
 				if(abs(v.last[0]-x) < w && abs(v.last[1]-y) < h) return true;
 
 		return false;
