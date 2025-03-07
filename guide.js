@@ -758,6 +758,11 @@ function drawGuide(){
 			push(); textAlign(LEFT, TOP);
 			_text(INFO[EMP] + "\n\n" + STATS[EMP], width/2-120, Y+150, 240, 1000);
 			pop();
+
+		}else{
+			push(); textAlign(LEFT, TOP);
+			_text("This page is under construction.", width/2-120, Y, 240, 1000);
+			pop();
 		}
 	}
 }
