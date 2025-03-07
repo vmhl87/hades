@@ -1004,10 +1004,11 @@ function main(){
 								if(T != NULL){
 									const RT = M.type >= ALPHA && M.type <= ALLY ? RECHARGE_TIME[T] : RECHARGE_TIME[T]-EFFECT_TIME[T];
 									push(); textSize(14); textAlign(CENTER, BOTTOM); fill(..._moduleColor(T), 150);
-									text((M.state == 1 ? "[READY]" : (
-										M.state < 0 ? ("[ACTIVE] " + ceil(-EFFECT_TIME[T]*M.state) + "s") :
-										("[RECHARGING] " + ceil((RT)*(1-M.state)) + "s"))),
-										width/2+25-25*S.modules.length+50*i, Y-35);
+									const ST = M.state < 0 ? M.state : min(1, M.state * (M.type == DELTA ? 1/0.75 : 1));
+									let D = ST == 1 ? "[READY]" : (
+										ST < 0 ? (([TP, LEAP, TURRET, WARP].includes(M.type) ? "[ACTIVATING]" : "[ACTIVE]") + " "
+										+ ceil(-EFFECT_TIME[T]*ST) + "s") : ("[RECHARGING] " + ceil((RT)*(1-ST)) + "s"));
+									text(D, width/2+25-25*S.modules.length+50*i, Y-35);
 									pop();
 								}
 							}
