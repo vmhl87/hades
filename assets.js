@@ -514,8 +514,8 @@ function drawShip(T, O, M){
 		if(O == 2) fill(155, 90, 90);
 		circle(0, 0, 13);
 		if(O == 0) stroke(60, 100, 100);
-		if(O == 1) fill(110, 10, 10);
-		if(O == 2) fill(95, 50, 50);
+		if(O == 1) stroke(110, 10, 10);
+		if(O == 2) stroke(95, 50, 50);
 		noFill(); strokeWeight(2);
 		line(0, -3, 0, 3);
 		line(-3, 0, 3, 0);
