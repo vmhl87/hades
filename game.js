@@ -853,7 +853,7 @@ class Game{
 					this.explode([...s.pos], RANGE[VENG], 9);
 				}
 
-				if(s.hp <= s.mhp) s.modules[i].use = true;
+				if(s.hp < s.mhp) s.modules[i].use = true;
 				
 				if(S == 1 && s.hp <= s.mhp*2/7){
 					s.modules[i].state = -1;

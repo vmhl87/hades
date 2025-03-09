@@ -1018,7 +1018,7 @@ function main(){
 					}
 
 					let canMove = ships[shipID].team == ID && !snapshot &&
-						ships[shipID].type == BS && ships[shipID].tp == null,
+						(ships[shipID].type == BS || CENT) && ships[shipID].tp == null,
 						canStop = ships[shipID].wait;
 
 					push(); strokeWeight(2);
@@ -1483,7 +1483,7 @@ function click(){
 		(focus[0] == "rock" ? mouseIn(width/2, height-40, 55, 20) : mouseIn(width/2, height-70, 150, 50))){
 		if(shipID != null){
 			let canMove = ships[shipID].team == ID &&
-				ships[shipID].type == BS && ships[shipID].tp == null,
+				(CENT || ships[shipID].type == BS) && ships[shipID].tp == null,
 				canStop = canMove && ships[shipID].wait;
 			if(canMove && (ships[shipID].move.length > 1 || canStop) &&
 				mouseIn(width/2-70, height-50, 20, 20)){
@@ -1578,7 +1578,7 @@ function keyReleased(){
 		if(focus && selectMove == null && !snapshot){
 			if(shipID != null){
 				let canMove = ships[shipID].team == ID &&
-					ships[shipID].type == BS && ships[shipID].tp == null,
+					(ships[shipID].type == BS || CENT) && ships[shipID].tp == null,
 					canStop = canMove && ships[shipID].wait;
 				if(canMove && (ships[shipID].move.length > 1 || canStop) &&
 					key == 'x'){
