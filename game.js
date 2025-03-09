@@ -887,7 +887,7 @@ class Game{
 
 		let m = [];
 		for(let p of this.players) m.push(p.id);
-		console.log("starting game", m);
+		console.log("starting game", this.uid, m);
 
 		let q = [];
 		for(let s of this.ships) q.push(s.encode());
@@ -895,6 +895,17 @@ class Game{
 		for(let p of this.players){
 			p.emit("start", {ships: q, rocks: this.rocks, uid: this.uid, rows: ROWS, cols: COLS});
 		}
+	}
+
+	addPlayer(s){
+		if(this.players.filter(x => x.id == s.id).length) return;
+
+		this.players.push(s);
+
+		let q = [];
+		for(let x of this.ships) q.push(x.encode());
+
+		s.emit("start", {ships: q, rocks: this.rocks, uid: this.uid, rows: ROWS, cols: COLS});
 	}
 
 	update(){

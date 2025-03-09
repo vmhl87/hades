@@ -273,6 +273,14 @@ io.on("connect", (socket) => {
 		}
 	});
 
+	socket.on("spectate", id => {
+		for(let g of games){
+			if(g.uid == id){
+				g.addPlayer(socket);
+			}
+		}
+	});
+
 	socket.on("activateModule", data => {
 		for(let g of games){
 			if(g.uid == data.gameID){

@@ -1197,6 +1197,11 @@ function stagingUI(){
 		return;
 	}
 
+	if(mouseIn(30, height-30, 30, 30) && ALLMODULE){
+		const D = parseInt(prompt("game ID"));
+		if(Number.isInteger(D)) socket.emit("spectate", D);
+	}
+
 	if(!searching){
 		push();
 		textSize(18); textAlign(CENTER, CENTER);
