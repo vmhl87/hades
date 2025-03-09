@@ -44,7 +44,7 @@ function drawShip(T, O, M){
 		}
 		if(O == 0) fill(60, 90, 90);
 		if(O == 1) fill(115, 10, 10);
-		if(O == 2) fill(100, 50, 30);
+		if(O == 2) fill(100, 50, 50);
 		_symm([
 			[14, 3.7],
 			[4, 6]
@@ -55,7 +55,7 @@ function drawShip(T, O, M){
 		]);
 		if(O == 0) fill(70, 100, 100);
 		if(O == 1) fill(125, 20, 20);
-		if(O == 2) fill(110, 60, 40);
+		if(O == 2) fill(110, 60, 60);
 		_symm([
 			[-20, 2.3],
 			[-18.5, 6],
@@ -410,7 +410,8 @@ function drawShip(T, O, M){
 
 	if(T == DECOY){
 		if(O == 0) fill(100, 150, 150);
-		if(O == 1) fill(170, 70, 70);
+		if(O == 1) fill(170, 50, 50);
+		if(O == 2) fill(155, 90, 90);
 		_symm([
 			[4.5, 0],
 			[4, 2],
@@ -420,11 +421,9 @@ function drawShip(T, O, M){
 			[-2, 2],
 			[-1.6, 0]
 		]);
-		//if(O == 0) fill(80, 120, 120);
-		//if(O == 1) fill(140, 50, 50);
-		//circle(1.25, 0, 4);
 		if(O == 0) fill(60, 100, 100);
-		if(O == 1) fill(120, 40, 40);
+		if(O == 1) fill(120, 20, 20);
+		if(O == 2) fill(105, 60, 60);
 		circle(1.25, 0, 2.5);
 		if(M){
 			fill(60, 180, 180);
@@ -447,15 +446,14 @@ function drawShip(T, O, M){
 
 	if(T == REPAIR){
 		if(O == 0) fill(100, 150, 150);
-		if(O == 1) fill(170, 70, 70);
+		if(O == 1) fill(170, 50, 50);
+		if(O == 2) fill(155, 90, 90);
 		ellipse(1.25, 0, 12, 10);
 		arc(3, 0, 18, 18, PI*0.7, PI*0.9);
 		arc(3, 0, 18, 18, PI*1.1, PI*1.3);
-		//if(O == 0) fill(80, 120, 120);
-		//if(O == 1) fill(140, 50, 50);
-		//circle(1, 0, 4);
 		if(O == 0) fill(60, 100, 100);
-		if(O == 1) fill(120, 40, 40);
+		if(O == 1) fill(120, 20, 20);
+		if(O == 2) fill(105, 60, 60);
 		circle(1, 0, 2.5);
 		if(M){
 			fill(60, 180, 180);
@@ -478,25 +476,22 @@ function drawShip(T, O, M){
 
 	if(T == TURRET){
 		if(O == 0) fill(100, 150, 150);
-		if(O == 1) fill(170, 70, 70);
+		if(O == 1) fill(170, 50, 50);
+		if(O == 2) fill(155, 90, 90);
 		circle(0, 0, 15);
 		if(O == 0) fill(70, 110, 110);
-		if(O == 1) fill(120, 40, 40);
+		if(O == 1) fill(120, 20, 20);
+		if(O == 2) fill(105, 60, 60);
 		arc(0, 0, 15, 15, PI/2-PI/4, PI/2+PI/4);
 		arc(0, 0, 15, 15, PI/2+PI*2/3-PI/4, PI/2+PI*2/3+PI/4);
 		arc(0, 0, 15, 15, PI/2+PI*4/3-PI/4, PI/2+PI*4/3+PI/4);
 		if(O == 0) fill(100, 150, 150);
-		if(O == 1) fill(170, 70, 70);
+		if(O == 1) fill(170, 50, 50);
+		if(O == 2) fill(155, 90, 90);
 		circle(0, 0, 13);
-		/*
-		if(O == 0) fill(80, 120, 120);
-		if(O == 1) fill(140, 50, 50);
-		circle(0, -3, 4);
-		circle(3*sin(PI*2/3), -3*cos(PI*2/3), 4);
-		circle(3*sin(PI*4/3), -3*cos(PI*4/3), 4);
-		*/
 		if(O == 0) fill(60, 100, 100);
-		if(O == 1) fill(120, 40, 40);
+		if(O == 1) fill(120, 20, 20);
+		if(O == 2) fill(105, 60, 60);
 		circle(0, -3, 2.5);
 		circle(3*sin(PI*2/3), -3*cos(PI*2/3), 2.5);
 		circle(3*sin(PI*4/3), -3*cos(PI*4/3), 2.5);
@@ -504,19 +499,23 @@ function drawShip(T, O, M){
 
 	if(T == PHASE){
 		if(O == 0) fill(100, 150, 150);
-		if(O == 1) fill(170, 70, 70);
+		if(O == 1) fill(170, 50, 50);
+		if(O == 2) fill(155, 90, 90);
 		circle(0, 0, 15);
 		if(O == 0) fill(70, 110, 110);
-		if(O == 1) fill(120, 40, 40);
+		if(O == 1) fill(120, 20, 20);
+		if(O == 2) fill(105, 60, 60);
 		arc(0, 0, 15, 15, -PI/6, PI/6);
 		arc(0, 0, 15, 15, PI/2-PI/6, PI/2+PI/6);
 		arc(0, 0, 15, 15, PI-PI/6, PI+PI/6);
 		arc(0, 0, 15, 15, PI*1.5-PI/6, PI*1.5+PI/6);
 		if(O == 0) fill(100, 150, 150);
-		if(O == 1) fill(170, 70, 70);
+		if(O == 1) fill(170, 50, 50);
+		if(O == 2) fill(155, 90, 90);
 		circle(0, 0, 13);
 		if(O == 0) stroke(60, 100, 100);
-		if(O == 1) stroke(120, 40, 40);
+		if(O == 1) fill(120, 20, 20);
+		if(O == 2) fill(105, 60, 60);
 		noFill(); strokeWeight(2);
 		line(0, -3, 0, 3);
 		line(-3, 0, 3, 0);
@@ -541,13 +540,15 @@ function drawShip(T, O, M){
 			]);
 		}
 		if(O == 0) fill(70, 110, 110);
-		if(O == 1) fill(120, 40, 40);
+		if(O == 1) fill(120, 20, 20);
+		if(O == 2) fill(105, 60, 60);
 		_symm([
 			[-9, 1],
 			[0, 2]
 		]);
 		if(O == 0) fill(100, 150, 150);
-		if(O == 1) fill(170, 70, 70);
+		if(O == 1) fill(170, 50, 50);
+		if(O == 2) fill(155, 90, 90);
 		_symm([
 			[8.5, 0],
 			[8, 2],
@@ -561,17 +562,16 @@ function drawShip(T, O, M){
 			[-9, 3],
 			[-12, 0]
 		]);
-		//if(O == 0) fill(80, 120, 120);
-		//if(O == 1) fill(140, 50, 50);
-		//circle(3, 0, 4);
 		if(O == 0) fill(60, 100, 100);
-		if(O == 1) fill(120, 40, 40);
+		if(O == 1) fill(120, 20, 20);
+		if(O == 2) fill(105, 60, 60);
 		circle(3, 0, 2.5);
 	}
 	
 	if(T == WARP){
 		if(O == 0) fill(100, 150, 150);
-		if(O == 1) fill(170, 70, 70);
+		if(O == 1) fill(170, 50, 50);
+		if(O == 2) fill(155, 90, 90);
 		_symm([
 			[8.5, 0],
 			[8, 2],
@@ -581,7 +581,8 @@ function drawShip(T, O, M){
 			[-2, 2]
 		]);
 		if(O == 0) fill(60, 100, 100);
-		if(O == 1) fill(120, 40, 40);
+		if(O == 1) fill(120, 20, 20);
+		if(O == 2) fill(105, 60, 60);
 		circle(3, 0, 2.5);
 	}
 
@@ -604,14 +605,16 @@ function drawShip(T, O, M){
 			]);
 		}
 		if(O == 0) fill(70, 110, 110);
-		if(O == 1) fill(120, 40, 40);
+		if(O == 1) fill(120, 20, 20);
+		if(O == 2) fill(105, 60, 60);
 		_symm([
 			[2, 0],
 			[-2, 2],
 			[-5, 1]
 		]);
 		if(O == 0) fill(100, 150, 150);
-		if(O == 1) fill(170, 70, 70);
+		if(O == 1) fill(170, 50, 50);
+		if(O == 2) fill(155, 90, 90);
 		_symm([
 			[6, 0],
 			[4, 1],
@@ -638,14 +641,16 @@ function drawShip(T, O, M){
 			]);
 		}
 		if(O == 0) fill(70, 110, 110);
-		if(O == 1) fill(120, 40, 40);
+		if(O == 1) fill(120, 20, 20);
+		if(O == 2) fill(105, 60, 60);
 		_symm([
 			[2, 0],
 			[-5, 3],
 			[-7, 2]
 		]);
 		if(O == 0) fill(100, 150, 150);
-		if(O == 1) fill(170, 70, 70);
+		if(O == 1) fill(170, 50, 50);
+		if(O == 2) fill(155, 90, 90);
 		_symm([
 			[9.5, 0],
 			[9, 0.5],
@@ -675,7 +680,8 @@ function drawShip(T, O, M){
 			]);
 		}
 		if(O == 0) fill(70, 110, 110);
-		if(O == 1) fill(120, 40, 40);
+		if(O == 1) fill(120, 20, 20);
+		if(O == 2) fill(105, 60, 60);
 		_symm([
 			[2, 0],
 			[0, 2],
@@ -683,7 +689,8 @@ function drawShip(T, O, M){
 			[-8, 0]
 		]);
 		if(O == 0) fill(100, 150, 150);
-		if(O == 1) fill(170, 70, 70);
+		if(O == 1) fill(170, 50, 50);
+		if(O == 2) fill(155, 90, 90);
 		_symm([
 			[9.5, 0],
 			[9, 0.5],
@@ -756,7 +763,7 @@ function drawShip2(s){
 	if(dragMove != null && dragMove[2] == s.uid && !s.move.length)
 		rotate(atan2(dragMove[1]-screenPos(s.vpos)[1], dragMove[0]-screenPos(s.vpos)[0]));
 	else rotate(s.rot);
-	drawShip(s.type, s.team != ID && s.team != DEV ? (s.type == BS && Number.isInteger(s.team) ? 2 : 1) : 0, s.move.length && !s.emp ? 1 : 0);
+	drawShip(s.type, s.team != ID && s.team != DEV ? (Number.isInteger(s.team) ? 2 : 1) : 0, s.move.length && !s.emp ? 1 : 0);
 	pop();
 	if(s.imp){
 		stroke(50, 200, 50); noFill(); strokeWeight(2);
