@@ -321,7 +321,7 @@ function mousePressed(){
 	}
 }
 
-let lastMouse = [], ALLMODULE = false, SECDISP = [0], GOD = false;
+let lastMouse = [], ALLMODULE = false, SECDISP = [0];
 
 function mobileClick(P){
 	if(staging){
@@ -362,11 +362,6 @@ function mouseReleased(){
 	if(MOBILE) return;
 
 	if(mouseButton == RIGHT) return;
-
-	if(!staging && connected && abs(startMouseX-30) < 30 && abs(startMouseY-30) < 30 && mouseIn(width-30, 30, 30, 30)){
-		GOD = !GOD;
-		return;
-	}
 
 	if(staging){
 		lastMouse.push([Date.now(), [mouseX, mouseY]]);
@@ -584,10 +579,6 @@ function updateTouch(){
 		}else if(touches.length == 0 && ctlState == 0){
 			mobileClick({first: [...P.first], last: [...P.last]});
 		}
-
-		if(!staging && connected && abs(P.last[0]-30) < 30 && abs(P.last[1]-30) < 30
-			&& abs(P.orig[0]-(width-30)) < 30 && abs(P.orig[1]-3) < 30)
-			GOD = !GOD;
 
 		posTouches.delete(k);
 		movedTouches.delete(k);

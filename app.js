@@ -1066,26 +1066,6 @@ function main(){
 					line(-10, -10, 10, 10);
 					line(-10, 10, 10, -10);
 					pop();
-					if(GOD){
-						if(mouseIn(width/2-23, height-50, 20, 20)) stroke(30, 90, 110);
-						else stroke(20, 70, 80);
-						noFill();
-						arc(width/2-23, height-50, 20, 20, PI*-0.3, PI*0.3);
-						arc(width/2-23, height-50, 20, 20, PI*0.7, PI*1.3);
-						circle(width/2-23, height-50, 8);
-						line(width/2-23, height-50-4, width/2-23, height-50-12);
-						line(width/2-23, height-50+4, width/2-23, height-50+12);
-					}
-					if(GOD){
-						if(mouseIn(width/2+117, height-95, 20, 20)) stroke(20, 70, 80);
-						else stroke(10, 40, 60);
-						noFill();
-						arc(width/2+125, height-95, 10, 10, -PI*0.75, PI*0.75);
-						arc(width/2+110, height-95, 10, 10, PI-PI*0.75, PI+PI*0.75);
-						line(width/2+117.5-15/4, height-95-15/4, width/2+117.5+15/4, height-95+15/4);
-						line(width/2+117.5+15/4, height-95-15/4, width/2+117.5+15/6, height-95-15/6);
-						line(width/2+117.5-15/4, height-95+15/4, width/2+117.5-15/6, height-95+15/6);
-					}
 					pop();
 				}
 			}
@@ -1488,8 +1468,6 @@ function click(){
 				socket.emit("cancelMove", {gameID: gameID, shipID: focus[1]});
 				ships[shipID].wait = null;
 			}
-			if(GOD && mouseIn(width/2-23, height-50, 20, 20)) god();
-			if(GOD && mouseIn(width/2+117, height-95, 20, 20)) ascend();
 			if(canMove && mouseIn(width/2-117, height-50, 20, 20)){
 				if(canStop) socket.emit("confirmMove", {gameID: gameID, shipID: focus[1]});
 				else selectMove = ["ship", focus[1]];
