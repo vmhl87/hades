@@ -419,6 +419,8 @@ function draw(){
 	timeframes[1] = timeframes[0];
 	timeframes[0] = Date.now();
 
+	if(windowWidth != width || windowHeight != height) resizeCanvas(windowWidth, windowHeight);
+
 	if(touches.length && !MOBILE){
 		MOBILE = true;
 		frameRate(30);
@@ -612,7 +614,7 @@ function touchEnded(){
 }
 
 function windowResized(){
-	resizeCanvas(windowWidth, windowHeight);
+	//resizeCanvas(windowWidth, windowHeight);
 }
 
 function saveState(){
