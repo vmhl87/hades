@@ -1524,7 +1524,7 @@ function click(){
 				const P = [rocks[select[1]][0], rocks[select[1]][1]+10];
 
 				if(RANGE[ships[shipID].modules[selectMove[1].i].type] == null ||
-					_dist(P, ships[shipID].vpos) < RANGE[ships[shipID].modules[selectMove[1].i].type]){
+					CENT || _dist(P, ships[shipID].vpos) < RANGE[ships[shipID].modules[selectMove[1].i].type]){
 					if(ships[shipID].modules[selectMove[1].i].type != STRIKE || ships[shipID].move.length > 0
 						|| (ships[shipID].move.length == 0 && select[1] != ships[shipID].dock)){
 						socket.emit("activateModule", {gameID: gameID, shipID: selectMove[1].s,
@@ -1536,7 +1536,7 @@ function click(){
 
 		}else if(shipID != null && ships[shipID].modules[selectMove[1].i].type == RIPPLE && select != null && select[1] != selectMove[1].s){
 			for(let s of ships) if(s.uid == select[1])
-				if(_dist(ships[shipID].vpos, s.vpos) < RANGE[RIPPLE]
+				if((_dist(ships[shipID].vpos, s.vpos) < RANGE[RIPPLE] || CENT)
 					&& (ships[shipID].team == s.team || s.team == CERB)){
 					socket.emit("activateModule", {gameID: gameID, shipID: selectMove[1].s,
 						i: selectMove[1].i, loc: select[1]});
