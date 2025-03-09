@@ -279,7 +279,7 @@ function selectedPos(pos){
 	if(selectMove == null || (selectMove[0] == "module" &&
 	shipID != null && ships[shipID].modules[selectMove[1].i].type == RIPPLE))
 		for(let i=0; i<ships.length; ++i){
-			const d = _dist(screenPos(ships[i].pos), pos);
+			const d = _dist(screenPos(ships[i].vpos), pos);
 			if(d < 50/F) opt.push([d-20/F, ["ship", ships[i].uid]]);
 		}
 
