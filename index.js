@@ -70,7 +70,7 @@ function tick(game){
 
 				let p = [];
 				for(let x of g.players) p.push(x.id);
-				console.log("ending game:", p);
+				console.log("ending game:", g.uid, p);
 			}
 		}
 
