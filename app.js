@@ -76,7 +76,7 @@ socket.on("start", data => {
 
 	rocks = data.rocks;
 
-	entities = {blast: [], death: [], heal: [], emp: [], imp: [], sectorDeath: []};
+	entities = {blast: [], death: [], heal: [], emp: [], imp: [], sectorDeath: [], eliminate: [], win: [], surrender: []};
 
 	last = Date.now();
 	speed = 1;
@@ -1096,6 +1096,29 @@ function main(){
 			textAlign(CENTER, CENTER);
 			fill(50, 200, 200, 200); noStroke(); textSize(17);
 			text("SECTOR COLLAPSE IN " + warn.toString() + "s", width/2, 28);
+			pop();
+		}
+
+		for(let e of entities.eliminate){
+			push(); textAlign(CENTER, TOP); textSize(17);
+			fill(200, 150, 50, 255*min(1, (e[1]-NOW)/TPS));
+			text(e[0] + " ELIMINATED", width/2, 50);
+			pop();
+		}
+
+		for(let e of entities.surrender){
+			push(); textAlign(CENTER, TOP); textSize(17);
+			fill(200, 150, 50, 255*min(1, (e[1]-NOW)/TPS));
+			text(e[0] + " SURRENDERS", width/2, 50);
+			pop();
+		}
+
+		for(let e of entities.win){
+			push(); textAlign(CENTER, TOP); textSize(17);
+			fill(200, 150, 50, 255*min(1, (e[1]-NOW)/TPS));
+			let mine = null;
+			for(let x of ships) if(x.type == BS && x.team == ID) mine = x.user;
+			text((e[0] == mine ? "YOU WIN" : e[0] + " WINS") + " THE MATCH", width/2, 70);
 			pop();
 		}
 

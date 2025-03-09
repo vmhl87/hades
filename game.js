@@ -475,7 +475,7 @@ class Game{
 		this.ships = [];
 		this.rocks = [];
 		this.uid = ++UID;
-		this.entities = {blast: [], death: [], heal: [], emp: [], imp: [], sectorDeath: []};
+		this.entities = {blast: [], death: [], heal: [], emp: [], imp: [], sectorDeath: [], eliminate: [], win: [], surrender: []};
 		this.lifetime = TPS*6;
 		this.loneBSTimer = Math.random();
 		this.sectors = new Array(ROWS*COLS);
@@ -1518,15 +1518,31 @@ class Game{
 		}
 
 		let q = [];
-		for(let s of this.ships){
-			if(s.hp > 0) q.push(s.encode());
-			else if([BS, DECOY, REPAIR, ROCKET, TURRET, PHASE, WARP, COL].includes(s.type))
-				this.die(s.pos);
 
-			if(s.ally != null && s.ally[0] != null && s.ally[0].hp <= 0) s.ally = null;
-		}
+		{
+			let off = false;
 
-		this.ships = this.ships.filter(x => x.hp > 0);
+			for(let s of this.ships){
+				if(s.hp > 0) q.push(s.encode());
+				else if([BS, DECOY, REPAIR, ROCKET, TURRET, PHASE, WARP, COL].includes(s.type)){
+					this.die(s.pos);
+					if(s.type == BS && !Number.isInteger(s.team[0])){
+						if(s.hp == 0) this.entities.eliminate.push([s.team[1], this.age + TPS*3]);
+						else this.entities.surrender.push([s.team[1], this.age + TPS*3]);
+						off = true;
+					}
+				}
+
+				if(s.ally != null && s.ally[0] != null && s.ally[0].hp <= 0) s.ally = null;
+			}
+
+			this.ships = this.ships.filter(x => x.hp > 0);
+
+			if(off){
+				const Z = this.ships.filter(x => x.type == BS && !Number.isInteger(x.team[0]));
+				if(Z.length == 1) this.entities.win.push([Z[0].team[1], this.age + TPS*3]);
+			}
+		};
 
 		for(let k of Object.keys(this.entities))
 			this.entities[k] = this.entities[k].filter(x => x[x.length-1] >= this.age);

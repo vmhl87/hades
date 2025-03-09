@@ -166,7 +166,7 @@ io.on("connect", (socket) => {
 			for(let s of g.ships){
 				if(s.type == 1 && s.team[0] == socket.id){
 					console.log(" => killing ships");
-					s.hp = 0;
+					s.hp = -1;
 				}
 			}
 
@@ -183,7 +183,7 @@ io.on("connect", (socket) => {
 			for(let s of g.ships){
 				if(s.type == 1 && s.team[0] == socket.id){
 					console.log(" => killing ships");
-					s.hp = 0;
+					s.hp = -1;
 					++ct;
 				}
 			}
