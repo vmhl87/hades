@@ -645,7 +645,7 @@ function loadState(STATE){
 
 function god(){
 	if(!staging && connected && focus != null && focus[0] == "ship" && shipID != null)
-		socket.emit("spawn", {gameID: gameID, arg: [STRIKEP, ID, [], ships[shipID].pos]});
+		socket.emit("spawn", {gameID: gameID, arg: [STRIKEP, [ID, "GOD"], [], ships[shipID].pos]});
 }
 
 function ascend(){

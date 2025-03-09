@@ -852,10 +852,11 @@ class Game{
 
 					this.explode([...s.pos], RANGE[VENG], 9);
 				}
+
+				if(s.hp <= s.mhp) s.modules[i].use = true;
 				
 				if(S == 1 && s.hp <= s.mhp*2/7){
 					s.modules[i].state = -1;
-					s.modules[i].use = true;
 
 					for(let i=0; i<this.ships.length; ++i)
 						if(this.ships[i].uid == s.uid)
@@ -1439,10 +1440,21 @@ class Game{
 							if(this.sectors[X].length){
 								const J = this.sectors[X][Math.floor(Math.random()*this.sectors[X].length)];
 								const P = this.rocks[J];
-								this.addShip(SENTINEL+I, [CERB, null], [SENTINEL+I, SENTINEL+I == COL ? APOCALYPSE : null], [P[0], P[1]-300*ROWS*10], []);
-								this.ships[this.ships.length-1].dock = J;
-								if(SENTINEL+I != INT) for(let i=0; i<this.sectors.length; ++i)
-									if(this.sectors[i].includes(J)) this.ships[this.ships.length-1].ai[1] = i;
+
+								let val = true;
+
+								for(let x of this.ships) if(x.type == BS){
+									if(_dist(P, x.pos) < 200) val = false;
+									if(x.move.length && _dist(P, x.move[0].slice(0, 2)) < 200) val = false;
+									if(x.tp != null && _dist(P, x.tp.slice(0, 2)) < 200) val = false;
+								}
+							
+								if(val){
+									this.addShip(SENTINEL+I, [CERB, null], [SENTINEL+I, SENTINEL+I == COL ? APOCALYPSE : null], [P[0], P[1]-300*ROWS*10], []);
+									this.ships[this.ships.length-1].dock = J;
+									if(SENTINEL+I != INT) for(let i=0; i<this.sectors.length; ++i)
+										if(this.sectors[i].includes(J)) this.ships[this.ships.length-1].ai[1] = i;
+								}
 							}
 						}
 					}
@@ -1493,6 +1505,7 @@ class Game{
 							for(let x of this.ships) if(x.type == BS){
 								if(_dist(P, x.pos) < 200) val = false;
 								if(x.move.length && _dist(P, x.move[0].slice(0, 2)) < 200) val = false;
+								if(x.tp != null && _dist(P, x.tp.slice(0, 2)) < 200) val = false;
 							}
 							
 							if(val){
