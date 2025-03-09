@@ -1199,7 +1199,10 @@ function stagingUI(){
 
 	if(mouseIn(30, height-30, 30, 30) && ALLMODULE){
 		const D = parseInt(prompt("game ID"));
-		if(Number.isInteger(D)) socket.emit("spectate", D);
+		if(Number.isInteger(D)){
+			socket.emit("spectate", D);
+			return;
+		}
 	}
 
 	if(!searching){
@@ -1409,6 +1412,13 @@ function click(){
 	if(mouseIn(width-30, 30, 30, 30) && !snapshot){
 		localStorage.setItem("save", saveState());
 		return;
+	}
+
+	if(mouseIn(30, height-30, 30, 30) && CENT){
+		if(shipID != null){
+			socket.emit("ascend", {gameID: gameID, shipID: focus[1]});
+			return;
+		}
 	}
 
 	if(mouseIn(30, 30, 30, 30)){
