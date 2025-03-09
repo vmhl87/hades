@@ -1487,9 +1487,18 @@ class Game{
 							];
 
 							const I = Math.floor(Math.random()*MODS.length);
+
+							let val = true;
+
+							for(let x of this.ships) if(x.type == BS){
+								if(_dist(P, x.pos) < 200) val = false;
+								if(x.move.length && _dist(P, x.move[0].slice(0, 2)) < 200) val = false;
+							}
 							
-							this.addShip(BS, [-(++UID), null], MODS[I], [P[0], P[1]+300*ROWS*10], []);
-							this.ships[this.ships.length-1].dock = J;
+							if(val){
+								this.addShip(BS, [-(++UID), null], MODS[I], [P[0], P[1]+300*ROWS*10], []);
+								this.ships[this.ships.length-1].dock = J;
+							}
 						}
 					}
 				}

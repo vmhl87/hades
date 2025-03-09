@@ -930,11 +930,13 @@ function main(){
 					rect(width/2-150, height-120, 300, 100);
 					pop();
 
+					let N = focus[0] == "rock" ? "ASTEROID" : NAME[ships[shipID].type];
+
+					if(ships[shipID].user != null) N += " [" + ships[shipID].user + "]";
+					else if(ships[shipID].team != CERB && ships[shipID].type == BS) N = "LONE BATTLESHIP";
+
 					push(); textAlign(LEFT, TOP); textSize(18);
-					fill(200); noStroke(); text(
-						focus[0] == "rock" ? "ASTEROID" : NAME[ships[shipID].type] +
-							(ships[shipID].user != null ? "  [" + ships[shipID].user + "]" : ""),
-						width/2-150 + 10, height-120 + 10);
+					fill(200); noStroke(); text(N, width/2-150 + 10, height-120 + 10);
 					pop();
 
 					fill(20, 40, 60); noStroke();

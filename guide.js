@@ -339,11 +339,11 @@ function drawGuide(){
 			pop();
 			push(); translate(width/2, Y+10);
 			rotate(PI*1.85);
-			drawShip(BS, 1, 0);
+			drawShip(BS, 2, 0);
 			pop();
 			push(); translate(width/2+60, Y+10);
 			rotate(PI*1.85);
-			drawShip(BS, 2, 0);
+			drawShip(BS, 1, 0);
 			pop();
 			push(); textAlign(LEFT, TOP);
 			_text(BODY.battleship, width/2-120, Y+50, 240, 1000);
@@ -700,6 +700,17 @@ function drawGuide(){
 			_text(INFO[LASER2] + "\n\n" + STATS[LASER2], width/2-120, Y+120, 240, 1000);
 			pop();
 
+		}else if(P == guideUI.rocketLauncher){
+			push();
+			textAlign(CENTER, CENTER); textSize(18);
+			fill(200 + sin(Date.now()/300)*55); noStroke();
+			text("PREVIEW UNDER\nCONSTRUCTION", width/2, Y+40);
+			pop();
+
+			push(); textAlign(LEFT, TOP);
+			_text(INFO[DART] + "\n\n" + STATS[DART], width/2-120, Y+150, 240, 1000);
+			pop();
+
 		}else if(P == guideUI.emp){
 			const T = 9;
 			const O = (((Date.now()-guideUI.time)/1000) % (T+2)) - 1;
@@ -757,6 +768,160 @@ function drawGuide(){
 
 			push(); textAlign(LEFT, TOP);
 			_text(INFO[EMP] + "\n\n" + STATS[EMP], width/2-120, Y+150, 240, 1000);
+			pop();
+
+		}else if(P == guideUI.duel){
+			push();
+			textAlign(CENTER, CENTER); textSize(18);
+			fill(200 + sin(Date.now()/300)*55); noStroke();
+			text("PREVIEW UNDER\nCONSTRUCTION", width/2, Y+40);
+			pop();
+
+			push(); textAlign(LEFT, TOP);
+			_text(INFO[DUEL] + "\n\n" + STATS[DUEL], width/2-120, Y+150, 240, 1000);
+			pop();
+
+		}else if(P == guideUI.fortify){
+			push();
+			textAlign(CENTER, CENTER); textSize(18);
+			fill(200 + sin(Date.now()/300)*55); noStroke();
+			text("PREVIEW UNDER\nCONSTRUCTION", width/2, Y+40);
+			pop();
+
+			push(); textAlign(LEFT, TOP);
+			_text(INFO[FORT] + "\n\n" + STATS[FORT], width/2-120, Y+150, 240, 1000);
+			pop();
+
+		}else if(P == guideUI.teleport){
+			push();
+			textAlign(CENTER, CENTER); textSize(18);
+			fill(200 + sin(Date.now()/300)*55); noStroke();
+			text("PREVIEW UNDER\nCONSTRUCTION", width/2, Y+40);
+			pop();
+
+			push(); textAlign(LEFT, TOP);
+			_text(INFO[TP] + "\n\n" + STATS[TP], width/2-120, Y+150, 240, 1000);
+			pop();
+
+		}else if(P == guideUI.amplify){
+			push();
+			textAlign(CENTER, CENTER); textSize(18);
+			fill(200 + sin(Date.now()/300)*55); noStroke();
+			text("PREVIEW UNDER\nCONSTRUCTION", width/2, Y+40);
+			pop();
+
+			push(); textAlign(LEFT, TOP);
+			_text(INFO[AMP] + "\n\n" + STATS[AMP], width/2-120, Y+150, 240, 1000);
+			pop();
+
+		}else if(P == guideUI.leap){
+			push();
+			textAlign(CENTER, CENTER); textSize(18);
+			fill(200 + sin(Date.now()/300)*55); noStroke();
+			text("PREVIEW UNDER\nCONSTRUCTION", width/2, Y+40);
+			pop();
+
+			push(); textAlign(LEFT, TOP);
+			_text(INFO[LEAP] + "\n\n" + STATS[LEAP], width/2-120, Y+150, 240, 1000);
+			pop();
+
+		}else if(P == guideUI.barrier){
+			push();
+			textAlign(CENTER, CENTER); textSize(18);
+			fill(200 + sin(Date.now()/300)*55); noStroke();
+			text("PREVIEW UNDER\nCONSTRUCTION", width/2, Y+40);
+			pop();
+
+			push(); textAlign(LEFT, TOP);
+			_text(INFO[BARRIER] + "\n\n" + STATS[BARRIER], width/2-120, Y+150, 240, 1000);
+			pop();
+
+		}else if(P == guideUI.strike){
+			push();
+			textAlign(CENTER, CENTER); textSize(18);
+			fill(200 + sin(Date.now()/300)*55); noStroke();
+			text("PREVIEW UNDER\nCONSTRUCTION", width/2, Y+40);
+			pop();
+
+			push(); textAlign(LEFT, TOP);
+			_text(INFO[STRIKE] + "\n\n" + STATS[STRIKE], width/2-120, Y+150, 240, 1000);
+			pop();
+
+		}else if(P == guideUI.ripple){
+			push();
+			textAlign(CENTER, CENTER); textSize(18);
+			fill(200 + sin(Date.now()/300)*55); noStroke();
+			text("PREVIEW UNDER\nCONSTRUCTION", width/2, Y+40);
+			pop();
+
+			push(); textAlign(LEFT, TOP);
+			_text(INFO[RIPPLE] + "\n\n" + STATS[RIPPLE], width/2-120, Y+150, 240, 1000);
+			pop();
+
+		}else if(P == guideUI.disrupt){
+			push();
+			textAlign(CENTER, CENTER); textSize(18);
+			fill(200 + sin(Date.now()/300)*55); noStroke();
+			text("PREVIEW UNDER\nCONSTRUCTION", width/2, Y+40);
+			pop();
+
+			push(); textAlign(LEFT, TOP);
+			_text(INFO[DISRUPT] + "\n\n" + STATS[DISRUPT], width/2-120, Y+150, 240, 1000);
+			pop();
+
+		}else if(P == guideUI.decoy){
+			push();
+			textAlign(CENTER, CENTER); textSize(18);
+			fill(200 + sin(Date.now()/300)*55); noStroke();
+			text("PREVIEW UNDER\nCONSTRUCTION", width/2, Y+40);
+			pop();
+
+			push(); textAlign(LEFT, TOP);
+			_text(INFO[DECOY] + "\n\n" + STATS[DECOY], width/2-120, Y+150, 240, 1000);
+			pop();
+
+		}else if(P == guideUI.rocket){
+			push();
+			textAlign(CENTER, CENTER); textSize(18);
+			fill(200 + sin(Date.now()/300)*55); noStroke();
+			text("PREVIEW UNDER\nCONSTRUCTION", width/2, Y+40);
+			pop();
+
+			push(); textAlign(LEFT, TOP);
+			_text(INFO[ROCKET] + "\n\n" + STATS[ROCKET], width/2-120, Y+150, 240, 1000);
+			pop();
+
+		}else if(P == guideUI.turret){
+			push();
+			textAlign(CENTER, CENTER); textSize(18);
+			fill(200 + sin(Date.now()/300)*55); noStroke();
+			text("PREVIEW UNDER\nCONSTRUCTION", width/2, Y+40);
+			pop();
+
+			push(); textAlign(LEFT, TOP);
+			_text(INFO[TURRET] + "\n\n" + STATS[TURRET], width/2-120, Y+150, 240, 1000);
+			pop();
+
+		}else if(P == guideUI.phase){
+			push();
+			textAlign(CENTER, CENTER); textSize(18);
+			fill(200 + sin(Date.now()/300)*55); noStroke();
+			text("PREVIEW UNDER\nCONSTRUCTION", width/2, Y+40);
+			pop();
+
+			push(); textAlign(LEFT, TOP);
+			_text(INFO[PHASE] + "\n\n" + STATS[PHASE], width/2-120, Y+150, 240, 1000);
+			pop();
+
+		}else if(P == guideUI.warp){
+			push();
+			textAlign(CENTER, CENTER); textSize(18);
+			fill(200 + sin(Date.now()/300)*55); noStroke();
+			text("PREVIEW UNDER\nCONSTRUCTION", width/2, Y+40);
+			pop();
+
+			push(); textAlign(LEFT, TOP);
+			_text(INFO[WARP] + "\n\n" + STATS[WARP], width/2-120, Y+150, 240, 1000);
 			pop();
 
 		}else{
@@ -822,7 +987,7 @@ const BODY = {
 	quickMatch: "Quick Match is the default gamemode and the only one currently available. Battleships compete within a 5x5 sector map populated by all Cerberus variations as well as Lone Battleships. All player-controlled battleships are hostile to one another.",
 	arena: "Nothing to see here yet!",
 
-	battleship: "Battleships are powerful combat vessels which may equip one Weapon, one Shield, two Modules, and one Drone. With a 7k health pool, they can absorb significant damage.\n\nIn addition to player controlled Battleships, several computer controlled Lone Battleships may jump into the arena at various points throughout the round. Some Lone Battleships equip an unobtainable VENGEANCE module. Lone Battleships are differentiated by their darker red color.",
+	battleship: "Battleships are powerful combat vessels which may equip one Weapon, one Shield, two Modules, and one Drone. With a 7k health pool, they can absorb significant damage.\n\nIn addition to player controlled Battleships, several computer controlled Lone Battleships may jump into the arena at various points throughout the round. Some Lone Battleships equip an unobtainable VENGEANCE module. Lone Battleships are identified by their pale salmon color.",
 	sentinel: "Cerberus Sentinels are dangerous, equipping powerful cannons that deal 200 DPS, but have a small 1.2k health pool. When hidden behind other enemy ships, Sentinels can pose a significant threat.\n\nSentinels do not leave their assigned sector.",
 	guardian: "Cerberus Guardians deal the lowest damage out of any ship in the game at 60 DPS. However, they have a high health pool of 8k, and can be dangerous by protecting other enemy ships from fire.\n\nGuardians do not leave their assigned sector.",
 	interceptor: "Cerberus Interceptors deal 100 DPS to up to four targets in range, rendering Decoy Drones useless. Despite their high health pool of 9k, Interceptors do not actively pursue player ships and are thus not a threat.\n\nInterceptors are not limited to any sector and patrol the map at random.",
