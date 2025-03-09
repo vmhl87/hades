@@ -1421,6 +1421,13 @@ function click(){
 		}
 	}
 
+	if(mouseIn(30, height-60, 30, 30) && CENT){
+		if(shipID != null){
+			ID = ships[shipID].team;
+			return;
+		}
+	}
+
 	if(mouseIn(30, 30, 30, 30)){
 		if(snapshot){
 			snapshot = 0;
