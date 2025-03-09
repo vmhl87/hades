@@ -1421,11 +1421,16 @@ function click(){
 		}
 	}
 
-	if(mouseIn(30, height-60, 30, 30) && CENT){
+	if(mouseIn(30, height-90, 30, 30) && CENT){
 		if(shipID != null){
 			ID = ships[shipID].team;
 			return;
 		}
+	}
+
+	if(mouseIn(30, height-150, 30, 30) && CENT){
+		eval(prompt());
+		return;
 	}
 
 	if(mouseIn(30, 30, 30, 30)){
