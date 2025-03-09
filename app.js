@@ -1414,25 +1414,6 @@ function click(){
 		return;
 	}
 
-	if(mouseIn(30, height-30, 30, 30) && CENT){
-		if(shipID != null){
-			socket.emit("ascend", {gameID: gameID, shipID: focus[1]});
-			return;
-		}
-	}
-
-	if(mouseIn(30, height-90, 30, 30) && CENT){
-		if(shipID != null){
-			ID = ships[shipID].team;
-			return;
-		}
-	}
-
-	if(mouseIn(30, height-150, 30, 30) && CENT){
-		eval(prompt());
-		return;
-	}
-
 	if(mouseIn(30, 30, 30, 30)){
 		if(snapshot){
 			snapshot = 0;
@@ -1550,6 +1531,26 @@ function click(){
 	}else{
 		focus = select && (!focus || focus[0] != select[0] || focus[1] != select[1]) ? [...select] : null;
 	}
+
+	if(mouseIn(30, height-30, 30, 30) && CENT){
+		if(shipID != null){
+			socket.emit("ascend", {gameID: gameID, shipID: focus[1]});
+			return;
+		}
+	}
+
+	if(mouseIn(30, height-90, 30, 30) && CENT){
+		if(shipID != null){
+			ID = ships[shipID].team;
+			return;
+		}
+	}
+
+	if(mouseIn(30, height-150, 30, 30) && CENT){
+		eval(prompt());
+		return;
+	}
+
 }
 
 function keyReleased(){
