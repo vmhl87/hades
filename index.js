@@ -57,7 +57,7 @@ const Ship = Module.Ship, Game = Module.Game;
 
 const COLS = Module.COLS, ROWS = Module.ROWS, TPS = Module.TPS;
 
-let games = [], queue = {"FFA": [], "2v2": [], "TEAM": []}, TIME = 0;
+let games = [], queue = {"FFA": [], "2TEAM": [], "CO-OP": []}, TIME = 0;
 
 function tick(game){
 	if(game) game.update();
@@ -104,7 +104,7 @@ function spawnBS(n){
 	return shuffle(Array.from(S).map(x => [x%COLS, Math.floor(x/COLS)]));
 }
 
-function startGame(Q, mode){
+function startGame(Q, mode="FFA"){
 	const g = new Game(Q.map(x => x.s));
 	const p = spawnBS(Q.length);
 
@@ -168,11 +168,11 @@ io.on("connect", (socket) => {
 
 		for(let k of Object.keys(queue)){
 			if(queue[k].filter(x => x.s.id == socket.id).length){
-				console.log("dequeued player", socket.id);
+				console.log("dequeued player", k, socket.id);
 				queue[k] = queue[k].filter(x => x.s.id != socket.id);
 				let m = [];
 				for(let q of queue[k]) m.push(q.u[0]);
-				console.log(" =>", m);
+				console.log(" =>", k, m);
 				io.emit("queueSize", k, queue[k].length);
 			}
 		}
@@ -196,7 +196,7 @@ io.on("connect", (socket) => {
 
 		for(let g of games){
 			for(let s of g.ships){
-				if(s.type == 1 && s.team[0] == socket.id){
+				if(s.type == 1 && s.team[1] == socket.id){
 					console.log(" => killing ships");
 					s.hp = -1;
 					++ct;
@@ -212,22 +212,21 @@ io.on("connect", (socket) => {
 	});
 
 	socket.on("enqueue", (modules, user, mode) => {
-		console.log("enqueued player", socket.id, "with", modules, "mode", mode);
+		console.log("enqueued player", mode, socket.id, "with", modules);
 		queue[mode].push({s: socket, modules: modules, u: user});
 		let m = [];
 		for(let q of queue[mode]) m.push(q.u[0]);
-		console.log(" =>", m);
+		console.log(" =>", mode, m);
 		io.emit("queueSize", mode, queue[mode].length);
 	});
 
 	socket.on("dequeue", () => {
-		console.log("dequeued player", socket.id);
-
-		for(let k of Object.keys(queue)){
+		for(let k of Object.keys(queue)) if(queue[k].filter(x => x.s.id == socket.id).length){
+			console.log("dequeued player", k, socket.id);
 			queue[k] = queue[k].filter(x => x.s.id != socket.id);
 			let m = [];
 			for(let q of queue[k]) m.push(q.u[0]);
-			console.log(" =>", m);
+			console.log(" =>", k, m);
 			io.emit("queueSize", k, queue[k].length);
 		}
 	});
@@ -242,7 +241,7 @@ io.on("connect", (socket) => {
 
 	socket.on("solo", (modules, user) => {
 		console.log("solo match started by", socket.id, "with", modules);
-		startGame([{s: socket, modules: modules, u: user}], "FFA");
+		startGame([{s: socket, modules: modules, u: user}]);
 	});
 
 	socket.on("move", data => {
