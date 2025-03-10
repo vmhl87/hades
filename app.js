@@ -730,9 +730,9 @@ function main(){
 
 					if(m.type == ALLY) drawEffect(ALLY, m.aux[0]);
 				}
-			}
 
-			pop();
+				pop();
+			}
 		}
 
 		for(let e of entities.emp){
@@ -1056,7 +1056,10 @@ function main(){
 						line(0, 10, 10, 0);
 						pop();
 					}
-					push(); translate(width/2-70, height-50);
+					pop();
+
+					push(); strokeWeight(2);
+					translate(width/2-70, height-50);
 					if(canMove && (canStop || ships[shipID].move.length > 1)){
 						if(mouseIn(width/2-70, height-50, 20, 20)){
 							stroke(30, 90, 110);
@@ -1065,7 +1068,6 @@ function main(){
 					}else stroke(10, 40, 60);
 					line(-10, -10, 10, 10);
 					line(-10, 10, 10, -10);
-					pop();
 					pop();
 				}
 			}
