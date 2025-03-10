@@ -141,7 +141,8 @@ class Ship{
 	decode(dat){
 		this.hp = dat.hp;
 		this.modules = dat.modules;
-		this.pos = dat.pos;
+		if(!Number.isNaN(dat.pos[0]) && !Number.isNaN(dat.pos[1]))
+			this.pos = dat.pos;
 		this.move = dat.move;
 		if(this.team != ID) this.wait = dat.wait;
 		else if(this.wait != null && dat.wait != null)
@@ -156,6 +157,13 @@ class Ship{
 	}
 
 	travel(){
+		if(Number.isNaN(this.vvpos[0]) || Number.isNaN(this.vvpos[1]) ||
+			Number.isNaN(this.vpos[0]) || Number.isNaN(this.vpos[1])){
+			this.vvpos = [...this.pos];
+			this.vpos = [...this.pos];
+			this.rot = PI*1.85;
+		}
+
 		let target;
 		if(this.move.length) target = atan2(this.move[0][1]-this.pos[1], this.move[0][0]-this.pos[0]);
 		else if(this.wait) target = atan2(this.wait[1]-this.pos[1], this.wait[0]-this.pos[0]);
@@ -199,8 +207,10 @@ function screenPos(pos){
 	return [width/2+(pos[0]-camera.x)*camera.z, height/2+(pos[1]-camera.y)*camera.z];
 }
 
+let usingTrackpad = false;
+
 function mouseWheel(e){
-	if(!staging){
+	if(!staging && !usingTrackpad){
 		let old = camera.z;
 		if(e.delta > 0) camera.z /= 1.04;
 		if(e.delta < 0) camera.z *= 1.04;
@@ -231,6 +241,8 @@ window.addEventListener("gesturechange", function (e) {
 
 	camera.x = e.pageX - gestureStart[0];
 	camera.y = e.pageY - gestureStart[1];
+
+	usingTrackpad = true;
 })
 
 window.addEventListener("gestureend", function (e) {
