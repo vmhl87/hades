@@ -196,8 +196,10 @@ function screenPos(pos){
 	return [width/2+(pos[0]-camera.x)*camera.z, height/2+(pos[1]-camera.y)*camera.z];
 }
 
+let usingTrackpad = false;
+
 function mouseWheel(e){
-	if(!staging){
+	if(!staging && !usingTrackpad){
 		let old = camera.z;
 		if(e.delta > 0) camera.z /= 1.04;
 		if(e.delta < 0) camera.z *= 1.04;
@@ -228,6 +230,8 @@ window.addEventListener("gesturechange", function (e) {
 
 	camera.x = e.pageX - gestureStart[0];
 	camera.y = e.pageY - gestureStart[1];
+
+	usingTrackpad = true;
 })
 
 window.addEventListener("gestureend", function (e) {
