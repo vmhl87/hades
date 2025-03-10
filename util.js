@@ -138,7 +138,8 @@ class Ship{
 	decode(dat){
 		this.hp = dat.hp;
 		this.modules = dat.modules;
-		this.pos = dat.pos;
+		if(!Number.isNaN(dat.pos[0]) && !Number.isNaN(dat.pos[1]))
+			this.pos = dat.pos;
 		this.move = dat.move;
 		if(this.team != ID) this.wait = dat.wait;
 		else if(this.wait != null && dat.wait != null)
@@ -153,6 +154,13 @@ class Ship{
 	}
 
 	travel(){
+		if(Number.isNaN(this.vvpos[0]) || Number.isNaN(this.vvpos[1]) ||
+			Number.isNaN(this.vpos[0]) || Number.isNaN(this.vpos[1])){
+			this.vvpos = [...this.pos];
+			this.vpos = [...this.pos];
+			this.rot = PI*1.85;
+		}
+
 		let target;
 		if(this.move.length) target = atan2(this.move[0][1]-this.pos[1], this.move[0][0]-this.pos[0]);
 		else if(this.wait) target = atan2(this.wait[1]-this.pos[1], this.wait[0]-this.pos[0]);
