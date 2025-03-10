@@ -1,7 +1,9 @@
 const socket = io();
 
+const MODES = ["FFA", "2v2", "TEAM"];
+
 function start(){
-	socket.emit("enqueue", modules, user);
+	socket.emit("enqueue", modules, user, MODES[mode]);
 }
 
 function cancel(){
@@ -9,7 +11,7 @@ function cancel(){
 }
 
 function begin(){
-	socket.emit("begin");
+	socket.emit("begin", MODES[mode]);
 }
 
 function solo(){
@@ -115,6 +117,7 @@ class Ship{
 		this.mhp = dat.mhp;
 		this.team = dat.team;
 		this.user = dat.user;
+		this.name = dat.name;
 		this.modules = dat.modules;
 		this.pos = dat.pos;
 		this.move = dat.move;

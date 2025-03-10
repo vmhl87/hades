@@ -7,7 +7,6 @@ let showGuide = false, guideUI = {};
 
 	guideUI.info = ct++;
 	guideUI.gameplay = ct++;
-	guideUI.gameMode = ct++;
 	guideUI.ship = ct++;
 	guideUI.weapon = ct++;
 	guideUI.shield = ct++;
@@ -18,9 +17,6 @@ let showGuide = false, guideUI = {};
 	guideUI.combat = ct++;
 	guideUI.modules = ct++;
 	guideUI.keyboardShortcuts = ct++;
-
-	guideUI.quickMatch = ct++;
-	guideUI.arena = ct++;
 
 	guideUI.battleship = ct++;
 	guideUI.sentinel = ct++;
@@ -75,9 +71,6 @@ let showGuide = false, guideUI = {};
 	for(let x=guideUI.movement; x<=guideUI.keyboardShortcuts; ++x)
 		subpage(guideUI.gameplay, x);
 
-	for(let x=guideUI.quickMatch; x<=guideUI.arena; ++x)
-		subpage(guideUI.gameMode, x);
-
 	for(let x=guideUI.battleship; x<=guideUI.bomber; ++x)
 		subpage(guideUI.ship, x);
 
@@ -101,7 +94,6 @@ let showGuide = false, guideUI = {};
 
 	info(guideUI.info).push("Introduction");
 	info(guideUI.gameplay).push("Gameplay");
-	info(guideUI.gameMode).push("Game Modes");
 	info(guideUI.ship).push("Ships");
 	info(guideUI.weapon).push("Weapons");
 	info(guideUI.shield).push("Shields");
@@ -112,9 +104,6 @@ let showGuide = false, guideUI = {};
 	info(guideUI.combat).push("Combat");
 	info(guideUI.modules).push("Modules");
 	info(guideUI.keyboardShortcuts).push("Keyboard Shortcuts");
-
-	info(guideUI.quickMatch).push("Quick Match");
-	info(guideUI.arena).push("Arena");
 
 	info(guideUI.battleship).push(["ship", BS]);
 	info(guideUI.battleship).push("Battleship");
@@ -322,26 +311,20 @@ function drawGuide(){
 			_text(BODY.keyboardShortcuts, width/2-120, Y, 240, 1000);
 			pop();
 
-		}else if(P == guideUI.quickMatch){
-			push(); textAlign(LEFT, TOP);
-			_text(BODY.quickMatch, width/2-120, Y, 240, 1000);
-			pop();
-
-		}else if(P == guideUI.arena){
-			push(); textAlign(LEFT, TOP);
-			_text(BODY.arena, width/2-120, Y, 240, 1000);
-			pop();
-
 		}else if(P == guideUI.battleship){
-			push(); translate(width/2-60, Y+10);
+			push(); translate(width/2-90, Y+10);
 			rotate(PI*1.85);
 			drawShip(BS, 0, 0);
 			pop();
-			push(); translate(width/2, Y+10);
+			push(); translate(width/2-30, Y+10);
+			rotate(PI*1.85);
+			drawShip(BS, 3, 0);
+			pop();
+			push(); translate(width/2+30, Y+10);
 			rotate(PI*1.85);
 			drawShip(BS, 2, 0);
 			pop();
-			push(); translate(width/2+60, Y+10);
+			push(); translate(width/2+90, Y+10);
 			rotate(PI*1.85);
 			drawShip(BS, 1, 0);
 			pop();
@@ -983,9 +966,6 @@ const BODY = {
 	combat: "Weapons auto-target and auto-activate without the need for player input. Each Weapon has a specific range, and begins firing on enemy ships that come within its range, up to its maximum number of targets.\n\nA Weapon will not stop firing upon an enemy ship until it is out of range, or a module such as Decoy Drone has been used to forcibly switch targeting.\n\nSelecting any Ship will display a circle representing its attack radius (or blast radius in the case of rockets) as well as any radii of nearby enemies.",
 	modules: "Many shields, modules, and drones must be manually activated. To trigger them, select the owner Ship, and click on the relevant icon in the control dialog. Once activated, the module will take some time to recharge before it can be used again.\n\nSome modules, such as Teleport, require the player to select a destination upon activation.\n\nThe modules of enemy Battleships are not visible until they have been used. In the case of automatically activated modules, such as Weapons, they reveal once the Ship has begun firing upon an enemy.",
 	keyboardShortcuts: "W - select your Battleship\n\nE - select movement destination\n\nX - cancel movement\n\nA/S/D/F/G - activate slot 1/2/3/4/5",
-
-	quickMatch: "Quick Match is the default gamemode and the only one currently available. Battleships compete within a 5x5 sector map populated by all Cerberus variations as well as Lone Battleships. All player-controlled battleships are hostile to one another.",
-	arena: "Nothing to see here yet!",
 
 	battleship: "Battleships are powerful combat vessels which may equip one Weapon, one Shield, two Modules, and one Drone. With a 7k health pool, they can absorb significant damage.\n\nIn addition to player controlled Battleships, several computer controlled Lone Battleships may jump into the arena at various points throughout the round. Some Lone Battleships equip an unobtainable VENGEANCE module. Lone Battleships are identified by their pale salmon color.",
 	sentinel: "Cerberus Sentinels are dangerous, equipping powerful cannons that deal 200 DPS, but have a small 1.2k health pool. When hidden behind other enemy ships, Sentinels can pose a significant threat.\n\nSentinels do not leave their assigned sector.",

@@ -57,7 +57,7 @@ const Ship = Module.Ship, Game = Module.Game;
 
 const COLS = Module.COLS, ROWS = Module.ROWS, TPS = Module.TPS;
 
-let games = [], queue = [], TIME = 0;
+let games = [], queue = {"FFA": [], "2v2": [], "TEAM": []}, TIME = 0;
 
 function tick(game){
 	if(game) game.update();
@@ -104,16 +104,29 @@ function spawnBS(n){
 	return shuffle(Array.from(S).map(x => [x%COLS, Math.floor(x/COLS)]));
 }
 
-function startGame(Q){
+function startGame(Q, mode){
 	const g = new Game(Q.map(x => x.s));
 	const p = spawnBS(Q.length);
 
-	let A = new Map();
+	let A = new Map(), B = new Array(Q.length);
+
+	if(mode == "FFA"){
+		for(let i=0; i<Q.length; ++i)
+			B[i] = 'T'+i.toString();
+
+	}else if(mode == "2v2"){
+		let S = new Set();
+
+		while(S.size < n/2)
+			S.add(Math.floor(Math.random()*Q.length));
+
+		for(let i=0; i<Q.length; ++i)
+			B[i] = S.has(i) ? "T0" : "T1";
+
+	}else if(mode == "TEAM") for(let i=0; i<Q.length; ++i) B[i] = "T0";
 
 	for(let i=0; i<Q.length; ++i){
 		const R = Q[i].u;
-		//const N = A.has(R) ? R + " (" + A.get(R).toString() + ")" : R;
-		//A.set(R, A.has(R) ? A.has(R)+1 : 1);
 
 		let N = R[0];
 
@@ -133,7 +146,7 @@ function startGame(Q){
 			A.get(R[0]).set(R[1], 0);
 		}
 
-		g.addShip(1, [Q[i].s.id, N], Q[i].modules,
+		g.addShip(1, [B[i], Q[i].s.id, N], Q[i].modules,
 			[300*(p[i][0]-COLS/2+0.5), 300*(p[i][1]-ROWS/2+0.5)]);
 	}
 
@@ -153,13 +166,15 @@ io.on("connect", (socket) => {
 	socket.on("disconnect", e => {
 		console.log("disconnect " + socket.id);
 
-		if(queue.filter(x => x.s.id == socket.id).length){
-			console.log("dequeued player", socket.id);
-			queue = queue.filter(x => x.s.id != socket.id);
-			let m = [];
-			for(let q of queue) m.push(q.u[0]);
-			console.log(" =>", m);
-			io.emit("queueSize", queue.length);
+		for(let k of Object.keys(queue)){
+			if(queue[k].filter(x => x.s.id == socket.id).length){
+				console.log("dequeued player", socket.id);
+				queue[k] = queue[k].filter(x => x.s.id != socket.id);
+				let m = [];
+				for(let q of queue[k]) m.push(q.u[0]);
+				console.log(" =>", m);
+				io.emit("queueSize", k, queue[k].length);
+			}
 		}
 
 		for(let g of games){
@@ -196,35 +211,38 @@ io.on("connect", (socket) => {
 		}
 	});
 
-	socket.on("enqueue", (modules, user) => {
-		console.log("enqueued player", socket.id, "with", modules);
-		queue.push({s: socket, modules: modules, u: user});
+	socket.on("enqueue", (modules, user, mode) => {
+		console.log("enqueued player", socket.id, "with", modules, "mode", mode);
+		queue[mode].push({s: socket, modules: modules, u: user});
 		let m = [];
-		for(let q of queue) m.push(q.u[0]);
+		for(let q of queue[mode]) m.push(q.u[0]);
 		console.log(" =>", m);
-		io.emit("queueSize", queue.length);
+		io.emit("queueSize", mode, queue[mode].length);
 	});
 
 	socket.on("dequeue", () => {
 		console.log("dequeued player", socket.id);
-		queue = queue.filter(x => x.s.id != socket.id);
-		let m = [];
-		for(let q of queue) m.push(q.u[0]);
-		console.log(" =>", m);
-		io.emit("queueSize", queue.length);
+
+		for(let k of Object.keys(queue)){
+			queue[k] = queue[k].filter(x => x.s.id != socket.id);
+			let m = [];
+			for(let q of queue[k]) m.push(q.u[0]);
+			console.log(" =>", m);
+			io.emit("queueSize", k, queue[k].length);
+		}
 	});
 
-	socket.on("begin", () => {
-		if(queue.length){
-			startGame(queue);
-			queue = [];
-			io.emit("queueSize", queue.length);
+	socket.on("begin", mode => {
+		if(queue[mode].length){
+			startGame(queue[mode], mode);
+			queue[mode] = [];
+			io.emit("queueSize", mode, 0);
 		}
 	});
 
 	socket.on("solo", (modules, user) => {
 		console.log("solo match started by", socket.id, "with", modules);
-		startGame([{s: socket, modules: modules, u: user}]);
+		startGame([{s: socket, modules: modules, u: user}], "FFA");
 	});
 
 	socket.on("move", data => {

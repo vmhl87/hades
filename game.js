@@ -320,9 +320,7 @@ class Ship{
 		}
 
 		if([SENTINEL, GUARD, COL, BOMBER].includes(type))
-			//this.ai = [Math.random(), Math.floor((pos[0]+150*COLS)/300)
-				//+COLS*Math.floor((pos[1]+300*ROWS*10+150*ROWS)/300)];
-			this.ai = [Math.random(), null];
+			this.ai = [Math.random(), Math.floor(Math.random()*COLS*ROWS)];
 
 		if(type == INT) this.ai = Math.random();
 	}
@@ -354,6 +352,7 @@ class Ship{
 			mhp: this.mhp,
 			team: this.team[0],
 			user: this.team[1],
+			name: this.team[2],
 			modules: this.modules,
 			pos: this.pos,
 			move: this.move,
@@ -1266,8 +1265,6 @@ class Game{
 						m.state =
 							count[Math.floor((s.pos[0]+150*COLS)/300)+COLS*Math.floor((s.pos[1]+150*ROWS)/300)]
 							== 2 ? 1 : 0;
-						// TODO this switches off multi-sol tactic
-						//if(m.state) sol[M.get(s.uid)] = DAMAGE[DUEL];
 						if(m.state){
 							sol[M.get(s.uid)] *= DAMAGE[DUEL];
 							if(firing.has(s.uid)) m.use = true;
@@ -1303,8 +1300,6 @@ class Game{
 			if(IS_WEAPON(m.type)) targets[i] += m.aux.length;
 
 		for(let i=0; i<this.ships.length; ++i) for(let m of this.ships[i].modules){
-			// TODO old ripple behavior
-			//if(m.type == RIPPLE && targets[i] == 0 && m.state == 0.75) m.state = 1;
 			if(m.type == DELTA && this.ships[i].move.length > 0 && m.state == 0.75) m.state = 1;
 		}
 
@@ -1383,7 +1378,6 @@ class Game{
 					for(let s of this.ships)
 						if(Math.floor((s.pos[0]+150*COLS)/300)+Math.floor((s.pos[1]+150*ROWS)/300)*COLS == i)
 							s.hp = 0;
-					//this.ev.push(["deadSector", i]);
 					this.entities.sectorDeath.push([i, this.age+4*TPS]);
 				}
 			}
@@ -1398,7 +1392,6 @@ class Game{
 					if(_dist(x.pos, s.pos) < RANGE[REPAIR])
 						x.heal(2000);
 
-				//this.ev.push(["heal", [...s.pos]]);
 				this.entities.heal.push([[...s.pos], this.age+2*TPS]);
 			}
 
@@ -1410,7 +1403,6 @@ class Game{
 						if(_dist(x.pos, s.pos) < RANGE[REPAIR])
 							x.heal(500);
 
-					//this.ev.push(["heal", [...s.pos]]);
 					this.entities.heal.push([[...s.pos], this.age+2*TPS]);
 				}
 			}
@@ -1446,7 +1438,6 @@ class Game{
 					if(idx.length){
 						const I = idx[Math.floor(Math.random()*idx.length)];
 						if(SENTINEL+I != COL || !COLLAPSING){
-							//const J = Math.floor(Math.random()*this.rocks.length);
 							const X = S[Math.floor(Math.random()*S.length)];
 							if(this.sectors[X].length){
 								const J = this.sectors[X][Math.floor(Math.random()*this.sectors[X].length)];
@@ -1461,7 +1452,7 @@ class Game{
 								}
 							
 								if(val){
-									this.addShip(SENTINEL+I, [CERB, null], [SENTINEL+I, SENTINEL+I == COL ? APOCALYPSE : null], [P[0], P[1]-300*ROWS*10], []);
+									this.addShip(SENTINEL+I, [CERB, CERB.toString()+UID.toString(), null], [SENTINEL+I, SENTINEL+I == COL ? APOCALYPSE : null], [P[0], P[1]-300*ROWS*10], []);
 									this.ships[this.ships.length-1].dock = J;
 									if(SENTINEL+I != INT) for(let i=0; i<this.sectors.length; ++i)
 										if(this.sectors[i].includes(J)) this.ships[this.ships.length-1].ai[1] = i;
@@ -1520,7 +1511,8 @@ class Game{
 							}
 							
 							if(val){
-								this.addShip(BS, [-(++UID), null], MODS[I], [P[0], P[1]+300*ROWS*10], []);
+								const U = ++UID;
+								this.addShip(BS, [-U, -U, null], MODS[I], [P[0], P[1]+300*ROWS*10], []);
 								this.ships[this.ships.length-1].dock = J;
 							}
 						}
@@ -1551,8 +1543,8 @@ class Game{
 				else if([BS, DECOY, REPAIR, ROCKET, TURRET, PHASE, WARP, COL].includes(s.type)){
 					this.die(s.pos);
 					if(s.type == BS && !Number.isInteger(s.team[0])){
-						if(s.hp == 0) this.entities.eliminate.push([s.team[1], this.age + TPS*3]);
-						else this.entities.surrender.push([s.team[1], this.age + TPS*3]);
+						if(s.hp == 0) this.entities.eliminate.push([s.team[2], this.age + TPS*3]);
+						else this.entities.surrender.push([s.team[2], this.age + TPS*3]);
 						off = true;
 					}
 				}
@@ -1563,8 +1555,9 @@ class Game{
 			this.ships = this.ships.filter(x => x.hp > 0);
 
 			if(off){
-				const Z = this.ships.filter(x => x.type == BS && !Number.isInteger(x.team[0]));
-				if(Z.length == 1) this.entities.win.push([Z[0].team[1], this.age + TPS*3]);
+				const Z = this.ships.filter(x => x.type == BS && !Number.isInteger(x.team[0]))
+				const Y = new Set(Z.map(x => x.team[0]));
+				if(Z.length == 1) this.entities.win.push([Z[0].team[2], this.age + TPS*3]);
 			}
 		};
 

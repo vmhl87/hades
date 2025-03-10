@@ -9,8 +9,8 @@ function genUser(){
 	];
 }
 
-let searching = 0, staging = 1, chooseModule = -1,
-	connected = 0, snapshot = 0, ID = null, now = null,
+let searching = 0, staging = 1, chooseModule = -1, mode = 0,
+	connected = 0, snapshot = 0, ID = null, TEAM = null, now = null,
 	queueSize = 0, open = 0, user = genUser(), savedUser = false;
 
 function preload(){
@@ -29,6 +29,10 @@ function setup(){
 	if(localStorage.getItem("user")){
 		user = JSON.parse(localStorage.getItem("user"));
 		savedUser = true;
+	}
+
+	if(localStorage.getItem("mode")){
+		mode = localStorage.getItem("mode");
 	}
 
 	setupLogin();
@@ -87,9 +91,10 @@ socket.on("start", data => {
 	camera.z = 1;
 
 	for(let s of data.ships)
-		if(s.type == BS && s.team == socket.id){
+		if(s.type == BS && s.user == socket.id){
 			camera.x = s.pos[0];
 			camera.y = s.pos[1];
+			TEAM = s.team;
 		}
 
 	selectMove = null;
@@ -140,7 +145,10 @@ socket.on("end", () => {
 	camera = {x: 0, y: 0, z: 1};
 });
 
-socket.on("queueSize", x => queueSize = x);
+socket.on("queueSize", (m, x) => {
+	if(m == MODES[mode])
+		queueSize = x;
+});
 
 function main(){
 	background(0, 10, 25);
@@ -319,6 +327,12 @@ function main(){
 				const H = mouseIn(width/2, height/2+150, textWidth("ENTER QUEUE")+30, 30);
 				fill(H ? 255 : 200); textSize(H ? 26 : 25);
 				text("ENTER QUEUE", width/2, height/2 + 150);
+				textSize(15); fill(200);
+				const A = "GAME MODE:  ", B = MODES[mode], C = textWidth(A), D = textWidth(B);
+				text(A, width/2-D/2, height/2+190);
+				const I = mouseIn(width/2+C/2, height/2+200, C/2+10, 20);
+				fill(I ? 255 : 200); textSize(I ? 16 : 15);
+				text(B, width/2+C/2, height/2+190);
 			}
 
 		}else{
@@ -577,7 +591,7 @@ function main(){
 				push();
 				stroke(90, 100); fill(90, 30);
 				if(selectMove == null) for(let i=0; i<ships[shipID].modules.length; ++i)
-					if(ships[shipID].type != BS || ships[shipID].team == ID || ships[shipID].modules[i].use)
+					if(ships[shipID].type != BS || ships[shipID].team == TEAM || ships[shipID].modules[i].use)
 						if(mouseIn(width/2+25-25*ships[shipID].modules.length+50*i, height-120-10-25, 25, 20))
 							if(RANGE[ships[shipID].modules[i].type] != null)
 								circle(...screenPos(ships[shipID].vpos), RANGE[ships[shipID].modules[i].type]*2*camera.z);
@@ -586,10 +600,10 @@ function main(){
 				pop();
 
 				push();
-				noFill(); stroke(...(ships[shipID].team == ID ? [70, 90, 90] : [90, 70, 70]), 100);
+				noFill(); stroke(...(ships[shipID].team == TEAM ? [70, 90, 90] : [90, 70, 70]), 100);
 				let shade = true;
 				for(let i=0; i<ships[shipID].modules.length; ++i)
-					if(ships[shipID].type != BS || ships[shipID].team == ID || ships[shipID].modules[i].use){
+					if(ships[shipID].type != BS || ships[shipID].team == TEAM || ships[shipID].modules[i].use){
 						if(weaponRange(ships[shipID].modules[i].type) != null){
 							circle(...screenPos(ships[shipID].vpos), weaponRange(ships[shipID].modules[i].type)*2*camera.z);
 							shade = false;
@@ -642,7 +656,7 @@ function main(){
 								circle(...screenPos(s.move[s.move.length-1]), RANGE[s.type]*2*camera.z);
 					}
 					if(near) for(let i=0; i<s.modules.length; ++i)
-						if(s.type != BS || s.team == ID || s.modules[i].use){
+						if(s.type != BS || s.team == TEAM || s.modules[i].use){
 							if(weaponRange(s.modules[i].type) != null)
 								circle(...screenPos(s.vpos), weaponRange(s.modules[i].type)*2*camera.z);
 							if(s.modules[i].type == ROCKETD)
@@ -721,7 +735,7 @@ function main(){
 
 					if(m.type == DELTA) drawEffect(DELTA, m.aux[2]);
 
-					if(m.type == PASSIVE && (m.use || s.type != BS || s.team == ID))
+					if(m.type == PASSIVE && (m.use || s.type != BS || s.team == TEAM))
 						drawEffect(PASSIVE, m.aux[0]);
 
 					if(m.type == OMEGA) drawEffect(OMEGA);
@@ -757,7 +771,6 @@ function main(){
 		push(); noFill(); strokeWeight(3*sqrt(camera.z));
 		for(let d of entities.death){
 			stroke(0, 255, 255, 80*Math.min(1, (d[1]-NOW)/0.8/TPS));
-			//circle(...screenPos(d[0]), (3000-d[1]+NOW)/50*sqrt(camera.z));
 			circle(...screenPos(d[0]), 60*(1-(d[1]-NOW)/TPS/3)*sqrt(camera.z));
 		}
 		pop();
@@ -932,8 +945,8 @@ function main(){
 
 					let N = focus[0] == "rock" ? "ASTEROID" : NAME[ships[shipID].type];
 
-					if(ships[shipID].user != null) N += " [" + ships[shipID].user + "]";
-					else if(ships[shipID].team != CERB && ships[shipID].type == BS) N = "LONE BATTLESHIP";
+					if(ships[shipID].name != null) N += " [" + ships[shipID].name + "]";
+					else if(ships[shipID].type == BS) N = "LONE BATTLESHIP";
 
 					push(); textAlign(LEFT, TOP); textSize(18);
 					fill(200); noStroke(); text(N, width/2-150 + 10, height-120 + 10);
@@ -956,7 +969,7 @@ function main(){
 
 					for(let m of ships[shipID].modules)
 						if(m.type >= ALPHA && m.type <= ALLY)
-							if(m.aux[0] && (m.use || ships[shipID].type != BS || ships[shipID].team == ID)){
+							if(m.aux[0] && (m.use || ships[shipID].type != BS || ships[shipID].team == TEAM)){
 								fill(50, 150, 150);
 								rect(width/2+150-20-100, height-120+100-20-20-6, ceil(100*m.aux[0]), 3);
 							}
@@ -965,17 +978,17 @@ function main(){
 						const H = mouseIn(width/2+25-25*ships[shipID].modules.length+50*i, height-120-10-25, 25, 20);
 
 						const Y = height-120-10-25 - (H && ships[shipID].modules[i].state == 1 && ACTIVATED[ships[shipID].modules[i].type] && (
-								ships[shipID].type != BS || ships[shipID].modules[i].use || ships[shipID].team == ID
+								ships[shipID].type != BS || ships[shipID].modules[i].use || ships[shipID].team == TEAM
 							)? 2 : 0);
 
 						push(); translate(width/2+25-25*ships[shipID].modules.length+50*i, Y);
 						const S = ships[shipID], M = S.modules[i];
-						drawModule2(M.use || S.type != BS || S.team == ID ? M.type : NULL, ships[shipID].modules[i].state);
+						drawModule2(M.use || S.type != BS || S.team == TEAM ? M.type : NULL, ships[shipID].modules[i].state);
 						pop();
 
 						if(H){
 							if(!MOBILE && mouseIsPressed){
-								const T = M.use || S.type != BS || S.team == ID ? M.type : NULL;
+								const T = M.use || S.type != BS || S.team == TEAM ? M.type : NULL;
 
 								if(MODULE_NAME[T] != null){
 									push(); textSize(14);
@@ -1001,7 +1014,7 @@ function main(){
 								}
 
 							}else if(ACTIVATED[M.type] || [DART, ROCKETD, BOMBER].includes(M.type)){
-								const T = M.use || S.type != BS || S.team == ID ? M.type : NULL;
+								const T = M.use || S.type != BS || S.team == TEAM ? M.type : NULL;
 
 								if(T != NULL){
 									const RT = M.type >= ALPHA && M.type <= ALLY ? RECHARGE_TIME[T] : RECHARGE_TIME[T]-EFFECT_TIME[T];
@@ -1017,7 +1030,7 @@ function main(){
 						}
 					}
 
-					let canMove = ships[shipID].team == ID && !snapshot &&
+					let canMove = ships[shipID].user == ID && !snapshot &&
 						(ships[shipID].type == BS || CENT) && ships[shipID].tp == null,
 						canStop = ships[shipID].wait;
 
@@ -1099,8 +1112,8 @@ function main(){
 			push(); textAlign(CENTER, TOP); textSize(17);
 			fill(200, 150, 50, 255*min(1, (e[1]-NOW)/TPS));
 			let mine = null;
-			for(let x of ships) if(x.type == BS && x.team == ID) mine = x.user;
-			text((e[0] == mine ? "YOU WIN" : e[0] + " WINS") + " THE MATCH", width/2, 70);
+			for(let x of ships) if(x.type == BS && x.user == ID) mine = x.name;
+			text((e[0] == mine ? "YOU WIN" : (MODES[mode] == "2v2" ? "YOU LOSE" : e[0] + " WINS")) + " THE MATCH", width/2, 70);
 			pop();
 		}
 
@@ -1133,7 +1146,7 @@ function main(){
 		{
 			let shipInArena = false;
 
-			for(let s of ships) if(s.team == ID && s.type == BS) shipInArena = true;
+			for(let s of ships) if(s.user == ID && s.type == BS) shipInArena = true;
 
 			{
 				push(); translate(30, 30);
@@ -1229,21 +1242,38 @@ function stagingUI(){
 	}
 
 	if(chooseModule == -1){
-		push();
-		textSize(18);
-		const T = queueSize.toString() + " OTHER PLAYER" + (queueSize == 1 ? "" : "S") + " IN QUEUE  -  ";
-		const D = textWidth(T), E = textWidth("START GAME");
-		pop();
+		{
+			push();
+			textSize(18);
+			const T = queueSize.toString() + " OTHER PLAYER" + (queueSize == 1 ? "" : "S") + " IN QUEUE  -  ";
+			const D = textWidth(T), E = textWidth("START GAME");
+			pop();
 
-		if(mouseIn(width/2+D/2, height/2+150, E/2+30, 15)){
-			if(searching){
-				searching = 0;
-				staging = 0;
-				if(open) begin();
-				else solo();
-				return;
+			if(mouseIn(width/2+D/2, height/2+150, E/2+30, 15)){
+				if(searching){
+					searching = 0;
+					staging = 0;
+					if(open) begin();
+					else solo();
+					return;
+				}
 			}
-		}
+		};
+
+		{
+			push();
+			textSize(15);
+			const A = "GAME MODE:  ", B = MODES[mode], C = textWidth(A), D = textWidth(B);
+			pop();
+
+			if(mouseIn(width/2+C/2, height/2+200, C/2+10, 20)){
+				if(!searching){
+					mode = (mode+1) % MODES.length;
+					localStorage.setItem("mode", mode);
+					queueSize = 0;
+				}
+			}
+		};
 
 		if(mouseIn(width/2, height/2+150, 120, 30)){
 			if(!searching){
@@ -1434,7 +1464,7 @@ function click(){
 
 	if(mouseIn(15, height-160, 15, 30) && CENT){
 		if(shipID != null){
-			ID = ships[shipID].team;
+			ID = ships[shipID].user;
 			return;
 		}
 	}
@@ -1460,7 +1490,7 @@ function click(){
 
 	if((!focus || MOBILE) && mouseIn(width-30, height-30, 30, 30) && selectMove == null)
 		for(let s of ships)
-			if(s.team == ID && s.type == BS){
+			if(s.user == ID && s.type == BS){
 				focus = ["ship", s.uid];
 				return;
 			}
@@ -1474,7 +1504,7 @@ function click(){
 	if(focus && shipID != null && selectMove == null && !snapshot){
 		for(let i=0; i<ships[shipID].modules.length; ++i){
 			if(mouseIn(width/2+25-25*ships[shipID].modules.length+50*i, height-120-10-25, 25, 25)){
-				if(ships[shipID].team == ID && ships[shipID].modules[i].state == 1){
+				if(ships[shipID].user == ID && ships[shipID].modules[i].state == 1){
 					if(ships[shipID].tp != null && [TP, LEAP, RIPPLE].includes(ships[shipID].modules[i].type))
 						return;
 					if(LOCMOD.includes(ships[shipID].modules[i].type))
@@ -1489,7 +1519,7 @@ function click(){
 	if(focus && selectMove == null &&
 		(focus[0] == "rock" ? mouseIn(width/2, height-40, 55, 20) : mouseIn(width/2, height-70, 150, 50))){
 		if(shipID != null){
-			let canMove = ships[shipID].team == ID &&
+			let canMove = ships[shipID].user == ID &&
 				(CENT || ships[shipID].type == BS) && ships[shipID].tp == null,
 				canStop = canMove && ships[shipID].wait;
 			if(canMove && (ships[shipID].move.length > 1 || canStop) &&
@@ -1539,7 +1569,7 @@ function click(){
 		}else if(shipID != null && ships[shipID].modules[selectMove[1].i].type == RIPPLE && select != null && select[1] != selectMove[1].s){
 			for(let s of ships) if(s.uid == select[1])
 				if((_dist(ships[shipID].vpos, s.vpos) < RANGE[RIPPLE] || CENT)
-					&& (ships[shipID].team == s.team || s.team == CERB || CENT)){
+					&& (ships[shipID].user == s.user || s.team == CERB || CENT)){
 					socket.emit("activateModule", {gameID: gameID, shipID: selectMove[1].s,
 						i: selectMove[1].i, loc: select[1]});
 					selectMove = null;
@@ -1558,7 +1588,7 @@ function keyReleased(){
 	if(!staging && connected){
 		if(key == 'w'){
 			for(let s of ships){
-				if(s.type == BS && s.team == ID){
+				if(s.type == BS && s.user == ID){
 					focus = ["ship", s.uid];
 					return;
 				}
@@ -1570,7 +1600,7 @@ function keyReleased(){
 
 			for(let i=0; i<ships[shipID].modules.length; ++i){
 				if(key == keys[i]){
-					if(ships[shipID].team == ID && !snapshot && ships[shipID].modules[i].state == 1){
+					if(ships[shipID].user == ID && !snapshot && ships[shipID].modules[i].state == 1){
 						if(ships[shipID].tp != null && [TP, LEAP, RIPPLE].includes(ships[shipID].modules[i].type))
 							return;
 						if(LOCMOD.includes(ships[shipID].modules[i].type))
@@ -1584,7 +1614,7 @@ function keyReleased(){
 
 		if(focus && selectMove == null && !snapshot){
 			if(shipID != null){
-				let canMove = ships[shipID].team == ID &&
+				let canMove = ships[shipID].user == ID &&
 					(ships[shipID].type == BS || CENT) && ships[shipID].tp == null,
 					canStop = canMove && ships[shipID].wait;
 				if(canMove && (ships[shipID].move.length > 1 || canStop) &&
