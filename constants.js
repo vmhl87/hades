@@ -291,7 +291,7 @@ STATS[BOMBER] = "Damage: 2000, Recharge time: 24s\nRange: 300m";
 
 STATS[ALPHA] = "Effect time: 6s";
 STATS[DELTA] = "HP: 3000, DPS: 900\nRange: 55m";
-STATS[PASSIVE] = "HP: 3500, Recharge time: 30s";
+STATS[PASSIVE] = "HP: 4000, Recharge time: 30s";
 STATS[OMEGA] = "HP: 4700";
 STATS[MIRROR] = "HP: 1500, Multiplier: 300%\nRange: 90m";
 STATS[ALLY] = "HP: 3000\nRange: 140m";
