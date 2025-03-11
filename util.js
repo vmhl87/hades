@@ -23,7 +23,7 @@ function setupLogin(){
 	const passwordBox = document.getElementById("password");
 
 	usernameBox.addEventListener("input", () => {
-		usernameBox.value = usernameBox.value.toUpperCase();
+		usernameBox.value = usernameBox.value.toUpperCase().replaceAll(' ', '_');
 	});
 
 	usernameBox.addEventListener("keypress", event => {
