@@ -1244,7 +1244,7 @@ class Game{
 
 			for(let s of this.ships)
 				for(let m of s.modules){
-					if(m.type == AMP && m.state < 0){
+					if(m.type == AMP && m.state < 0 && s.type != WARP){
 						for(let x of this.ships) if(_dist(x.pos, s.pos) < RANGE[AMP])
 							amp[M.get(x.uid)] = DAMAGE[AMP];
 					}
@@ -1536,7 +1536,7 @@ class Game{
 		let q = [];
 
 		{
-			let leave = new Set();
+			let leave = new Set(), elim = [], surr = [];
 
 			for(let s of this.ships){
 				if(s.hp > 0) q.push(s.encode());
@@ -1544,8 +1544,8 @@ class Game{
 					this.die(s.pos);
 					if(s.type == BS && !Number.isInteger(s.team[0])){
 						leave.add(s.team[0]);
-						if(s.hp == 0) this.entities.eliminate.push([s.team[2], this.age + TPS*3]);
-						else this.entities.surrender.push([s.team[2], this.age + TPS*3]);
+						if(s.hp == 0) elim.push([s.team[2], this.age + TPS*3]);
+						else surr.push([s.team[2], this.age + TPS*3]);
 					}
 				}
 
@@ -1556,7 +1556,12 @@ class Game{
 
 			let alive = new Set(this.ships.filter(x => x.type == BS).map(x => x.team[0]));
 
-			let off = false;
+			if(alive.size){
+				this.entities.eliminate.push(...elim);
+				this.entities.surrender.push(...surr);
+			}
+
+			let off = false;  // are any teams totally eliminated?
 
 			for(let x of leave) if(!alive.has(x)) off = true;
 

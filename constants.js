@@ -247,10 +247,10 @@ INFO[MIRROR] = "A weak shield that reflects and multiplies damage until it is de
 INFO[ALLY] = "A weak shield that absorbs damage taken by any allied drone or rocket within range. The Battleship itself is not covered by this shield.";
 
 INFO[EMP] = "Disables all enemy vessels within range for a short period of time. Disabled Battleships cannot move or fire, but can activate Modules.";
-INFO[DUEL] = "Increases weapon damage when there is exactly one enemy Battleship in the sector.";
+INFO[DUEL] = "Increases primary weapon damage when there is exactly one enemy Battleship in the sector. Rocket Launcher is not affected.";
 INFO[FORT] = "Locks the Battleship in place and reduces incoming damage for a short period of time.";
 INFO[TP] = "After a short delay, the Battleship instantaneously moves to a selected location within range.";
-INFO[AMP] = "Massively increases weapon damage for all ships in range.";
+INFO[AMP] = "Massively increases primary weapon damage for all ships in range. Rocket Launcher, and Warp Drones are not affected.";
 INFO[LEAP] = "After a short delay, the Battleship applies massive blast damage to all enemy ships in range and then teleports away to a randomly selected adjacent sector.";
 INFO[BARRIER] = "Prevents enemy ships, drones, and most rockets within range from moving. Enemy ships which teleport into or out of the field take damage. Teleportation caused by LEAP is affected as well. Half of the incurred damage is applied normally, and the other half applies directly to the hull regardless of shields.";
 INFO[STRIKE] = "Launches a fast rocket that deals high damage to enemy vessels within range. Can pass through Barrier. A small amount of damage is applied if the rocket is destroyed before reaching its destination.";
@@ -315,8 +315,8 @@ STATS[APOCALYPSE] = "Delay: 40s";
 
 STATS[DECOY] = "HP: 1000, Deploy range: 250m\nLifetime: 40s";
 STATS[REPAIR] = "HP: 1000, Heal amount: 500-2000\nDeploy range: 200m, Lifetime: 40s";
-STATS[ROCKET] = "HP: 600, Deploy range: 250m\nLifetime: 100s";
-STATS[TURRET] = "HP: 1500, Setup time: 3s\nLifetime: 120s";
+STATS[ROCKET] = "HP: 600, Deploy range: 250m\nLifetime: 100s, Damage: 1000";
+STATS[TURRET] = "HP: 1500, Setup time: 3s\nLifetime: 120s, DPS: 200";
 STATS[PHASE] = "HP: 1000, Range: 150m\nLifetime: 30s";
 STATS[WARP] = "HP: 900, Delay: 3s, DPS: 200\nDeploy range: 400m, Lifetime: 40s";
 

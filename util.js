@@ -1,6 +1,6 @@
 const socket = io();
 
-const MODES = ["FFA", "2TEAM", "CO-OP"];
+const MODES = ["FFA", "2TEAM", "CO-OP", "SOLO"];
 
 function start(){
 	socket.emit("enqueue", modules, user, MODES[mode]);

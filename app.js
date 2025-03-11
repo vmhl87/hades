@@ -11,7 +11,7 @@ function genUser(){
 
 let searching = 0, staging = 1, chooseModule = -1, mode = 0,
 	connected = 0, snapshot = 0, ID = null, TEAM = null, now = null,
-	queueSize = 0, open = 0, user = genUser(), savedUser = false;
+	queueSize = 0, user = genUser(), savedUser = false;
 
 function preload(){
 	font = loadFont('Ubuntu-Regular.ttf');
@@ -47,7 +47,6 @@ let ships = [], rocks = [], blasts = [], entities = [],
 socket.on("reset", () => {
 	searching = 0;
 	staging = 1;
-	open = 0;
 	connected = 0;
 	select = null;
 	selectMove = null;
@@ -63,7 +62,6 @@ socket.on("start", data => {
 	chooseModule = -1;
 	searching = 0;
 	staging = 0;
-	open = 0;
 	connected = 1;
 	select = null;
 	selectMove = null;
@@ -136,7 +134,6 @@ socket.on("state", data => {
 socket.on("end", () => {
 	chooseModule = -1;
 	searching = 0;
-	open = 0;
 	staging = 1;
 	connected = 0;
 	select = null;
@@ -315,18 +312,12 @@ function main(){
 				fill(H ? 255 : 200); textSize(H ? 16 : 15);
 				text("LEAVE QUEUE", width/2, height/2 + 200);
 
-				if(queueSize > (open ? 1 : 0)){
-					textSize(15);
-					H = mouseIn(width/2, height/2+230, textWidth("SOLO")+30, 15);
-					fill(H ? 255 : 200); textSize(H ? 16 : 15);
-					text("SOLO", width/2, height/2 + 230);
-				}
-
 			}else{
 				textSize(25);
-				const H = mouseIn(width/2, height/2+150, textWidth("ENTER QUEUE")+30, 30);
+				const T = MODES[mode] == "SOLO" ? "START GAME" : "ENTER QUEUE";
+				const H = mouseIn(width/2, height/2+150, textWidth(T)+30, 30);
 				fill(H ? 255 : 200); textSize(H ? 26 : 25);
-				text("ENTER QUEUE", width/2, height/2 + 150);
+				text(T, width/2, height/2 + 150);
 				textSize(15); fill(200);
 				const A = "GAME MODE:  ", B = MODES[mode], C = textWidth(A), D = textWidth(B);
 				text(A, width/2-D/2, height/2+190);
@@ -1253,8 +1244,7 @@ function stagingUI(){
 				if(searching){
 					searching = 0;
 					staging = 0;
-					if(open) begin();
-					else solo();
+					begin();
 					return;
 				}
 			}
@@ -1277,32 +1267,22 @@ function stagingUI(){
 
 		if(mouseIn(width/2, height/2+150, 120, 30)){
 			if(!searching){
-				searching = 1;
-				setTimeout(() => {
-					if(searching){
-						start();
-						open = 1;
-					}
-				}, 2000);
-				return;
+				if(MODES[mode] == "SOLO"){
+					staging = 0;
+					solo();
+
+				}else{
+					searching = 1;
+					start();
+					return;
+				}
 			}
 		}
 
 		if(mouseIn(width/2, height/2+200, 120, 15)){
 			if(searching){
 				searching = 0;
-				if(open) cancel();
-				open = 0;
-				return;
-			}
-		}
-
-		if(mouseIn(width/2, height/2+230, 60, 15) && queueSize > (open ? 1 : 0)){
-			if(searching){
-				searching = 0;
-				if(open) cancel();
-				solo();
-				staging = 0;
+				cancel();
 				return;
 			}
 		}

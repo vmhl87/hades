@@ -104,7 +104,7 @@ function spawnBS(n){
 	return shuffle(Array.from(S).map(x => [x%COLS, Math.floor(x/COLS)]));
 }
 
-function startGame(Q, mode="FFA"){
+function startGame(Q, mode){
 	const g = new Game(Q.map(x => x.s));
 	const p = spawnBS(Q.length);
 
@@ -123,7 +123,12 @@ function startGame(Q, mode="FFA"){
 		for(let i=0; i<Q.length; ++i)
 			B[i] = S.has(i) ? "T0" : "T1";
 
-	}else if(mode == "TEAM") for(let i=0; i<Q.length; ++i) B[i] = "T0";
+	}else if(mode == "TEAM"){
+		for(let i=0; i<Q.length; ++i) B[i] = "T0";
+
+	}else if(mode == "SOLO"){
+		B[0] = "T0";
+	}
 
 	for(let i=0; i<Q.length; ++i){
 		const R = Q[i].u;
@@ -241,7 +246,7 @@ io.on("connect", (socket) => {
 
 	socket.on("solo", (modules, user) => {
 		console.log("solo match started by", socket.id, "with", modules);
-		startGame([{s: socket, modules: modules, u: user}]);
+		startGame([{s: socket, modules: modules, u: user}], "SOLO");
 	});
 
 	socket.on("move", data => {
