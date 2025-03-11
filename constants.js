@@ -201,7 +201,7 @@ EFFECT_TIME[WARP] = 3;
 RECHARGE_TIME[WARP] = 60;
 
 EFFECT_TIME[ALPHA] = 8;
-RECHARGE_TIME[ALPHA] = 45;
+RECHARGE_TIME[ALPHA] = 30;
 
 EFFECT_TIME[DELTA] = 45;
 RECHARGE_TIME[DELTA] = 75;
@@ -290,11 +290,11 @@ STATS[COL] = "DPS: 80-600, Charge time: 20s\nRange: 80m";
 STATS[BOMBER] = "Damage: 2000, Recharge time: 24s\nRange: 300m";
 
 STATS[ALPHA] = "Effect time: 6s";
-STATS[DELTA] = "HP: 2250, DPS: 900\nRange: 55m";
+STATS[DELTA] = "HP: 3000, DPS: 900\nRange: 55m";
 STATS[PASSIVE] = "HP: 3500, Recharge time: 30s";
 STATS[OMEGA] = "HP: 4700";
-STATS[MIRROR] = "HP: 1000, Multiplier: 300%\nRange: 90m";
-STATS[ALLY] = "HP: 2000\nRange: 140m";
+STATS[MIRROR] = "HP: 1500, Multiplier: 300%\nRange: 90m";
+STATS[ALLY] = "HP: 3000\nRange: 140m";
 
 STATS[EMP] = "Effect time: 6s\nRange: 80m";
 STATS[DUEL] = "Multiplier: 150%";
