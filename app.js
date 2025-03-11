@@ -1565,6 +1565,8 @@ function click(){
 }
 
 function keyReleased(){
+	MOBILE = false;
+
 	if(!staging && connected){
 		if(key == 'w'){
 			for(let s of ships){
