@@ -1444,6 +1444,7 @@ function click(){
 
 	if(mouseIn(15, height-160, 15, 30) && CENT){
 		if(shipID != null){
+			TEAM = ships[shipID].team;
 			ID = ships[shipID].user;
 			return;
 		}
