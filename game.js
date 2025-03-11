@@ -1554,7 +1554,7 @@ class Game{
 
 			this.ships = this.ships.filter(x => x.hp > 0);
 
-			let alive = new Set(this.ships.filter(x => x.type == BS && !Number.isInteger(s.team[0])).map(x => x.team[0]));
+			let alive = new Set(this.ships.filter(x => x.type == BS && !Number.isInteger(x.team[0])).map(x => x.team[0]));
 
 			if(alive.size){
 				this.entities.eliminate.push(...elim);
