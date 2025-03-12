@@ -5,7 +5,7 @@ let showGuide = false, guideUI = {};
 
 	guideUI.start = ct++;
 
-	guideUI.info = ct++;
+	guideUI.credits = ct++;
 	guideUI.gameplay = ct++;
 	guideUI.ship = ct++;
 	guideUI.weapon = ct++;
@@ -13,6 +13,7 @@ let showGuide = false, guideUI = {};
 	guideUI.module = ct++;
 	guideUI.drone = ct++;
 
+	guideUI.intro = ct++;
 	guideUI.movement = ct++;
 	guideUI.combat = ct++;
 	guideUI.modules = ct++;
@@ -65,10 +66,10 @@ let showGuide = false, guideUI = {};
 		guideUI.tree[child].par = node;
 	}
 
-	for(let x=guideUI.info; x<=guideUI.drone; ++x)
+	for(let x=guideUI.credits; x<=guideUI.drone; ++x)
 		subpage(guideUI.start, x);
 
-	for(let x=guideUI.movement; x<=guideUI.keyboardShortcuts; ++x)
+	for(let x=guideUI.intro; x<=guideUI.keyboardShortcuts; ++x)
 		subpage(guideUI.gameplay, x);
 
 	for(let x=guideUI.battleship; x<=guideUI.bomber; ++x)
@@ -92,7 +93,7 @@ let showGuide = false, guideUI = {};
 
 	info(guideUI.start).push("Guide");
 
-	info(guideUI.info).push("Introduction");
+	info(guideUI.credits).push("Credits");
 	info(guideUI.gameplay).push("Gameplay");
 	info(guideUI.ship).push("Ships");
 	info(guideUI.weapon).push("Weapons");
@@ -100,6 +101,7 @@ let showGuide = false, guideUI = {};
 	info(guideUI.module).push("Modules");
 	info(guideUI.drone).push("Drones");
 
+	info(guideUI.intro).push("Introduction");
 	info(guideUI.movement).push("Movement");
 	info(guideUI.combat).push("Combat");
 	info(guideUI.modules).push("Modules");
@@ -286,9 +288,14 @@ function drawGuide(){
 			text(wrap(T, w), x, y);
 		}
 
-		if(P == guideUI.info){
+		if(P == guideUI.credits){
 			push(); textAlign(LEFT, TOP);
-			_text(BODY.info, width/2-120, Y, 240, 1000);
+			_text(BODY.credits, width/2-120, Y, 240, 1000);
+			pop();
+
+		}else if(P == guideUI.intro){
+			push(); textAlign(LEFT, TOP);
+			_text(BODY.intro, width/2-120, Y, 240, 1000);
 			pop();
 
 		}else if(P == guideUI.movement){
@@ -960,8 +967,9 @@ function controlGuide(){
 }
 
 const BODY = {
-	info: "This is a Hades' Star fangame.\n\nIn this space combat game, players pilot battleships in a 2-d arena. Battleships equip weapons, shields, modules, and drones in combat against various player- and computer-controlled enemies.\n\nPlayers may compete in multiplayer arenas, or play solo.",
-	
+	credits: "First and foremost, this is a fanmade clone of the original Hades' Star video game.\n\nMany of the ships and modules were modeled after their Hades' Star counterparts, both in visual design and function.\n\nAll of the code on this game is original and available here:  github.com/vmhl87/hades",
+
+	intro: "In this space combat game, players pilot battleships in a 2-d arena. Battleships equip weapons, shields, modules, and drones in combat against various player- and computer-controlled enemies.\n\nPlayers may compete in multiplayer arenas, or play solo.",
 	movement: "Ships in Hades' Star cannot move arbitrarily. Players may only direct their Battleship and drones to move towards locations of asteroids, and once a ship has started moving, it cannot be cancelled.\n\nIn order to move, select your Battleship by clicking on it, and either press the arrow in the control dialog or drag your ship to the desired location. The ship then begins a 10-second countdown before departing, allowing you to cancel the movement. If you wish to depart immediately, press the arrow again (it should now turn into a check mark).",
 	combat: "Weapons auto-target and auto-activate without the need for player input. Each Weapon has a specific range, and begins firing on enemy ships that come within its range, up to its maximum number of targets.\n\nA Weapon will not stop firing upon an enemy ship until it is out of range, or a module such as Decoy Drone has been used to forcibly switch targeting.\n\nSelecting any Ship will display a circle representing its attack radius (or blast radius in the case of rockets) as well as any radii of nearby enemies.",
 	modules: "Many shields, modules, and drones must be manually activated. To trigger them, select the owner Ship, and click on the relevant icon in the control dialog. Once activated, the module will take some time to recharge before it can be used again.\n\nSome modules, such as Teleport, require the player to select a destination upon activation.\n\nThe modules of enemy Battleships are not visible until they have been used. In the case of automatically activated modules, such as Weapons, they reveal once the Ship has begun firing upon an enemy.",
