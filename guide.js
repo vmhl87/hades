@@ -960,7 +960,7 @@ function controlGuide(){
 }
 
 const BODY = {
-	info: "Hades' Star is a space combat game where players pilot battleships in a 2-d arena.\n\nBattleships equip weapons, shields, modules, and drones in combat against various player- and computer-controlled enemies.\n\nPlayers may compete in multiplayer arenas, or play solo.",
+	info: "This is a Hades' Star fangame.\n\nIn this space combat game, players pilot battleships in a 2-d arena. Battleships equip weapons, shields, modules, and drones in combat against various player- and computer-controlled enemies.\n\nPlayers may compete in multiplayer arenas, or play solo.",
 	
 	movement: "Ships in Hades' Star cannot move arbitrarily. Players may only direct their Battleship and drones to move towards locations of asteroids, and once a ship has started moving, it cannot be cancelled.\n\nIn order to move, select your Battleship by clicking on it, and either press the arrow in the control dialog or drag your ship to the desired location. The ship then begins a 10-second countdown before departing, allowing you to cancel the movement. If you wish to depart immediately, press the arrow again (it should now turn into a check mark).",
 	combat: "Weapons auto-target and auto-activate without the need for player input. Each Weapon has a specific range, and begins firing on enemy ships that come within its range, up to its maximum number of targets.\n\nA Weapon will not stop firing upon an enemy ship until it is out of range, or a module such as Decoy Drone has been used to forcibly switch targeting.\n\nSelecting any Ship will display a circle representing its attack radius (or blast radius in the case of rockets) as well as any radii of nearby enemies.",
