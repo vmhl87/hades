@@ -1134,6 +1134,12 @@ function main(){
 			pop();
 		}
 
+		if(CENT){
+			push(); stroke(200, 100, 50, mouseIn(30, height-220, 30, 30) ? 80 : 60); noFill(); strokeWeight(3);
+			rect(6, height-220-20, 40, 40);
+			pop();
+		}
+
 		{
 			let shipInArena = false;
 
