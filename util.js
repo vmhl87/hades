@@ -295,7 +295,11 @@ function selectedPos(pos){
 	shipID != null && ships[shipID].modules[selectMove[1].i].type == RIPPLE))
 		for(let i=0; i<ships.length; ++i){
 			const d = _dist(screenPos(ships[i].vpos), pos);
-			if(d < 50/F) opt.push([d-20/F, ["ship", ships[i].uid]]);
+			if(d < 50/F){
+				opt.push([d-20/F, ["ship", ships[i].uid]]);
+				if(focus != null && focus[0] == "ship" && focus[1] == ships[i].uid)
+					return ["ship", focus[1]];
+			}
 		}
 
 	opt.sort((a, b) => a[0] - b[0]);

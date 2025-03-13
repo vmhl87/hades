@@ -791,9 +791,15 @@ function main(){
 			}
 		}
 
-		for(let s of ships){
+		for(let s of ships) if(focus == null || focus[0] != "ship" || s.uid != focus[1]){
 			push(); translate(...screenPos(s.vpos));
 			drawShip2(s);
+			pop();
+		}
+
+		if(focus != null && focus[0] == "ship" && shipID != null){
+			push(); translate(...screenPos(ships[shipID].vpos));
+			drawShip2(ships[shipID]);
 			pop();
 		}
 
