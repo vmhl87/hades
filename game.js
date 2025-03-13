@@ -1522,7 +1522,8 @@ class Game{
 		};
 
 		if(this.ships.filter(x => x.hp == 0 && x.type == COL && x.kill != null).length){
-			const REM = Math.min(this.aliveCount, Math.max(3, Math.ceil(this.aliveCount*0.2)));
+			//const REM = Math.min(this.aliveCount, Math.max(3, Math.ceil(this.aliveCount*0.2)));
+			const REM = 5; // let's keep this simple
 
 			for(let i=0; i<REM; ++i){
 				const I = this.pickDyingSector();
