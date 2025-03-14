@@ -140,6 +140,7 @@ class Ship{
 
 	decode(dat){
 		this.hp = dat.hp;
+		this.mhp = dat.mhp;
 		this.modules = dat.modules;
 		if(!Number.isNaN(dat.pos[0]) && !Number.isNaN(dat.pos[1]))
 			this.pos = dat.pos;

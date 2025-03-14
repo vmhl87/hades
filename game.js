@@ -48,6 +48,8 @@ const PASSIVE_DELAY = 3, PASSIVE_TIME = 30;
 
 const CERB = 3.14;
 
+const Artifacts = require("./artifacts.js");
+
 function _dist(a, b){
 	return Math.sqrt((a[0]-b[0])*(a[0]-b[0]) + (a[1]-b[1])*(a[1]-b[1]));
 }
@@ -84,6 +86,7 @@ class Ship{
 		this.ai = null;
 		this.kill = null;
 
+		this.empVuln = 1;
 		this.suspend = 1;
 
 		for(let m of this.modules){
@@ -705,7 +708,7 @@ class Game{
 		if(!this.alive()) this.lifetime = Math.max(0, this.lifetime-1);
 
 		for(let s of this.ships){
-			s.emp = Math.max(0, s.emp - 1/(TPS*EFFECT_TIME[EMP]));
+			s.emp = Math.max(0, s.emp - 1/(TPS*EFFECT_TIME[EMP]*s.empVuln));
 			s.fort = Math.max(0, s.fort - 1/(TPS*EFFECT_TIME[FORT]));
 			s.imp = Math.max(0, s.imp - 1/(TPS*EFFECT_TIME[DISRUPT]));
 		}
@@ -955,6 +958,8 @@ class Game{
 						this.rocks[i][1]+10*Math.cos(2*Math.PI/X[i].length*(j-X[i].length/2+0.5))
 					];
 		}
+
+		// targeting code
 
 		let firing = new Set();
 
@@ -1344,7 +1349,16 @@ class Game{
 					}
 
 				}else if(s.kill != null && [SENTINEL, GUARD, INT, COL, BOMBER].includes(s.type)){
-					for(let x of this.ships) if(x.team[1] == s.kill){
+					for(let x of this.ships)
+						if(x.team[1] == s.kill && x.type == BS && !Number.isInteger(s.kill)){
+							if(Math.random() > ([0.8, 0.5, 0.4, 0, 0])[s.type-SENTINEL]){
+								for(let i=0; i<s.type==BOMBER?2:1; ++i){
+									const I = Math.floor(Math.random()*Artifacts.types.length);
+									for(let y of this.players) if(y.id == x.team[1]){
+										y.emit("artifact", x.uid, I);
+									}
+								}
+							}
 					}
 				}
 
@@ -1377,6 +1391,14 @@ class Game{
 		for(let p of this.players) p.emit("state", {s: q, entities: this.entities, dead: this.dead, age: this.age, speed: this.speed});
 
 		++this.age;
+	}
+
+	activateArtifact(shipID, type){
+		for(let s of this.ships) if(s.uid == shipID){
+			if(Artifacts.types[type] != null){
+				Artifacts.types[type][2](s);
+			}
+		}
 	}
 
 	pickDyingSector(){

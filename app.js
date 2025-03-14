@@ -11,7 +11,7 @@ function genUser(){
 
 let searching = 0, staging = 1, chooseModule = -1, mode = 0,
 	connected = 0, snapshot = 0, ID = null, TEAM = null, now = null,
-	queueSize = 0, user = genUser(), savedUser = false;
+	queueSize = 0, user = genUser(), savedUser = false, artifacts = [];
 
 function preload(){
 	font = loadFont('Ubuntu-Regular.ttf');
@@ -52,6 +52,8 @@ socket.on("reset", () => {
 	selectMove = null;
 	gameID = null;
 
+	artifacts = [];
+
 	camera = {x: 0, y: 0, z: 1};
 	speed = 1;
 	last = 0;
@@ -65,6 +67,8 @@ socket.on("start", data => {
 	connected = 1;
 	select = null;
 	selectMove = null;
+
+	artifacts = [];
 
 	ROWS = data.rows;
 	COLS = data.cols;
@@ -131,6 +135,11 @@ socket.on("state", data => {
 	age = data.age;
 });
 
+socket.on("artifact", (shipID, type) => {
+	if(!staging && connected)
+		artifacts.push([Date.now()+5000, shipID, type]);
+});
+
 socket.on("end", () => {
 	chooseModule = -1;
 	searching = 0;
@@ -140,6 +149,8 @@ socket.on("end", () => {
 	selectMove = null;
 	gameID = null;
 	camera = {x: 0, y: 0, z: 1};
+
+	artifacts = [];
 });
 
 socket.on("queueSize", (m, x) => {
@@ -1191,6 +1202,39 @@ function main(){
 			}
 		};
 
+		if(artifacts.length){
+			const T = Artifacts.types[artifacts[0][2]];
+			const O = 255*min(1, (artifacts[0][0]-Date.now())*7/5000);
+
+			push();
+			fill(0, 20, 30, O); stroke(20, 70, 80, O); strokeWeight(3);
+			rect(width/2-150, 30, 300, 100);
+			fill(40, 130, 150, O); noStroke();
+			textAlign(RIGHT, TOP); textSize(17);
+			text("ARTIFACT RECOVERED", width/2 + 140, 37);
+
+			noFill(); stroke(200, 150, 50, 100/255*O); rect(width/2-150 + 10, 40, 80, 80);
+
+			fill(200, O); noStroke(); textSize(15);
+			text(T[0], width/2+140, 60);
+			fill(150, O); textSize(14);
+			text(T[1], width/2+140, 80);
+			textSize(15); textAlign(CENTER, BOTTOM);
+			const A = "Keep", B = "         ", C = "Discard", D = textWidth(A), E = textWidth(B), F = textWidth(C);
+			fill(50, 150, 50, O);
+			textSize(mouseIn(width/2-150+90+210/2-E/2-F/2, 120, D/2+10, 15) ? 17 : 15);
+			text(A, width/2-150+90+210/2-E/2-F/2, 120);
+			fill(150, 50, 50, O);
+			textSize(mouseIn(width/2-150+90+210/2+D/2+E/2, 120, D/2+10, 15) ? 17 : 15);
+			text(C, width/2-150+90+210/2+D/2+E/2, 120);
+			pop();
+		}
+
+		while(artifacts.length && artifacts[0][0] < Date.now()){
+			artifacts = artifacts.slice(1);
+			if(artifacts.length) artifacts[0][0] = Date.now()+5000;
+		}
+
 	}else{
 		fill(200); textSize(25); noStroke();
 		text("CONNECTING", width/2, height/2);
@@ -1433,6 +1477,32 @@ function stagingUI(){
 }
 
 function click(){
+	if(artifacts.length){
+		if(artifacts[0][0]-Date.now() > 5000/7){
+			const T = Artifacts.types[artifacts[0][2]];
+
+			push();
+			textSize(15); textAlign(CENTER, BOTTOM);
+			const A = "Keep", B = "         ", C = "Discard", D = textWidth(A), E = textWidth(B), F = textWidth(C);
+			pop();
+
+			if(mouseIn(width/2-150+90+210/2-E/2-F/2, 120, D/2+10, 15)){
+				socket.emit("artifact", gameID, artifacts[0][1], artifacts[0][2]);
+				artifacts[0][0] = min(artifacts[0][0], Date.now()+5000/7);
+				//artifacts = artifacts.slice(1);
+				return;
+			}
+
+			if(mouseIn(width/2-150+90+210/2+D/2+E/2, 120, D/2+10, 15)){
+				artifacts[0][0] = min(artifacts[0][0], Date.now()+5000/7);
+				//artifacts = artifacts.slice(1);
+				return;
+			}
+		}
+
+		if(mouseIn(width/2, 80, 150, 50)) return;
+	}
+
 	if(mouseIn(width-30, 30, 30, 30) && !snapshot){
 		localStorage.setItem("save", saveState());
 		return;

@@ -771,7 +771,7 @@ function drawShip2(s){
 			arc(0, 0, 20, 20, PI*2*i/3+Date.now()/500, PI*2*i/3+PI/3+Date.now()/500);
 	}
 
-	const hp = s.hp, max = HP[s.type];
+	const hp = s.hp, max = s.mhp;
 
 	fill(100, 80); noStroke();
 	if(hp != max) rect(-15, -20, 30, 3);

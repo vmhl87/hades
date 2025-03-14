@@ -15,6 +15,11 @@ app.get("/constants.js", (req, res) => {
 	res.sendFile(path.join(__dirname, "constants.js"));
 });
 
+app.get("/artifacts.js", (req, res) => {
+	res.set("Content-Type", "application/javascript");
+	res.sendFile(path.join(__dirname, "artifacts.js"));
+});
+
 app.get("/app.js", (req, res) => {
 	res.set("Content-Type", "application/javascript");
 	res.sendFile(path.join(__dirname, "app.js"));
@@ -314,6 +319,14 @@ io.on("connect", (socket) => {
 						}
 					}
 				}
+			}
+		}
+	});
+
+	socket.on("artifact", (gameID, shipID, type) => {
+		for(let g of games){
+			if(g.uid == gameID){
+				g.activateArtifact(shipID, type);
 			}
 		}
 	});
