@@ -87,14 +87,16 @@ class Ship{
 		this.kill = null;
 		this.arts = new Set();
 
+		this.dmgBoost = 1;
 		this.empVuln = 1;
 		this.suspend = 1;
 
 		for(let m of this.modules){
-			if(IS_WEAPON(m.type))
+			if(IS_WEAPON(m.type)){
 				m.aux = [];
+				m.color = [200, 100, 50];
 
-			else if(m.type == PASSIVE)
+			}else if(m.type == PASSIVE)
 				m.aux = [1, 1];
 
 			else if(m.type == DELTA)
@@ -111,6 +113,9 @@ class Ship{
 
 			if([LASER, LASER2, COL, CANNON].includes(m.type))
 				m.state = 0;
+
+			else if(m.type == WARP)
+				m.color = [200, 100, 50];
 		}
 
 		if(type == BS && Number.isInteger(team[0]) && team[0] < 0){
@@ -336,11 +341,13 @@ class Game{
 				this.ships[s].pos[0]+10*Math.cos(R),
 				this.ships[s].pos[1]+10*Math.sin(R)
 			]);
+			this.ships[this.ships.length-1].modules[0].color = this.ships[s].modules[dat.i].color;
 			this.activateModule(this.ships.length-1, {i: 1, loc: dat.loc, dock: dat.dock});
 			this.addShip(WARP, this.ships[s].team, [SENTINEL, TP], [
 				this.ships[s].pos[0]-10*Math.cos(R),
 				this.ships[s].pos[1]-10*Math.sin(R)
 			]);
+			this.ships[this.ships.length-1].modules[0].color = this.ships[s].modules[dat.i].color;
 			this.activateModule(this.ships.length-1, {i: 1, loc: dat.loc, dock: dat.dock});
 		}
 
@@ -1084,7 +1091,7 @@ class Game{
 
 						if(D != null)
 							for(let x of m.aux) if(M.has(x)){
-								this.ships[M.get(x)].hurt(D*amp[M.get(s.uid)]*sol[M.get(s.uid)]/TPS, s.team[1]);
+								this.ships[M.get(x)].hurt(s.dmgBoost*D*amp[M.get(s.uid)]*sol[M.get(s.uid)]/TPS, s.team[1]);
 							}
 					}
 		}
@@ -1350,7 +1357,10 @@ class Game{
 						else surr.push([s.team[2], this.age + TPS*3]);
 					}
 
-				}else if(s.kill != null && [SENTINEL, GUARD, INT, COL, BOMBER].includes(s.type)){
+				}
+
+				if(s.hp <= 0 && s.kill != null && [SENTINEL, GUARD, INT, COL, BOMBER].includes(s.type)){
+					console.log(s.type, s.kill);
 					for(let x of this.ships)
 						if(x.team[1] == s.kill && x.type == BS && !Number.isInteger(s.kill)){
 							if(Math.random() > ([0.8, 0.5, 0.4, 0, 0])[s.type-SENTINEL]){
@@ -1397,7 +1407,7 @@ class Game{
 		for(let s of this.ships) if(s.uid == shipID){
 			if(Artifacts.types[type] != null){
 				s.arts.add(type);
-				Artifacts.types[type][2](s);
+				Artifacts.types[type][3](s, this);
 			}
 		}
 	}

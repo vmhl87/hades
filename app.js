@@ -842,7 +842,7 @@ function main(){
 						let C = [s.vpos[0]+17*Math.cos(s.rot)/S, s.vpos[1]+17*Math.sin(s.rot)/S];
 
 						if([LASER, LASER2, COL].includes(m.type)){
-							fill(200, 100, 50, 150); noStroke();
+							fill(...m.color, 150); noStroke();
 							circle(...screenPos(C), 12*S*(5+sin(Date.now()/16/20))/5);
 						}
 
@@ -851,18 +851,18 @@ function main(){
 							if(x == null) continue;
 
 							if([LASER, LASER2, COL].includes(m.type)){
-								fill(200, 100, 50, 150); noStroke();
+								fill(...m.color, 150); noStroke();
 								circle(...screenPos(x.vpos), 7*S*(8+sin(Date.now()/16/20))/8);
 								if(m.state < 0.6){
-									stroke(200, 100, 50); strokeWeight(2*S);
+									stroke(...m.color); strokeWeight(2*S);
 									line(...screenPos(C), ...screenPos(x.vpos));
 								}else if(m.state < 1){
-									stroke(200, 100, 50); strokeWeight(4*S);
+									stroke(...m.color); strokeWeight(4*S);
 									line(...screenPos(C), ...screenPos(x.vpos));
 								}else{
-									stroke(200, 100, 50); strokeWeight(6*S);
+									stroke(...m.color); strokeWeight(6*S);
 									line(...screenPos(C), ...screenPos(x.vpos));
-									stroke(255, 150, 100); strokeWeight(3*S);
+									stroke(m.color[0]+50, m.color[1]+50, m.color[2]+50); strokeWeight(3*S);
 									line(...screenPos(C), ...screenPos(x.vpos));
 								}
 
@@ -878,7 +878,7 @@ function main(){
 								line(...screenPos(R), ...screenPos(x.vpos));
 
 							}else if([CANNON, SPREAD, SENTINEL, GUARD, INT].includes(m.type)){
-								stroke(200, 100, 50); strokeWeight(2*S);
+								stroke(...m.color); strokeWeight(2*S);
 								const L = (((Date.now()/16+x.uid*6+s.uid*3)/20) % 1) * 0.9;
 								line(...screenPos(_lerp(C, x.vpos, L)),
 									...screenPos(_lerp(C, x.vpos, L+0.1)));
