@@ -133,6 +133,7 @@ class Ship{
 		this.fort = dat.fort;
 		this.imp = dat.imp;
 		this.ally = dat.ally;
+		this.arts = dat.arts;
 
 		if(this.move.length)
 			this.rot = atan2(this.move[0][1]-this.pos[1], this.move[0][0]-this.pos[0]);
@@ -155,6 +156,7 @@ class Ship{
 		this.fort = dat.fort;
 		this.imp = dat.imp;
 		this.ally = dat.ally;
+		this.arts = dat.arts;
 	}
 
 	travel(){

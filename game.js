@@ -85,6 +85,7 @@ class Ship{
 
 		this.ai = null;
 		this.kill = null;
+		this.arts = new Set();
 
 		this.empVuln = 1;
 		this.suspend = 1;
@@ -162,6 +163,7 @@ class Ship{
 			fort: this.fort,
 			imp: this.imp,
 			ally: this.ally == null ? 0 : 1,
+			arts: Array.from(this.arts),
 		};
 	}
 	
@@ -1352,11 +1354,9 @@ class Game{
 					for(let x of this.ships)
 						if(x.team[1] == s.kill && x.type == BS && !Number.isInteger(s.kill)){
 							if(Math.random() > ([0.8, 0.5, 0.4, 0, 0])[s.type-SENTINEL]){
-								for(let i=0; i<s.type==BOMBER?2:1; ++i){
-									const I = Math.floor(Math.random()*Artifacts.types.length);
-									for(let y of this.players) if(y.id == x.team[1]){
-										y.emit("artifact", x.uid, I);
-									}
+								const I = Math.floor(Math.random()*Artifacts.types.length);
+								if(!x.arts.has(I)) for(let y of this.players) if(y.id == x.team[1]){
+									y.emit("artifact", x.uid, I);
 								}
 							}
 					}
@@ -1396,6 +1396,7 @@ class Game{
 	activateArtifact(shipID, type){
 		for(let s of this.ships) if(s.uid == shipID){
 			if(Artifacts.types[type] != null){
+				s.arts.add(type);
 				Artifacts.types[type][2](s);
 			}
 		}
