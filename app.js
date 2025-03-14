@@ -1204,7 +1204,7 @@ function main(){
 
 		if(artifacts.length){
 			const T = Artifacts.types[artifacts[0][2]];
-			const O = 255*min(1, (artifacts[0][0]-Date.now())*14/10000);
+			const O = 255*min(1, (artifacts[0][0]-Date.now())*7/5000);
 
 			push();
 			fill(0, 20, 30, O); stroke(20, 70, 80, O); strokeWeight(3);
@@ -1222,12 +1222,24 @@ function main(){
 			textSize(15); textAlign(CENTER, BOTTOM);
 			const A = "Keep", B = "         ", C = "Discard", D = textWidth(A), E = textWidth(B), F = textWidth(C);
 			fill(50, 150, 50, O);
-			textSize(mouseIn(width/2-150+90+210/2-E/2-F/2, 120, D/2+10, 15) ? 17 : 15);
+			textSize(mouseIn(width/2-150+90+210/2-E/2-F/2, 120, D/2+10, 15) && artifacts[0][0]-Date.now() > 5000/7 ? 17 : 15);
 			text(A, width/2-150+90+210/2-E/2-F/2, 120);
 			fill(150, 50, 50, O);
-			textSize(mouseIn(width/2-150+90+210/2+D/2+E/2, 120, D/2+10, 15) ? 17 : 15);
+			textSize(mouseIn(width/2-150+90+210/2+D/2+E/2, 120, D/2+10, 15) && artifacts[0][0]-Date.now() > 5000/7 ? 17 : 15);
 			text(C, width/2-150+90+210/2+D/2+E/2, 120);
 			pop();
+
+			if(T[2] != null && mouseIn(width/2-150+50, 80, 40, 40) && artifacts[0][0]-Date.now() > 5000/7){
+				push(); textSize(14);
+				const W = wrap(T[2], 280);
+				const H = font.textBounds(W, 0, 0).h;
+				fill(0, 20, 30, O); stroke(20, 70, 80, O); strokeWeight(3);
+				rect(width/2-140, 140, 280, H+22);
+				textAlign(LEFT, TOP);
+				fill(150, O); noStroke();
+				text(W, width/2-130, 150);
+				pop();
+			}
 		}
 
 		while(artifacts.length && artifacts[0][0] < Date.now()){
@@ -1478,7 +1490,7 @@ function stagingUI(){
 
 function click(){
 	if(artifacts.length){
-		if(artifacts[0][0]-Date.now() > 10000/14){
+		if(artifacts[0][0]-Date.now() > 5000/7){
 			const T = Artifacts.types[artifacts[0][2]];
 
 			push();
@@ -1488,12 +1500,12 @@ function click(){
 
 			if(mouseIn(width/2-150+90+210/2-E/2-F/2, 120, D/2+10, 15)){
 				socket.emit("artifact", gameID, artifacts[0][1], artifacts[0][2]);
-				artifacts[0][0] = min(artifacts[0][0], Date.now()+10000/14);
+				artifacts[0][0] = min(artifacts[0][0], Date.now()+5000/7);
 				return;
 			}
 
 			if(mouseIn(width/2-150+90+210/2+D/2+E/2, 120, D/2+10, 15)){
-				artifacts[0][0] = min(artifacts[0][0], Date.now()+10000/14);
+				artifacts[0][0] = min(artifacts[0][0], Date.now()+5000/7);
 				return;
 			}
 		}
