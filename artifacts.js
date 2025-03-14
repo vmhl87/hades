@@ -1,15 +1,14 @@
-let _ct = 0;
-
 let Artifacts = {
-	names: {
-		LIGHTALLOYPLATING: _ct++,
-		IONCELL: _ct++,
-	}, types: new Array(_ct)
+	names: {},
+	types: [],
 };
 
 {
+	let ct = 0;
+
 	function s(name, arg){
-		Artifacts.types[Artifacts.names[name]] = arg;
+		Artifacts.names[name] = ct++;
+		Artifacts.types.push(arg);
 	}
 
 	s("LIGHTALLOYPLATING", [
