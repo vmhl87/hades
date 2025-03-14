@@ -28,227 +28,21 @@ const EMP = ++ct, DUEL = ++ct, FORT = ++ct, TP = ++ct, AMP = ++ct, LEAP = ++ct, 
 
 /* UNOBTAIN */ const SUSPEND = ++ct, VENG = ++ct, APOCALYPSE = ++ct;
 
+const Const = require("./constants.js");
+
+/*
 let SPEED = new Array(ct), HP = new Array(ct),
 	EFFECT_TIME = new Array(ct), RECHARGE_TIME = new Array(ct),
 	ACTIVATED = new Array(ct), RANGE = new Array(ct),
 	EXPIRE_TIME = new Array(ct), TARGETS = new Array(ct),
 	DAMAGE = new Array(ct), LASER_DAMAGE = new Array(ct),
 	STRENGTH = new Array(ct);
+*/
 
-STRENGTH[DELTA] = 3000;
-STRENGTH[PASSIVE] = 4000;
-STRENGTH[OMEGA] = 4700;
-STRENGTH[MIRROR] = 1500;
-STRENGTH[ALLY] = 3000;
-
-DAMAGE[CANNON] = 284;
-DAMAGE[SPREAD] = 220;
-DAMAGE[SENTINEL] = 200;
-DAMAGE[GUARD] = 60;
-DAMAGE[INT] = 100;
-DAMAGE[TURRETD] = 200;
-
-DAMAGE[BARRIER] = 3000;
-DAMAGE[DUEL] = 1.5;
-DAMAGE[AMP] = 3;
-DAMAGE[SUSPEND] = 0.70;
-DAMAGE[MIRROR] = 3;
-DAMAGE[FORT] = 0.6;
-DAMAGE[VENG] = 7000;
-DAMAGE[DELTA] = 900;
-DAMAGE[LEAP] = 4000;
-
-LASER_DAMAGE[LASER] = [160, 350, 600];
-LASER_DAMAGE[LASER2] = [184, 450, 800];
-LASER_DAMAGE[COL] = [80, 200, 600];
-
-EXPIRE_TIME[DECOY] = 40;
-EXPIRE_TIME[REPAIR] = 40;
-EXPIRE_TIME[ROCKET] = 100;
-EXPIRE_TIME[TURRET] = 120;
-EXPIRE_TIME[PHASE] = 30;
-EXPIRE_TIME[WARP] = 40;
-
-RECHARGE_TIME[TURRETD] = 3;
-
-EFFECT_TIME[CANNON] = 0;
-RECHARGE_TIME[CANNON] = 2;
-
-EFFECT_TIME[DART] = 0;
-RECHARGE_TIME[DART] = 10;
-
-EFFECT_TIME[ROCKETD] = 0;
-RECHARGE_TIME[ROCKETD] = 12;
-
-EFFECT_TIME[BOMBER] = 0;
-RECHARGE_TIME[BOMBER] = 24;
-
-EFFECT_TIME[EMP] = 6;
-RECHARGE_TIME[EMP] = 45;
-
-EFFECT_TIME[FORT] = 10;
-RECHARGE_TIME[FORT] = 30;
-
-EFFECT_TIME[TP] = 3;
-RECHARGE_TIME[TP] = 55;
-
-EFFECT_TIME[AMP] = 30;
-RECHARGE_TIME[AMP] = 60;
-
-EFFECT_TIME[LEAP] = 6;
-RECHARGE_TIME[LEAP] = 90;
-
-EFFECT_TIME[BARRIER] = 11;
-RECHARGE_TIME[BARRIER] = 60;
-
-EFFECT_TIME[STRIKE] = 0;
-RECHARGE_TIME[STRIKE] = 45;
-
-RECHARGE_TIME[RIPPLE] = 60;
-
-EFFECT_TIME[VENG] = 10;
-RECHARGE_TIME[VENG] = 120;
-
-EFFECT_TIME[SUSPEND] = 30;
-RECHARGE_TIME[SUSPEND] = 90;
-
-EFFECT_TIME[DISRUPT] = 6;
-RECHARGE_TIME[DISRUPT] = 45;
-
-EFFECT_TIME[DECOY] = 0;
-RECHARGE_TIME[DECOY] = 60;
-
-EFFECT_TIME[REPAIR] = 0;
-RECHARGE_TIME[REPAIR] = 30;
-
-EFFECT_TIME[ROCKET] = 0;
-RECHARGE_TIME[ROCKET] = 120;
-
-EFFECT_TIME[TURRET] = 3;
-RECHARGE_TIME[TURRET] = 60;
-
-EFFECT_TIME[PHASE] = 0;
-RECHARGE_TIME[PHASE] = 90;
-
-EFFECT_TIME[WARP] = 3;
-RECHARGE_TIME[WARP] = 60;
-
-// SHIELD
-
-EFFECT_TIME[ALPHA] = 8;
-RECHARGE_TIME[ALPHA] = 30;
-
-EFFECT_TIME[DELTA] = 45;
-RECHARGE_TIME[DELTA] = 75;
-
-EFFECT_TIME[OMEGA] = 45;
-RECHARGE_TIME[OMEGA] = 60;
-
-EFFECT_TIME[MIRROR] = 45;
-RECHARGE_TIME[MIRROR] = 60;
-
-EFFECT_TIME[MIRROR] = 45;
-RECHARGE_TIME[MIRROR] = 60;
-
-EFFECT_TIME[ALLY] = 45;
-RECHARGE_TIME[ALLY] = 60;
-
-ACTIVATED[ALPHA] = true;
-ACTIVATED[DELTA] = true;
-for(let i=OMEGA; i<=ALLY; ++i)
-	ACTIVATED[i] = true;
-
-ACTIVATED[EMP] = true;
-ACTIVATED[FORT] = true;
-ACTIVATED[TP] = true;
-ACTIVATED[AMP] = true;
-ACTIVATED[LEAP] = true;
-ACTIVATED[BARRIER] = true;
-ACTIVATED[STRIKE] = true;
-ACTIVATED[RIPPLE] = true;
-ACTIVATED[DISRUPT] = true;
-ACTIVATED[SUSPEND] = true;
-ACTIVATED[DECOY] = true;
-ACTIVATED[REPAIR] = true;
-ACTIVATED[ROCKET] = true;
-ACTIVATED[TURRET] = true;
-ACTIVATED[PHASE] = true;
-ACTIVATED[WARP] = true;
-
-SPEED[BS] = 20;
-SPEED[SENTINEL] = 10;
-SPEED[GUARD] = 11;
-SPEED[INT] = 26;
-SPEED[COL] = 12;
-SPEED[BOMBER] = 8;
-SPEED[DECOY] = 20;
-SPEED[REPAIR] = 20;
-SPEED[ROCKET] = 15;
-SPEED[WARP] = 20;
-SPEED[DARTP] = 25;
-SPEED[ROCKETP] = 70;
-SPEED[STRIKEP] = 110;
-SPEED[BOMBERP] = 25;
-
-SPEED[DELTA] = 2;
-
-HP[BS] = 7000;
-HP[SENTINEL] = 1200;
-HP[GUARD] = 8000;
-HP[INT] = 9000;
-HP[COL] = 20000;
-HP[BOMBER] = 16000;
-HP[DECOY] = 1000;
-HP[REPAIR] = 1000;
-HP[ROCKET] = 600;
-HP[TURRET] = 1500;
-HP[PHASE] = 1000;
-HP[WARP] = 900;
-HP[DARTP] = 250;
-HP[ROCKETP] = 400;
-HP[STRIKEP] = 180;
-HP[BOMBERP] = 900;
-
-RANGE[LEAP] = 65;
-RANGE[BARRIER] = 100;
-RANGE[DARTP] = 40;
-RANGE[ROCKETP] = 70;
-RANGE[STRIKEP] = 70;
-RANGE[BOMBERP] = 100;
-
-RANGE[REPAIR] = 60;
-RANGE[EMP] = 80;
-RANGE[AMP] = 100;
-RANGE[MIRROR] = 90;
-RANGE[DISRUPT] = 70;
-RANGE[VENG] = 150;
-RANGE[SUSPEND] = 140;
-RANGE[DELTA] = 55;
-RANGE[ALLY] = 140;
-
-for(let i=LASER; i<=LASER2; ++i) RANGE[i] = 80;
-RANGE[DART] = 100;
-RANGE[ROCKETD] = 400;
-RANGE[TURRETD] = 130;
-for(let i=SENTINEL; i<=COL; ++i) RANGE[i] = 80;
-
-TARGETS[LASER] = 1;
-TARGETS[CANNON] = 1;
-TARGETS[SPREAD] = 3;
-TARGETS[LASER2] = 2;
-TARGETS[DART] = 1;
-TARGETS[ROCKETD] = 1;
-TARGETS[TURRETD] = 3;
-TARGETS[SENTINEL] = 1;
-TARGETS[GUARD] = 1;
-TARGETS[INT] = 4;
-TARGETS[COL] = 1;
-
-const LASER_CHARGE = new Array(ct);
-
-LASER_CHARGE[LASER] = [6, 10];
-LASER_CHARGE[LASER2] = [3, 6];
-LASER_CHARGE[COL] = [10, 20];
+let SPEED = Const.SPEED, HP = Const.HP, EFFECT_TIME = Const.EFFECT_TIME, RECHARGE_TIME = Const.RECHARGE_TIME,
+	ACTIVATED = Const.ACTIVATED, RANGE = Const.RANGE, EXPIRE_TIME = Const.EXPIRE_TIME, TARGETS = Const.TARGETS,
+	DAMAGE = Const.DAMAGE, LASER_DAMAGE = Const.LASER_DAMAGE, STRENGTH = Const.STRENGTH,
+	LASER_CHARGE = Const.LASER_CHARGE;
 
 const PASSIVE_DELAY = 3, PASSIVE_TIME = 30;
 
@@ -671,8 +465,8 @@ class Game{
 				for(let x of this.ships) if(x.team[0] != s.team[0])
 					for(let m of x.modules) if(m.type == BARRIER && m.state < 0)
 						if(_dist(x.pos, s.pos) < RANGE[BARRIER]){
-							s.hurt(DAMAGE[BARRIER]/2, x.team[0]);
-							s._hurt(DAMAGE[BARRIER]/2, x.team[0]);
+							s.hurt(DAMAGE[BARRIER]/2, x.team[1]);
+							s._hurt(DAMAGE[BARRIER]/2, x.team[1]);
 						}
 
 				s.pos = s.tp.slice(0, 2);
@@ -682,8 +476,8 @@ class Game{
 				for(let x of this.ships) if(x.team[0] != s.team[0])
 					for(let m of x.modules) if(m.type == BARRIER && m.state < 0)
 						if(_dist(x.pos, s.pos) < RANGE[BARRIER]){
-							s.hurt(DAMAGE[BARRIER]/2, x.team[0]);
-							s._hurt(DAMAGE[BARRIER]/2, x.team[0]);
+							s.hurt(DAMAGE[BARRIER]/2, x.team[1]);
+							s._hurt(DAMAGE[BARRIER]/2, x.team[1]);
 						}
 			}
 
@@ -691,13 +485,13 @@ class Game{
 				for(let x of this.ships)
 					if(x.team[0] != s.team[0])
 						if(_dist(x.pos, s.pos) < RANGE[LEAP])
-							x.hurt(DAMAGE[LEAP], s.team[0]);
+							x.hurt(DAMAGE[LEAP], s.team[1]);
 
 				for(let x of this.ships) if(x.team[0] != s.team[0])
 					for(let m of x.modules) if(m.type == BARRIER && m.state < 0)
 						if(_dist(x.pos, s.pos) < RANGE[BARRIER]){
-							s.hurt(DAMAGE[BARRIER]/2, x.team[0]);
-							s._hurt(DAMAGE[BARRIER]/2, x.team[0]);
+							s.hurt(DAMAGE[BARRIER]/2, x.team[1]);
+							s._hurt(DAMAGE[BARRIER]/2, x.team[1]);
 						}
 
 				this.explode([...s.pos], RANGE[LEAP], 9);
@@ -708,8 +502,8 @@ class Game{
 				for(let x of this.ships) if(x.team[0] != s.team[0])
 					for(let m of x.modules) if(m.type == BARRIER && m.state < 0)
 						if(_dist(x.pos, s.pos) < RANGE[BARRIER]){
-							s.hurt(DAMAGE[BARRIER]/2, x.team[0]);
-							s._hurt(DAMAGE[BARRIER]/2, x.team[0]);
+							s.hurt(DAMAGE[BARRIER]/2, x.team[1]);
+							s._hurt(DAMAGE[BARRIER]/2, x.team[1]);
 						}
 			}
 
@@ -797,7 +591,7 @@ class Game{
 					for(let x of this.ships)
 						if(x.team[0] != s.team[0])
 							if(_dist(x.pos, s.pos) < RANGE[DELTA])
-								x.hurt(DAMAGE[DELTA]/TPS, s.team[0]);
+								x.hurt(DAMAGE[DELTA]/TPS, s.team[1]);
 			}
 
 			if(T == ALLY && s.modules[i].aux[0] > 0 && s.imp == 0){
@@ -833,7 +627,7 @@ class Game{
 					for(let x of this.ships)
 						if(x.team[0] != s.team[0])
 							if(_dist(x.pos, s.pos) < RANGE[MIRROR])
-								x.hurt(s.modules[i].blast[0]*DAMAGE[MIRROR], s.team[0]);
+								x.hurt(s.modules[i].blast[0]*DAMAGE[MIRROR], s.team[1]);
 
 					s.modules[i].blast[0] = 0;
 				}
@@ -847,7 +641,7 @@ class Game{
 					for(let x of this.ships)
 						if(x.team[0] != s.team[0])
 							if(_dist(x.pos, s.pos) < RANGE[VENG])
-								x.hurt(DAMAGE[VENG], s.team[0]);
+								x.hurt(DAMAGE[VENG], s.team[1]);
 
 					this.explode([...s.pos], RANGE[VENG], 9);
 				}
@@ -1283,7 +1077,7 @@ class Game{
 
 						if(D != null)
 							for(let x of m.aux) if(M.has(x)){
-								this.ships[M.get(x)].hurt(D*amp[M.get(s.uid)]*sol[M.get(s.uid)]/TPS, s.team[0]);
+								this.ships[M.get(x)].hurt(D*amp[M.get(s.uid)]*sol[M.get(s.uid)]/TPS, s.team[1]);
 							}
 					}
 		}
@@ -1312,7 +1106,7 @@ class Game{
 					for(let x of this.ships)
 						if(x.uid == s.ai)
 							if(_dist(x.pos, s.pos) < RANGE[DARTP])
-								x.hurt(4000, s.team[0]);
+								x.hurt(4000, s.team[1]);
 				}
 
 				if(s.type == ROCKETP){
@@ -1321,7 +1115,7 @@ class Game{
 					for(let x of this.ships)
 						if(x.team[0] != s.team[0])
 							if(_dist(x.pos, s.pos) < RANGE[ROCKETP])
-								x.hurt(1000, s.team[0]);
+								x.hurt(1000, s.team[1]);
 				}
 
 				if(s.type == STRIKEP){
@@ -1330,7 +1124,7 @@ class Game{
 					for(let x of this.ships)
 						if(x.team[0] != s.team[0])
 							if(_dist(x.pos, s.pos) < RANGE[STRIKEP])
-								x.hurt(3000, s.team[0]);
+								x.hurt(3000, s.team[1]);
 				}
 
 				if(s.type == BOMBERP){
@@ -1351,7 +1145,7 @@ class Game{
 				for(let x of this.ships)
 					if(x.team[0] != s.team[0])
 						if(_dist(x.pos, s.pos) < RANGE[STRIKEP])
-							x.hurt(500, s.team[0]);
+							x.hurt(500, s.team[1]);
 			}
 
 			if(s.type == ROCKETP){
@@ -1359,7 +1153,7 @@ class Game{
 				for(let x of this.ships)
 					if(x.team[0] != s.team[0])
 						if(_dist(x.pos, s.pos) < RANGE[ROCKETP])
-							x.hurt(200, s.team[0]);
+							x.hurt(200, s.team[1]);
 			}
 
 			if(s.type == BOMBERP){
@@ -1547,6 +1341,10 @@ class Game{
 						leave.add(s.team[0]);
 						if(s.hp == 0) elim.push([s.team[2], this.age + TPS*3]);
 						else surr.push([s.team[2], this.age + TPS*3]);
+					}
+
+				}else if(s.kill != null && [SENTINEL, GUARD, INT, COL, BOMBER].includes(s.type)){
+					for(let x of this.ships) if(x.team[1] == s.kill){
 					}
 				}
 
