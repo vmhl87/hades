@@ -1231,7 +1231,7 @@ function main(){
 
 			if(T[2] != null && mouseIn(width/2-150+50, 80, 40, 40) && artifacts[0][0]-Date.now() > 5000/7){
 				push(); textSize(14);
-				const W = wrap(T[2], 280);
+				const W = wrap(T[2], 260);
 				const H = font.textBounds(W, 0, 0).h;
 				fill(0, 20, 30, O); stroke(20, 70, 80, O); strokeWeight(3);
 				rect(width/2-140, 140, 280, H+22);
