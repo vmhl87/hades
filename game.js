@@ -1360,7 +1360,6 @@ class Game{
 				}
 
 				if(s.hp <= 0 && s.kill != null && [SENTINEL, GUARD, INT, COL, BOMBER].includes(s.type)){
-					console.log(s.type, s.kill);
 					for(let x of this.ships)
 						if(x.team[1] == s.kill && x.type == BS && !Number.isInteger(s.kill)){
 							if(Math.random() > ([0.8, 0.5, 0.4, 0, 0])[s.type-SENTINEL]){
