@@ -85,6 +85,7 @@ class Ship{
 
 		this.ai = null;
 		this.kill = null;
+		this._kill = new Map();
 		this.arts = new Set();
 
 		this.dmgBoost = 1;
@@ -218,7 +219,24 @@ class Ship{
 	_hurt(x, src = null){
 		this.hp = Math.max(0, this.hp-x);
 
-		if(this.hp == 0 && src != null) this.kill = src;
+		//if(this.hp == 0 && src != null) this.kill = src;
+
+		if(src != null){
+			if(!this._kill.has(src)) this._kill.set(src, 0);
+			this._kill.set(this._kill.get(src) + x);
+
+			if(this.hp == 0){
+				let best = 0;
+				for(let x of this._kill.keys){
+					if(this._kill.get(x) > best){
+						best = this._kill.get(x);
+						this.kill = x;
+
+					}else if(this._kill.get(x) == best)
+						if(Math.random() > 0.5) this.kill = x;
+				}
+			}
+		}
 	}
 
 	heal(x){
