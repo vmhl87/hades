@@ -1626,13 +1626,13 @@ function drawEffect(T, S=null){
 	}
 
 	if(T == PULSE){
-		const Q = min(1, S*2);
+		const Q = min(1, S[1]*2);
 		scale(camera.z);
-		fill(200, 75, 50, 60*Q); noStroke();
+		fill(...S[0], 60*Q); noStroke();
 		circle(0, 0, RANGE[PULSE]*2+20);
-		stroke(200, 75, 50, 150*Q); strokeWeight(2); noFill();
-		arc(0, 0, RANGE[PULSE]*2+20, RANGE[PULSE]*2+20, -PI/2-PI/2*S, -PI/2+PI/2*S);
-		arc(0, 0, RANGE[PULSE]*2+20, RANGE[PULSE]*2+20, PI/2-PI/2*S, PI/2+PI/2*S);
+		stroke(...S[0], 150*Q); strokeWeight(2); noFill();
+		arc(0, 0, RANGE[PULSE]*2+20, RANGE[PULSE]*2+20, -PI/2-PI/2*S[1], -PI/2+PI/2*S[1]);
+		arc(0, 0, RANGE[PULSE]*2+20, RANGE[PULSE]*2+20, PI/2-PI/2*S[1], PI/2+PI/2*S[1]);
 	}
 
 	pop();

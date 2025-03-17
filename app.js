@@ -41,7 +41,7 @@ function setup(){
 		element.addEventListener("contextmenu", e => e.preventDefault())
 }
 
-let ships = [], rocks = [], blasts = [], entities = [],
+let ships = [], rocks = [], entities = [],
 	gameID = null, ROWS, COLS, dead = [], speed = 1, age = 0, last = 0;
 
 socket.on("reset", () => {
@@ -748,7 +748,7 @@ function main(){
 						if(m.type == ALLY) drawEffect(ALLY, m.aux[0]);
 					}
 
-					if(m.type == PULSE) drawEffect(PULSE, m.state);
+					if(m.type == PULSE) drawEffect(PULSE, [m.color, m.state]);
 				}
 
 				pop();
@@ -820,7 +820,7 @@ function main(){
 
 		push();
 		for(let b of entities.blast){
-			fill(200, 100, 50, ceil((b[2]-NOW)*255/2/TPS));
+			fill(...b[2], ceil((b[3]-NOW)*255/2/TPS));
 			circle(...screenPos(b[0]), b[1]*2*camera.z);
 		}
 		pop();

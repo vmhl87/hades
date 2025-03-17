@@ -99,6 +99,8 @@ class Ship{
 				m.aux = [];
 				m.color = [200, 100, 50];
 
+				if(m.type == PULSE) m.color = [200, 75, 50];
+
 			}else if(m.type == PASSIVE)
 				m.aux = [1, 1];
 
@@ -223,7 +225,7 @@ class Ship{
 
 		if(src != null){
 			if(!this._kill.has(src)) this._kill.set(src, 0);
-			this._kill.set(this._kill.get(src) + x);
+			this._kill.set(src, this._kill.get(src) + x);
 
 			if(this.hp == 0){
 				let best = 0;
@@ -453,9 +455,9 @@ class Game{
 		}
 	}
 
-	explode(pos, range, str){
+	explode(pos, range, str, color){
 		//this.ev.push(["explode", [[...pos], range, str]]);
-		this.entities.blast.push([[...pos], range, this.age+0.2*str*TPS]);
+		this.entities.blast.push([[...pos], range, color, this.age+0.2*str*TPS]);
 	}
 
 	die(pos){
@@ -526,7 +528,7 @@ class Game{
 							s._hurt(DAMAGE[BARRIER]/2, x.team[1]);
 						}
 
-				this.explode([...s.pos], RANGE[LEAP], 9);
+				this.explode([...s.pos], RANGE[LEAP], 9, [200, 100, 50]);
 				s.pos = s.tp.slice(0, 2);
 				s.dock = s.tp[2];
 				s.tp = null;
@@ -682,7 +684,7 @@ class Game{
 				}
 
 				if(s.modules[i].blast[1] && --s.modules[i].blast[1] == 1)
-					this.explode([...s.pos], RANGE[MIRROR], 3);
+					this.explode([...s.pos], RANGE[MIRROR], 3, [200, 50, 50]);
 			}
 
 			if(T == VENG){
@@ -692,7 +694,7 @@ class Game{
 							if(_dist(x.pos, s.pos) < RANGE[VENG])
 								x.hurt(DAMAGE[VENG], s.team[1]);
 
-					this.explode([...s.pos], RANGE[VENG], 9);
+					this.explode([...s.pos], RANGE[VENG], 9, [200, 50, 50]);
 				}
 
 				if(s.hp < s.mhp) s.modules[i].use = true;
@@ -1133,7 +1135,7 @@ class Game{
 										if(_dist(x.pos, s.pos) < RANGE[PULSE])
 											x.hurt(DAMAGE[PULSE]*amp[M.get(s.uid)]*sol[M.get(s.uid)], s.team[1]);
 
-								this.explode([...s.pos], RANGE[PULSE], 9);
+								this.explode([...s.pos], RANGE[PULSE], 9, m.color);
 								m.state = 0;
 
 							}else
@@ -1163,7 +1165,7 @@ class Game{
 			if(!s.move.length){
 				if(s.type == DARTP){
 					s.hp = -1;
-					this.explode(s.pos, RANGE[DARTP], 9);
+					this.explode(s.pos, RANGE[DARTP], 9, [200, 100, 50]);
 
 					for(let x of this.ships)
 						if(x.uid == s.ai)
@@ -1173,7 +1175,7 @@ class Game{
 
 				if(s.type == ROCKETP){
 					s.hp = -1;
-					this.explode(s.pos, RANGE[ROCKETP], 5);
+					this.explode(s.pos, RANGE[ROCKETP], 5, [200, 100, 50]);
 					for(let x of this.ships)
 						if(x.team[0] != s.team[0])
 							if(_dist(x.pos, s.pos) < RANGE[ROCKETP])
@@ -1182,7 +1184,7 @@ class Game{
 
 				if(s.type == STRIKEP){
 					s.hp = -1;
-					this.explode(s.pos, RANGE[STRIKEP], 7);
+					this.explode(s.pos, RANGE[STRIKEP], 7, [200, 100, 50]);
 					for(let x of this.ships)
 						if(x.team[0] != s.team[0])
 							if(_dist(x.pos, s.pos) < RANGE[STRIKEP])
@@ -1191,7 +1193,7 @@ class Game{
 
 				if(s.type == BOMBERP){
 					s.hp = -1;
-					this.explode(s.pos, RANGE[BOMBERP], 5);
+					this.explode(s.pos, RANGE[BOMBERP], 5, [200, 100, 50]);
 					for(let x of this.ships)
 						if(x.team[0] != s.team[0])
 							if(_dist(x.pos, s.pos) < RANGE[BOMBERP])
@@ -1203,7 +1205,7 @@ class Game{
 
 		for(let s of this.ships) if(s.hp == 0){
 			if(s.type == STRIKEP){
-				this.explode(s.pos, RANGE[STRIKEP], 1);
+				this.explode(s.pos, RANGE[STRIKEP], 1, [200, 100, 50]);
 				for(let x of this.ships)
 					if(x.team[0] != s.team[0])
 						if(_dist(x.pos, s.pos) < RANGE[STRIKEP])
@@ -1211,7 +1213,7 @@ class Game{
 			}
 
 			if(s.type == ROCKETP){
-				this.explode(s.pos, RANGE[ROCKETP], 1);
+				this.explode(s.pos, RANGE[ROCKETP], 1, [200, 100, 50]);
 				for(let x of this.ships)
 					if(x.team[0] != s.team[0])
 						if(_dist(x.pos, s.pos) < RANGE[ROCKETP])
@@ -1219,7 +1221,7 @@ class Game{
 			}
 
 			if(s.type == BOMBERP){
-				this.explode(s.pos, 40, 3);
+				this.explode(s.pos, 40, 3, [200, 100, 50]);
 				for(let x of this.ships)
 					if(x.team[0] != s.team[0])
 						if(_dist(x.pos, s.pos) < 40)
