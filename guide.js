@@ -31,6 +31,7 @@ let showGuide = false, guideUI = {};
 	guideUI.spreadCannon = ct++;
 	guideUI.dualLaser = ct++;
 	guideUI.rocketLauncher = ct++;
+	guideUI.pulse = ct++;
 
 	guideUI.alpha = ct++;
 	guideUI.delta = ct++;
@@ -75,7 +76,7 @@ let showGuide = false, guideUI = {};
 	for(let x=guideUI.battleship; x<=guideUI.bomber; ++x)
 		subpage(guideUI.ship, x);
 
-	for(let x=guideUI.laser; x<=guideUI.rocketLauncher; ++x)
+	for(let x=guideUI.laser; x<=guideUI.pulse; ++x)
 		subpage(guideUI.weapon, x);
 
 	for(let x=guideUI.alpha; x<=guideUI.ally; ++x)
@@ -130,6 +131,8 @@ let showGuide = false, guideUI = {};
 	info(guideUI.dualLaser).push("Dual Laser");
 	info(guideUI.rocketLauncher).push(["module", DART]);
 	info(guideUI.rocketLauncher).push("Rocket Launcher");
+	info(guideUI.pulse).push(["module", PULSE]);
+	info(guideUI.pulse).push("Pulse");
 
 	info(guideUI.alpha).push(["module", ALPHA]);
 	info(guideUI.alpha).push("Alpha Shield");

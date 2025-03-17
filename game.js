@@ -542,6 +542,7 @@ class Game{
 				if(s.modules[i].aux.length && !s.emp) s.modules[i].state = Math.min(1, s.modules[i].state+1/(RECHARGE_TIME[PULSE]*TPS));
 				else s.modules[i].state = Math.max(0, s.modules[i].state-1/(30*TPS));
 
+				/*
 				if(s.modules[i].state == 1){
 					for(let x of this.ships)
 						if(x.team[0] != s.team[0])
@@ -551,6 +552,7 @@ class Game{
 					this.explode([...s.pos], RANGE[PULSE], 9);
 					s.modules[i].state = 0;
 				}
+				*/
 			}
 
 			if(T == BOMBER){
@@ -1099,17 +1101,23 @@ class Game{
 
 			for(let s of this.ships) if(!s.emp)
 				for(let m of s.modules)
-					if(IS_WEAPON(m.type) && m.type != PULSE &&
+					if(IS_WEAPON(m.type) && (m.type != PULSE || m.state == 1)
 						(m.type != CANNON || m.state == 1)){
 						const D = DAMAGE[m.type] != null ? DAMAGE[m.type] :
 							(LASER_DAMAGE[m.type] != null ? LASER_DAMAGE[m.type][
 								m.state < 0.6 ? 0 : (m.state < 1 ? 1 : 2)
 							] : null);
 
-						if(D != null)
+						if(D != null){
 							for(let x of m.aux) if(M.has(x)){
 								this.ships[M.get(x)].hurt(s.dmgBoost*D*amp[M.get(s.uid)]*sol[M.get(s.uid)]/TPS, s.team[1]);
 							}
+
+							if(m.type == PULSE){
+								this.explode([...s.pos], RANGE[PULSE], 9);
+								m.state = 0;
+							}
+						}
 					}
 		}
 

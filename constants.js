@@ -379,12 +379,12 @@ STATS[BOMBER] = `Damage: ${DAMAGE[BOMBERP]}, Recharge time: ${RECHARGE_TIME[BOMB
 
 STATS[ALPHA] = `Effect time: ${EFFECT_TIME[ALPHA]}s`;
 STATS[DELTA] = `HP: ${STRENGTH[DELTA]}, DPS: ${DAMAGE[DELTA]}\nRange: ${RANGE[DELTA]}m`;
-STATS[PASSIVE] = `HP: 4000, Recharge time: 30s`;
-STATS[OMEGA] = `HP: 4700`;
-STATS[MIRROR] = `HP: 1500, Multiplier: 300%\nRange: 90m`;
-STATS[ALLY] = `HP: 3000\nRange: 140m`;
+STATS[PASSIVE] = `HP: ${STRENGTH[PASSIVE]}, Recharge time: 30s`;
+STATS[OMEGA] = `HP: ${STRENGTH[OMEGA]}`;
+STATS[MIRROR] = `HP: ${STRENGTH[MIRROR]}, Multiplier: 300%\nRange: ${RANGE[MIRROR]}m`;
+STATS[ALLY] = `HP: ${STRENGTH[ALLY]}\nRange: ${RANGE[ALLY]}m`;
 
-STATS[EMP] = `Effect time: 6s\nRange: 80m`;
+STATS[EMP] = `Effect time: ${EFFECT_TIME[EMP]}s\nRange: ${RANGE[EMP]}m`;
 STATS[DUEL] = `Multiplier: 150%`;
 STATS[FORT] = `Effect time: 12s, Reduction: 40%`;
 STATS[TP] = `Delay: 3s\nRange: 400m`;
