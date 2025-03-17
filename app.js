@@ -387,10 +387,10 @@ function main(){
 			}
 
 			if(chooseModule == 4){
-				for(let i=0; i<5; ++i){
-					fill(255, 100, 0, mouseIn(width/2-100+i*50, height/2+150, 20, 20) ? 80 : 60);
-					rect(width/2-120+i*50, height/2+130, 40, 40);
-					push(); translate(width/2-100+i*50, height/2+150);
+				for(let i=0; i<6; ++i){
+					fill(255, 100, 0, mouseIn(width/2-125+i*50, height/2+150, 20, 20) ? 80 : 60);
+					rect(width/2-145+i*50, height/2+130, 40, 40);
+					push(); translate(width/2-125+i*50, height/2+150);
 					drawModule(DECOY+i);
 					pop();
 				}
@@ -502,6 +502,7 @@ function main(){
 				cerbID.push(i);
 			if(ships[i].type == REPAIR) repairID.push(i);
 			if(ships[i].type == PHASE) modID.push(i);
+			if(ships[i].type == BOMB) modID.push(i);
 			REV.set(ships[i].uid, i);
 		}
 
@@ -730,7 +731,7 @@ function main(){
 			if(s.imp == 0){
 				push(); translate(width/2+(s.vpos[0]-camera.x)*camera.z, height/2+(s.vpos[1]-camera.y)*camera.z);
 
-				for(let m of s.modules){
+				for(let m of s.modules)
 					if(Array.isArray(m.aux) && m.aux.length && m.aux[0] &&
 						(m.aux[1] > 3/TIME[m.type] || ((Date.now()/1000)%1 < 0.5)) || m.type == PASSIVE){
 
@@ -747,9 +748,6 @@ function main(){
 
 						if(m.type == ALLY) drawEffect(ALLY, m.aux[0]);
 					}
-
-					if(m.type == PULSE) drawEffect(PULSE, [m.color, m.state]);
-				}
 
 				pop();
 			}
@@ -787,6 +785,12 @@ function main(){
 				if([LEAP, VENG, BARRIER, AMP, SUSPEND].includes(m.type) && m.state < 0){
 					push(); translate(...screenPos(s.vpos));
 					drawEffect(m.type, m.state);
+					pop();
+				}
+
+				if(m.type == PULSE){
+					push(); translate(...screenPos(s.vpos));
+					drawEffect(m.type, [m.color, m.state]);
 					pop();
 				}
 			}
@@ -1411,8 +1415,8 @@ function stagingUI(){
 	}else if(chooseModule == 4){
 		let p = true;
 
-		for(let i=0; i<5; ++i){
-			if(mouseIn(width/2-100+i*50, height/2+150, 20, 20)){
+		for(let i=0; i<6; ++i){
+			if(mouseIn(width/2-125+i*50, height/2+150, 20, 20)){
 				modules[4] = modules[4] == DECOY+i ? null : DECOY+i;
 				localStorage.setItem("modules", JSON.stringify(modules));
 				p = false;

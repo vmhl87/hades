@@ -10,7 +10,7 @@ const DARTP = ++ct, ROCKETP = ++ct, STRIKEP = ++ct, BOMBERP = ++ct;
 
 // DRONE TYPES
 
-const DECOY = ++ct, ROCKET = ++ct, TURRET = ++ct, PHASE = ++ct, WARP = ++ct, REPAIR = ++ct;
+const DECOY = ++ct, ROCKET = ++ct, TURRET = ++ct, PHASE = ++ct, WARP = ++ct, BOMB = ++ct, REPAIR = ++ct;
 
 // WEAPON TYPES
 
@@ -76,6 +76,7 @@ EXPIRE_TIME[ROCKET] = 100;
 EXPIRE_TIME[TURRET] = 120;
 EXPIRE_TIME[PHASE] = 30;
 EXPIRE_TIME[WARP] = 40;
+EXPIRE_TIME[BOMB] = 120;
 
 LASER_DAMAGE[LASER] = [160, 350, 600];
 LASER_DAMAGE[LASER2] = [184, 450, 800];
@@ -136,6 +137,7 @@ NAME[ROCKET] = "ROCKET DRONE";
 NAME[TURRET] = "TURRET DRONE";
 NAME[PHASE] = "PHASE DRONE";
 NAME[WARP] = "WARP DRONE";
+NAME[BOMB] = "REMOTE BOMB";
 
 HP[BS] = 7000;
 HP[SENTINEL] = 1200;
@@ -149,6 +151,7 @@ HP[ROCKET] = 600;
 HP[TURRET] = 1500;
 HP[PHASE] = 1000;
 HP[WARP] = 900;
+HP[BOMB] = 2000;
 HP[DARTP] = 250;
 HP[ROCKETP] = 400;
 HP[STRIKEP] = 180;
@@ -216,6 +219,7 @@ ACTIVATED[ROCKET] = true;
 ACTIVATED[TURRET] = true;
 ACTIVATED[PHASE] = true;
 ACTIVATED[WARP] = true;
+ACTIVATED[BOMB] = true;
 
 RECHARGE_TIME[TURRETD] = 3;
 
@@ -284,6 +288,9 @@ RECHARGE_TIME[PHASE] = 90;
 
 EFFECT_TIME[WARP] = 3;
 RECHARGE_TIME[WARP] = 60;
+
+EFFECT_TIME[BOMB] = 0;
+RECHARGE_TIME[BOMB] = 90;
 
 EFFECT_TIME[ALPHA] = 8;
 RECHARGE_TIME[ALPHA] = 30;
@@ -356,6 +363,7 @@ INFO[ROCKET] = "A drone that periodically fires rockets at enemy vessels within 
 INFO[TURRET] = "A drone that after a small setup time applies constant damage to three enemies within range.";
 INFO[PHASE] = "A drone that projects a suspension field around nearby enemy ships, slowing them down and decreasing their weapon damage.";
 INFO[WARP] = "Two drones that after a small delay teleport to a target location and fire on enemy ships.";
+INFO[BOMB] = "A stationary drone equipping a Pulse weapon, charging up when enemies are within range.";
 
 INFO[NULL] = "The owner battleship hasn't used this module yet.";
 
@@ -407,6 +415,7 @@ STATS[ROCKET] = `HP: 600, Deploy range: 250m\nLifetime: 100s, Damage: 1000`;
 STATS[TURRET] = `HP: 1500, Setup time: 3s\nLifetime: 120s, DPS: 200`;
 STATS[PHASE] = `HP: 1000, Range: 150m\nLifetime: 30s`;
 STATS[WARP] = `HP: 900, Delay: 3s, DPS: 200\nDeploy range: 400m, Lifetime: 40s`;
+STATS[BOMB] = `HP: ${HP[BOMB]}, Damage: ${DAMAGE[PULSE]}\nDelay: ${RECHARGE_TIME[PULSE]}, Lifetime: 120s`;
 
 let MODULE_NAME = new Array(ct);
 
@@ -456,6 +465,7 @@ MODULE_NAME[ROCKET] = "ROCKET DRONE";
 MODULE_NAME[TURRET] = "TURRET DRONE";
 MODULE_NAME[PHASE] = "PHASE DRONE";
 MODULE_NAME[WARP] = "WARP DRONES";
+MODULE_NAME[BOMB] = "REMOTE BOMB";
 
 MODULE_NAME[NULL] = "UNKNOWN";
 

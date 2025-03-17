@@ -500,6 +500,36 @@ function drawShip(T, O, M){
 		line(-3, 0, 3, 0);
 	}
 
+	if(T == BOMB){
+		if(O == 0) fill(100, 150, 150);
+		if(O == 1) fill(170, 50, 50);
+		if(O == 2) fill(155, 90, 90);
+		if(O == 3) fill(110, 150, 110);
+		circle(0, 0, 15);
+		if(O == 0) fill(70, 110, 110);
+		if(O == 1) fill(120, 20, 20);
+		if(O == 2) fill(105, 60, 60);
+		if(O == 3) fill(80, 110, 80);
+		arc(0, 0, 15, 15, -PI/6, PI/6);
+		arc(0, 0, 15, 15, PI/2-PI/6, PI/2+PI/6);
+		arc(0, 0, 15, 15, PI-PI/6, PI+PI/6);
+		arc(0, 0, 15, 15, PI*1.5-PI/6, PI*1.5+PI/6);
+		if(O == 0) fill(100, 150, 150);
+		if(O == 1) fill(170, 50, 50);
+		if(O == 2) fill(155, 90, 90);
+		if(O == 3) fill(110, 150, 110);
+		circle(0, 0, 13);
+		if(O == 0) stroke(60, 100, 100);
+		if(O == 1) stroke(110, 10, 10);
+		if(O == 2) stroke(95, 50, 50);
+		if(O == 3) stroke(70, 100, 70);
+		noFill(); strokeWeight(1.5);
+		line(-2.5, -2.5, -2.5, 2.5);
+		line(-2.5, 2.5, 2.5, 2.5);
+		line(2.5, 2.5, 2.5, -2.5);
+		line(2.5, -2.5, -2.5, -2.5);
+	}
+
 	if(T == ROCKET){
 		if(M){
 			fill(60, 180, 180);
@@ -1350,6 +1380,18 @@ function drawModule(T){
 		stroke(150, 100, 50); noFill();
 		line(0, -5, 0, 5);
 		line(-5, 0, 5, 0);
+		arc(0, 0, 22, 22, -PI/6, PI/6);
+		arc(0, 0, 22, 22, PI/2-PI/6, PI/2+PI/6);
+		arc(0, 0, 22, 22, PI-PI/6, PI+PI/6);
+		arc(0, 0, 22, 22, PI*1.5-PI/6, PI*1.5+PI/6);
+	}
+
+	if(T == BOMB){
+		stroke(150, 100, 50); noFill();
+		line(0, 5, 5, 0);
+		line(5, 0, 0, -5);
+		line(0, -5, -5, 0);
+		line(-5, 0, 0, 5);
 		arc(0, 0, 22, 22, -PI/6, PI/6);
 		arc(0, 0, 22, 22, PI/2-PI/6, PI/2+PI/6);
 		arc(0, 0, 22, 22, PI-PI/6, PI+PI/6);

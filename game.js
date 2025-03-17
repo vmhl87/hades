@@ -10,7 +10,7 @@ const DARTP = ++ct, ROCKETP = ++ct, STRIKEP = ++ct, BOMBERP = ++ct;
 
 // DRONE TYPES
 
-const DECOY = ++ct, ROCKET = ++ct, TURRET = ++ct, PHASE = ++ct, WARP = ++ct, REPAIR = ++ct;
+const DECOY = ++ct, ROCKET = ++ct, TURRET = ++ct, PHASE = ++ct, WARP = ++ct, BOMB = ++ct, REPAIR = ++ct;
 
 // WEAPON TYPES
 
@@ -357,6 +357,15 @@ class Game{
 			this.activateModule(this.ships.length-1, {i: 0});
 		}
 
+		if(T == BOMB){
+			const R = Math.random()*Math.PI*2;
+			this.addShip(BOMB, this.ships[s].team, [PULSE], [
+				this.ships[s].pos[0]+10*Math.cos(R),
+				this.ships[s].pos[1]+10*Math.sin(R)
+			]);
+			this.ships[this.ships.length-1].modules[0].color = [200, 50, 100];
+		}
+
 		if(T == WARP){
 			const R = Math.random()*Math.PI*2;
 			this.addShip(WARP, this.ships[s].team, [SENTINEL, TP], [
@@ -561,18 +570,6 @@ class Game{
 			if(T == PULSE){
 				if(s.modules[i].aux.length && !s.emp) s.modules[i].state = Math.min(1, s.modules[i].state+1/(RECHARGE_TIME[PULSE]*TPS));
 				else s.modules[i].state = Math.max(0, s.modules[i].state-1/(30*TPS));
-
-				/*
-				if(s.modules[i].state == 1){
-					for(let x of this.ships)
-						if(x.team[0] != s.team[0])
-							if(_dist(x.pos, s.pos) < RANGE[PULSE])
-								x.hurt(DAMAGE[PULSE], s.team[1]);
-
-					this.explode([...s.pos], RANGE[PULSE], 9);
-					s.modules[i].state = 0;
-				}
-				*/
 			}
 
 			if(T == BOMBER){
@@ -918,6 +915,8 @@ class Game{
 
 								if(m.type == PHASE) this.activateModule(i, {i: j});
 
+								if(m.type == BOMB) this.activateModule(i, {i: j});
+
 								if(m.type == DECOY){
 									this.activateModule(i, {i: j, loc: s.move.length ? s.move[0].slice(0, 2) :  [...s.pos],
 										dock: s.move.length ? s.move[0][2] : s.dock
@@ -1138,6 +1137,8 @@ class Game{
 								this.explode([...s.pos], RANGE[PULSE], 9, m.color);
 								m.state = 0;
 
+								if(s.type == BOMB) s.hp = 0;
+
 							}else
 								for(let x of m.aux) if(M.has(x)){
 									this.ships[M.get(x)].hurt(s.dmgBoost*D*amp[M.get(s.uid)]*sol[M.get(s.uid)]/TPS, s.team[1]);
@@ -1337,15 +1338,15 @@ class Game{
 							const P = this.rocks[J];
 
 							const MODS = [
-								[CANNON, OMEGA, VENG],
-								[LASER, OMEGA, VENG],
+								[CANNON, OMEGA, VENG, BOMB],
+								[LASER, OMEGA, VENG, BOMB],
 								[CANNON, PASSIVE, VENG, DECOY],
 								[LASER, PASSIVE, VENG],
 								[CANNON, PASSIVE, DUEL, ROCKET],
 								[PULSE, OMEGA, FORT, VENG],
 								[SPREAD, PASSIVE, DUEL],
 								[SPREAD, PASSIVE, FORT, DUEL],
-								[CANNON, ALPHA, AMP],
+								[CANNON, ALPHA, AMP, BOMB],
 								[CANNON, PASSIVE, FORT, PHASE],
 								[LASER, PASSIVE, EMP, DECOY],
 								[DART, OMEGA, EMP, ROCKET],
@@ -1357,7 +1358,7 @@ class Game{
 								[SPREAD, ALPHA, VENG, AMP, ROCKET],
 								[DART, PASSIVE, EMP, TURRET],
 								[LASER, PASSIVE, BARRIER, PHASE],
-								[PULSE, ALPHA, EMP, FORT],
+								[PULSE, OMEGA, EMP, FORT],
 							];
 
 							const I = Math.floor(Math.random()*MODS.length);
