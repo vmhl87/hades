@@ -416,7 +416,7 @@ STATS[ROCKET] = `HP: 600, Deploy range: 250m\nLifetime: 100s, Damage: 1000`;
 STATS[TURRET] = `HP: 1500, Setup time: 3s\nLifetime: 120s, DPS: 200`;
 STATS[PHASE] = `HP: 1000, Range: 150m\nLifetime: 30s`;
 STATS[WARP] = `HP: 900, Delay: 3s, DPS: 200\nDeploy range: 400m, Lifetime: 40s`;
-STATS[BOMB] = `HP: ${HP[BOMB]}, Damage: ${DAMAGE[PULSE]}\nDelay: ${RECHARGE_TIME[PULSE]}, Lifetime: 120s`;
+STATS[BOMB] = `HP: ${HP[BOMB]}, Damage: ${DAMAGE[PULSE]}\nDelay: 8s, Lifetime: 120s`;
 
 let MODULE_NAME = new Array(ct);
 

@@ -99,7 +99,10 @@ class Ship{
 				m.aux = [];
 				m.color = [200, 100, 50];
 
-				if(m.type == PULSE) m.color = [200, 75, 50];
+				if(m.type == PULSE){
+					m.color = [200, 75, 50];
+					m.delay = RECHARGE_TIME[PULSE];
+				}
 
 			}else if(m.type == PASSIVE)
 				m.aux = [1, 1];
@@ -364,6 +367,7 @@ class Game{
 				this.ships[s].pos[1]+10*Math.sin(R)
 			]);
 			this.ships[this.ships.length-1].modules[0].color = [200, 50, 100];
+			this.ships[this.ships.length-1].modules[0].delay = 8;
 		}
 
 		if(T == WARP){
@@ -568,7 +572,7 @@ class Game{
 			}
 
 			if(T == PULSE){
-				if(s.modules[i].aux.length && !s.emp) s.modules[i].state = Math.min(1, s.modules[i].state+1/(RECHARGE_TIME[PULSE]*TPS));
+				if(s.modules[i].aux.length && !s.emp) s.modules[i].state = Math.min(1, s.modules[i].state+1/(s.modules[i].delay*TPS));
 				else s.modules[i].state = Math.max(0, s.modules[i].state-1/(30*TPS));
 			}
 
