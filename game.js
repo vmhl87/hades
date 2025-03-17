@@ -1109,14 +1109,19 @@ class Game{
 							] : null);
 
 						if(D != null){
-							for(let x of m.aux) if(M.has(x)){
-								this.ships[M.get(x)].hurt(s.dmgBoost*D*amp[M.get(s.uid)]*sol[M.get(s.uid)]/TPS, s.team[1]);
-							}
-
 							if(m.type == PULSE){
+								for(let x of this.ships)
+									if(x.team[0] != s.team[0])
+										if(_dist(x.pos, s.pos) < RANGE[PULSE])
+											x.hurt(DAMAGE[PULSE], s.team[1]);
+
 								this.explode([...s.pos], RANGE[PULSE], 9);
 								m.state = 0;
-							}
+
+							}else
+								for(let x of m.aux) if(M.has(x)){
+									this.ships[M.get(x)].hurt(s.dmgBoost*D*amp[M.get(s.uid)]*sol[M.get(s.uid)]/TPS, s.team[1]);
+								}
 						}
 					}
 		}
