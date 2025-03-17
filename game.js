@@ -1113,7 +1113,7 @@ class Game{
 								for(let x of this.ships)
 									if(x.team[0] != s.team[0])
 										if(_dist(x.pos, s.pos) < RANGE[PULSE])
-											x.hurt(DAMAGE[PULSE], s.team[1]);
+											x.hurt(DAMAGE[PULSE]*amp[M.get(s.uid)]*sol[M.get(s.uid)], s.team[1]);
 
 								this.explode([...s.pos], RANGE[PULSE], 9);
 								m.state = 0;
