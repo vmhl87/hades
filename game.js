@@ -91,7 +91,7 @@ class Ship{
 		this.empVuln = 1;
 		this.disruptVuln = 1;
 		this.suspend = 1;
-		this.sectorDmg = ([DELTAP, ROCKETP, STRIKEP, BOMBERP]).includes(type) ? 0 : 150;
+		this.sectorDmg = ([STRIKEP, ROCKETP, STRIKEP, BOMBERP]).includes(type) ? 0 : 150;
 
 		for(let m of this.modules){
 			if(IS_WEAPON(m.type)){
