@@ -227,7 +227,7 @@ class Ship{
 
 			if(this.hp == 0){
 				let best = 0;
-				for(let x of this._kill.keys){
+				for(let x of this._kill.keys()){
 					if(this._kill.get(x) > best){
 						best = this._kill.get(x);
 						this.kill = x;
