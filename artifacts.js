@@ -13,9 +13,16 @@ let Artifacts = {
 
 	s([
 		"Light Alloy Plating",
-		"+500 HP",
+		"+500 Max HP",
 		"When the space defenses of what used to be Germany took down the first Cerberus craft in 2107, scientists found this strange material amidst the wreckage. It is slightly translucent, multicolored, and incredibly durable.",
 		(x, g) => { x.hp += 500; x.mhp += 500; }
+	]);
+
+	s([
+		"Heavy Alloy Plating",
+		"+1500 Max HP, -25% Speed",
+		"Synthesized from some form of supercompressed carbon, this material comprises the hull of Cerberus ships, granting supreme protection at the cost of greatly increasing the ship’s mass.",
+		(x, g) => { x.hp += 1500; x.mhp += 1500; x.speed *= 0.75; }
 	]);
 
 	s([
@@ -44,6 +51,20 @@ let Artifacts = {
 
 			x.dmgBoost *= 1.05;
 		}
+	]);
+
+	s([
+		"Gamma Shield",
+		"-50% Sector Damage",
+		"",
+		(x, g) => { x.sectorDmg *= 0.5; }
+	]);
+
+	s([
+		"Surge Protector",
+		"+25% EMP/Disrupt Resist",
+		"",
+		(x, g) => { x.empVuln *= 0.8; x.disruptVuln *= 0.8; }
 	]);
 };
 

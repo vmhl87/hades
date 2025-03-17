@@ -14,7 +14,7 @@ const DECOY = ++ct, ROCKET = ++ct, TURRET = ++ct, PHASE = ++ct, WARP = ++ct, REP
 
 // WEAPON TYPES
 
-const LASER = ++ct, CANNON = ++ct, SPREAD = ++ct, LASER2 = ++ct, DART = ++ct;
+const LASER = ++ct, CANNON = ++ct, SPREAD = ++ct, LASER2 = ++ct, DART = ++ct, PULSE = ++ct;
 
 /* UNOBTAIN */ const TURRETD = ++ct, ROCKETD = ++ct;
 
@@ -45,6 +45,7 @@ TARGETS[CANNON] = 1;
 TARGETS[SPREAD] = 3;
 TARGETS[LASER2] = 2;
 TARGETS[DART] = 1;
+TARGETS[PULSE] = 100;
 TARGETS[ROCKETD] = 1;
 TARGETS[TURRETD] = 3;
 TARGETS[SENTINEL] = 1;
@@ -85,6 +86,7 @@ DAMAGE[SPREAD] = 220;
 DAMAGE[SENTINEL] = 200;
 DAMAGE[GUARD] = 60;
 DAMAGE[INT] = 100;
+DAMAGE[PULSE] = 3000;
 DAMAGE[TURRETD] = 200;
 
 DAMAGE[BARRIER] = 3000;
@@ -96,6 +98,11 @@ DAMAGE[FORT] = 0.6;
 DAMAGE[VENG] = 7000;
 DAMAGE[DELTA] = 900;
 DAMAGE[LEAP] = 4000;
+
+DAMAGE[DARTP] = 4000;
+DAMAGE[ROCKETP] = 1000;
+DAMAGE[STRIKEP] = 3000;
+DAMAGE[BOMBERP] = 2000;
 
 STRENGTH[DELTA] = 3000;
 STRENGTH[PASSIVE] = 4000;
@@ -149,8 +156,9 @@ HP[BOMBERP] = 900;
 
 for(let i=LASER; i<=LASER2; ++i) RANGE[i] = 80;
 RANGE[DART] = 100;
-RANGE[ROCKETD] = 400;
+RANGE[PULSE] = 60;
 RANGE[TURRETD] = 130;
+RANGE[ROCKETD] = 400;
 for(let i=SENTINEL; i<=COL; ++i) RANGE[i] = 80;
 
 function weaponRange(T){
@@ -216,6 +224,9 @@ RECHARGE_TIME[CANNON] = 2;
 
 EFFECT_TIME[DART] = 0;
 RECHARGE_TIME[DART] = 10;
+
+EFFECT_TIME[PULSE] = 0;
+RECHARGE_TIME[PULSE] = 10;
 
 EFFECT_TIME[ROCKETD] = 0;
 RECHARGE_TIME[ROCKETD] = 12;
@@ -303,6 +314,8 @@ INFO[CANNON] = "A single-target weapon that deals high damage to one enemy. Two 
 INFO[SPREAD] = "A multi-target weapon that deals constant damage to three enemies within range.";
 INFO[LASER2] = "A multi-target weapon that deals damage to two enemies within range. Damage increases while both beams are active, and resets when there are less than two enemies in range.";
 INFO[DART] = "A single-target weapon that periodically launches powerful rockets towards one enemy in range. When projectiles reach their destination, damage is dealt to only the targeted enemy, if it is still within the blast radius. Battleships are preferred over Cerberus.";
+INFO[PULSE] = "A powerful weapon that slowly charges up while enemies are within range. Once fully charged up, a massive blast deals damage to every ship within range.";
+INFO[DART] = "A single-target weapon that periodically launches powerful rockets towards one enemy in range. When projectiles reach their destination, damage is dealt to only the targeted enemy, if it is still within the blast radius. Battleships are preferred over Cerberus.";
 
 INFO[ROCKETD] = "A single-target weapon that periodically launches rockets towards enemies in range. Projectiles deal a small amount of damage if destroyed before they reach their destination. Battleships are preferred over Cerberus.";
 INFO[TURRETD] = "A multi-target weapon that deals constant damage to three enemies within range.";
@@ -348,51 +361,52 @@ INFO[NULL] = "The owner battleship hasn't used this module yet.";
 
 let STATS = new Array(ct);
 
-STATS[LASER] = "DPS: 160-600, Charge time: 10s\nRange: 80m";
-STATS[CANNON] = "DPS: 284\nRange: 80m";
-STATS[SPREAD] = "DPS: 220\nRange: 80m";
-STATS[LASER2] = "DPS: 184-800, Charge time: 6s\nRange: 80m";
-STATS[DART] = "Damage: 4000, Recharge time: 10s\nRange: 100m";
+STATS[LASER] = `DPS: ${LASER_DAMAGE[LASER][0]}-${LASER_DAMAGE[LASER][2]}, Charge time: ${LASER_CHARGE[LASER][1]}s\nRange: ${RANGE[LASER]}m`;
+STATS[CANNON] = `DPS: ${DAMAGE[CANNON]}\nRange: ${RANGE[CANNON]}m`;
+STATS[SPREAD] = `DPS: ${DAMAGE[SPREAD]}\nRange: ${RANGE[SPREAD]}m`;
+STATS[LASER2] = `DPS: ${LASER_DAMAGE[LASER2][0]}-${LASER_DAMAGE[LASER2][2]}, Charge time: ${LASER_CHARGE[LASER2][1]}s\nRange: ${RANGE[LASER2]}m`;
+STATS[DART] = `Damage: ${DAMAGE[DARTP]}, Recharge time: ${RECHARGE_TIME[DART]}s\nRange: ${RANGE[DART]}m`;
+STATS[PULSE] = `Damage: ${DAMAGE[PULSE]}, Recharge time: ${RECHARGE_TIME[PULSE]}s\nRange: ${RANGE[PULSE]}m`;
 
-STATS[ROCKETD] = "Damage: 1000, Recharge time: 12s\nRange: 400m";
-STATS[TURRETD] = "DPS: 200\nRange: 130m";
+STATS[ROCKETD] = `Damage: ${DAMAGE[ROCKETP]}, Recharge time: ${RECHARGE_TIME[ROCKETD]}s\nRange: ${RANGE[ROCKETD]}m`;
+STATS[TURRETD] = `DPS: ${DAMAGE[TURRETD]}\nRange: ${RANGE[TURRETD]}m`;
 
-STATS[SENTINEL] = "DPS: 200\nRange: 80m";
-STATS[GUARD] = "DPS: 60\nRange: 80m";
-STATS[INT] = "DPS: 100\nRange: 80m";
-STATS[COL] = "DPS: 80-600, Charge time: 20s\nRange: 80m";
-STATS[BOMBER] = "Damage: 2000, Recharge time: 24s\nRange: 300m";
+STATS[SENTINEL] = `DPS: ${DAMAGE[SENTINEL]}\nRange: ${RANGE[SENTINEL]}m`;
+STATS[GUARD] = `DPS: ${DAMAGE[GUARD]}\nRange: ${RANGE[GUARD]}m`;
+STATS[INT] = `DPS: ${DAMAGE[INT]}\nRange: ${RANGE[INT]}m`;
+STATS[COL] = `DPS: ${LASER_DAMAGE[COL][0]}-${LASER_DAMAGE[COL][2]}, Charge time: ${LASER_CHARGE[COL][1]}s\nRange: ${RANGE[COL]}m`;
+STATS[BOMBER] = `Damage: ${DAMAGE[BOMBERP]}, Recharge time: ${RECHARGE_TIME[BOMBER]}s`;
 
-STATS[ALPHA] = "Effect time: 6s";
-STATS[DELTA] = "HP: 3000, DPS: 900\nRange: 55m";
-STATS[PASSIVE] = "HP: 4000, Recharge time: 30s";
-STATS[OMEGA] = "HP: 4700";
-STATS[MIRROR] = "HP: 1500, Multiplier: 300%\nRange: 90m";
-STATS[ALLY] = "HP: 3000\nRange: 140m";
+STATS[ALPHA] = `Effect time: ${EFFECT_TIME[ALPHA]}s`;
+STATS[DELTA] = `HP: ${STRENGTH[DELTA]}, DPS: ${DAMAGE[DELTA]}\nRange: ${RANGE[DELTA]}m`;
+STATS[PASSIVE] = `HP: 4000, Recharge time: 30s`;
+STATS[OMEGA] = `HP: 4700`;
+STATS[MIRROR] = `HP: 1500, Multiplier: 300%\nRange: 90m`;
+STATS[ALLY] = `HP: 3000\nRange: 140m`;
 
-STATS[EMP] = "Effect time: 6s\nRange: 80m";
-STATS[DUEL] = "Multiplier: 150%";
-STATS[FORT] = "Effect time: 12s, Reduction: 40%";
-STATS[TP] = "Delay: 3s\nRange: 400m";
-STATS[AMP] = "Multiplier: 300%\nRange: 100m";
-STATS[LEAP] = "Damage: 4000, Delay: 6s\nRange: 65m";
-STATS[BARRIER] = "Effect time: 10s\nRange: 100m";
-STATS[STRIKE] = "Damage: 3000, HP: 180\nRange: Unlimited";
-STATS[RIPPLE] = "Range: 300m";
-STATS[DISRUPT] = "Effect time: 6s\nRange: 70m";
+STATS[EMP] = `Effect time: 6s\nRange: 80m`;
+STATS[DUEL] = `Multiplier: 150%`;
+STATS[FORT] = `Effect time: 12s, Reduction: 40%`;
+STATS[TP] = `Delay: 3s\nRange: 400m`;
+STATS[AMP] = `Multiplier: 300%\nRange: 100m`;
+STATS[LEAP] = `Damage: 4000, Delay: 6s\nRange: 65m`;
+STATS[BARRIER] = `Effect time: 10s\nRange: 100m`;
+STATS[STRIKE] = `Damage: 3000, HP: 180\nRange: Unlimited`;
+STATS[RIPPLE] = `Range: 300m`;
+STATS[DISRUPT] = `Effect time: 6s\nRange: 70m`;
 
-STATS[SUSPEND] = "Effect time: 30s, Reduction: 30%\nRange: 150m";
+STATS[SUSPEND] = `Effect time: 30s, Reduction: 30%\nRange: 150m`;
 
-STATS[VENG] = "Damage: 7000, Delay: 10s\nRange: 160m";
+STATS[VENG] = `Damage: 7000, Delay: 10s\nRange: 160m`;
 
-STATS[APOCALYPSE] = "Delay: 40s";
+STATS[APOCALYPSE] = `Delay: 40s`;
 
-STATS[DECOY] = "HP: 1000, Deploy range: 250m\nLifetime: 40s";
-STATS[REPAIR] = "HP: 1000, Heal amount: 500-2000\nDeploy range: 200m, Lifetime: 40s";
-STATS[ROCKET] = "HP: 600, Deploy range: 250m\nLifetime: 100s, Damage: 1000";
-STATS[TURRET] = "HP: 1500, Setup time: 3s\nLifetime: 120s, DPS: 200";
-STATS[PHASE] = "HP: 1000, Range: 150m\nLifetime: 30s";
-STATS[WARP] = "HP: 900, Delay: 3s, DPS: 200\nDeploy range: 400m, Lifetime: 40s";
+STATS[DECOY] = `HP: 1000, Deploy range: 250m\nLifetime: 40s`;
+STATS[REPAIR] = `HP: 1000, Heal amount: 500-2000\nDeploy range: 200m, Lifetime: 40s`;
+STATS[ROCKET] = `HP: 600, Deploy range: 250m\nLifetime: 100s, Damage: 1000`;
+STATS[TURRET] = `HP: 1500, Setup time: 3s\nLifetime: 120s, DPS: 200`;
+STATS[PHASE] = `HP: 1000, Range: 150m\nLifetime: 30s`;
+STATS[WARP] = `HP: 900, Delay: 3s, DPS: 200\nDeploy range: 400m, Lifetime: 40s`;
 
 let MODULE_NAME = new Array(ct);
 
@@ -401,6 +415,7 @@ MODULE_NAME[CANNON] = "CANNON";
 MODULE_NAME[SPREAD] = "SPREAD CANNON";
 MODULE_NAME[LASER2] = "DUAL LASER";
 MODULE_NAME[DART] = "ROCKET LAUNCHER";
+MODULE_NAME[PULSE] = "PULSE";
 
 MODULE_NAME[ROCKETD] = "ROCKET LAUNCHER";
 MODULE_NAME[TURRETD] = "TRIPLE LASER";

@@ -1,4 +1,4 @@
-const COLS = 5, ROWS = 5, TPS = 4, SECTOR_COLLAPSE_TIME = 40;
+const COLS = 5, ROWS = 5, TPS = 4, SECTOR_COLLAPSE_TIME = 40, MAX_ARTS = 3;
 
 let ct = 0;
 
@@ -14,7 +14,7 @@ const DECOY = ++ct, ROCKET = ++ct, TURRET = ++ct, PHASE = ++ct, WARP = ++ct, REP
 
 // WEAPON TYPES
 
-const LASER = ++ct, CANNON = ++ct, SPREAD = ++ct, LASER2 = ++ct, DART = ++ct;
+const LASER = ++ct, CANNON = ++ct, SPREAD = ++ct, LASER2 = ++ct, DART = ++ct, PULSE = ++ct;
 
 /* UNOBTAIN */ const TURRETD = ++ct, ROCKETD = ++ct;
 
@@ -89,7 +89,9 @@ class Ship{
 
 		this.dmgBoost = 1;
 		this.empVuln = 1;
+		this.disruptVuln = 1;
 		this.suspend = 1;
+		this.sectorDmg = ([DELTAP, ROCKETP, STRIKEP, BOMBERP]).includes(type) ? 0 : 150;
 
 		for(let m of this.modules){
 			if(IS_WEAPON(m.type)){
@@ -111,7 +113,7 @@ class Ship{
 			if(m.type == TURRETD)
 				m.state = 0;
 
-			if([LASER, LASER2, COL, CANNON].includes(m.type))
+			if([LASER, LASER2, COL, CANNON, PULSE].includes(m.type))
 				m.state = 0;
 
 			else if(m.type == WARP)
@@ -447,7 +449,7 @@ class Game{
 		for(let i=0; i<s.modules.length; ++i){
 			const T = s.modules[i].type;
 
-			if(EFFECT_TIME[T] != null){
+			if(EFFECT_TIME[T] != null && T != PULSE){
 				if(s.modules[i].state < 0)
 					s.modules[i].state = Math.min(0, s.modules[i].state+1/(1+EFFECT_TIME[T]*TPS));
 				else{
@@ -534,6 +536,21 @@ class Game{
 					}
 
 				}else s.modules[i].state = 0.3;
+			}
+
+			if(T == PULSE){
+				if(s.modules[i].aux.length && !s.emp) s.modules[i].state = Math.min(1, s.modules[i].state+1/(RECHARGE_TIME[PULSE]*TPS));
+				else s.modules[i].state = Math.max(0, s.modules[i].state-1/(30*TPS));
+
+				if(s.modules[i].state == 1){
+					for(let x of this.ships)
+						if(x.team[0] != s.team[0])
+							if(_dist(x.pos, s.pos) < RANGE[PULSE])
+								x.hurt(DAMAGE[PULSE], s.team[1]);
+
+					this.explode([...s.pos], RANGE[PULSE], 9);
+					s.modules[i].state = 0;
+				}
 			}
 
 			if(T == BOMBER){
@@ -719,7 +736,7 @@ class Game{
 		for(let s of this.ships){
 			s.emp = Math.max(0, s.emp - 1/(TPS*EFFECT_TIME[EMP]*s.empVuln));
 			s.fort = Math.max(0, s.fort - 1/(TPS*EFFECT_TIME[FORT]));
-			s.imp = Math.max(0, s.imp - 1/(TPS*EFFECT_TIME[DISRUPT]));
+			s.imp = Math.max(0, s.imp - 1/(TPS*EFFECT_TIME[DISRUPT]*s.disruptVuln));
 		}
 
 		let locked = new Set();
@@ -762,7 +779,7 @@ class Game{
 				const s = this.ships[i];
 
 				if(this.dead[Math.floor((s.pos[0]+150*COLS)/300)+Math.floor((s.pos[1]+150*ROWS)/300)*COLS] == 2)
-					s.hurt(150/TPS);
+					s.hurt(s.sectorDmg/TPS);
 
 				if([SENTINEL, GUARD, COL].includes(s.type)){
 					if(s.pos[1] > -150*ROWS*2){
@@ -1082,7 +1099,7 @@ class Game{
 
 			for(let s of this.ships) if(!s.emp)
 				for(let m of s.modules)
-					if(IS_WEAPON(m.type) &&
+					if(IS_WEAPON(m.type) && m.type != PULSE &&
 						(m.type != CANNON || m.state == 1)){
 						const D = DAMAGE[m.type] != null ? DAMAGE[m.type] :
 							(LASER_DAMAGE[m.type] != null ? LASER_DAMAGE[m.type][
@@ -1120,7 +1137,7 @@ class Game{
 					for(let x of this.ships)
 						if(x.uid == s.ai)
 							if(_dist(x.pos, s.pos) < RANGE[DARTP])
-								x.hurt(4000, s.team[1]);
+								x.hurt(DAMAGE[DARTP], s.team[1]);
 				}
 
 				if(s.type == ROCKETP){
@@ -1129,7 +1146,7 @@ class Game{
 					for(let x of this.ships)
 						if(x.team[0] != s.team[0])
 							if(_dist(x.pos, s.pos) < RANGE[ROCKETP])
-								x.hurt(1000, s.team[1]);
+								x.hurt(DAMAGE[ROCKETP], s.team[1]);
 				}
 
 				if(s.type == STRIKEP){
@@ -1138,7 +1155,7 @@ class Game{
 					for(let x of this.ships)
 						if(x.team[0] != s.team[0])
 							if(_dist(x.pos, s.pos) < RANGE[STRIKEP])
-								x.hurt(3000, s.team[1]);
+								x.hurt(DAMAGE[STRIKEP], s.team[1]);
 				}
 
 				if(s.type == BOMBERP){
@@ -1147,7 +1164,7 @@ class Game{
 					for(let x of this.ships)
 						if(x.team[0] != s.team[0])
 							if(_dist(x.pos, s.pos) < RANGE[BOMBERP])
-								x.hurt(2000);
+								x.hurt(DAMAGE[BOMBERP]);
 				}
 
 			}
@@ -1292,6 +1309,7 @@ class Game{
 								[CANNON, PASSIVE, VENG, DECOY],
 								[LASER, PASSIVE, VENG],
 								[CANNON, PASSIVE, DUEL, ROCKET],
+								[PULSE, OMEGA, FORT, VENG],
 								[SPREAD, PASSIVE, DUEL],
 								[SPREAD, PASSIVE, FORT, DUEL],
 								[CANNON, ALPHA, AMP],
@@ -1306,6 +1324,7 @@ class Game{
 								[SPREAD, ALPHA, VENG, AMP, ROCKET],
 								[DART, PASSIVE, EMP, TURRET],
 								[LASER, PASSIVE, BARRIER, PHASE],
+								[PULSE, ALPHA, EMP, FORT],
 							];
 
 							const I = Math.floor(Math.random()*MODS.length);
@@ -1362,7 +1381,7 @@ class Game{
 				if(s.hp <= 0 && s.kill != null && [SENTINEL, GUARD, INT, COL, BOMBER].includes(s.type)){
 					for(let x of this.ships)
 						if(x.team[1] == s.kill && x.type == BS && !Number.isInteger(s.kill)){
-							if(Math.random() > ([0.8, 0.5, 0.4, 0, 0])[s.type-SENTINEL]){
+							if(Math.random() > ([0.8, 0.5, 0.4, 0, 0])[s.type-SENTINEL] && Math.random() > x.arts.size/MAX_ARTS){
 								const I = Math.floor(Math.random()*Artifacts.types.length);
 								if(!x.arts.has(I)) for(let y of this.players) if(y.id == x.team[1]){
 									y.emit("artifact", x.uid, I);

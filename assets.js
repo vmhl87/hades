@@ -891,6 +891,15 @@ function drawModule(T){
 		line(5, 8, 5, 2);
 	}
 
+	if(T == PULSE){
+		stroke(200, 50, 50); noFill();
+		arc(0, 0, 25, 27, -PI*0.3, PI*0.3);
+		arc(0, 0, 25, 27, PI-PI*0.3, PI+PI*0.3);
+		
+		for(let i=0; i<6; ++i)
+			line(5*cos(i*PI/3), 5*sin(i*PI/3), 7*cos(i*PI/3), 7*sin(i*PI/3));
+	}
+
 	// DRONE
 
 	if(T == ROCKETD){
@@ -1614,6 +1623,16 @@ function drawEffect(T, S=null){
 		scale(camera.z);
 		fill(50, 200, 50, 20); noStroke();
 		circle(0, 0, 60*2);
+	}
+
+	if(T == PULSE){
+		const Q = min(1, S*2);
+		scale(camera.z);
+		fill(200, 75, 50, 60*Q); noStroke();
+		circle(0, 0, RANGE[PULSE]*2+20);
+		stroke(200, 75, 50, 150*Q); strokeWeight(2); noFill();
+		arc(0, 0, RANGE[PULSE]*2+20, RANGE[PULSE]*2+20, -PI/2-PI/2*S, -PI/2+PI/2*S);
+		arc(0, 0, RANGE[PULSE]*2+20, RANGE[PULSE]*2+20, PI/2-PI/2*S, PI/2+PI/2*S);
 	}
 
 	pop();

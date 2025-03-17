@@ -339,10 +339,10 @@ function main(){
 
 		}else{
 			if(chooseModule == 0){
-				for(let i=0; i<5; ++i){
-					fill(255, 50, 50, mouseIn(width/2-100+i*50, height/2+150, 20, 20) ? 80 : 60);
-					rect(width/2-120+i*50, height/2+130, 40, 40);
-					push(); translate(width/2-100+i*50, height/2+150);
+				for(let i=0; i<6; ++i){
+					fill(255, 50, 50, mouseIn(width/2-125+i*50, height/2+150, 20, 20) ? 80 : 60);
+					rect(width/2-145+i*50, height/2+130, 40, 40);
+					push(); translate(width/2-125+i*50, height/2+150);
 					drawModule(LASER+i);
 					pop();
 				}
@@ -730,21 +730,25 @@ function main(){
 			if(s.imp == 0){
 				push(); translate(width/2+(s.vpos[0]-camera.x)*camera.z, height/2+(s.vpos[1]-camera.y)*camera.z);
 
-				for(let m of s.modules) if(Array.isArray(m.aux) && m.aux.length && m.aux[0] &&
-					(m.aux[1] > 3/TIME[m.type] || ((Date.now()/1000)%1 < 0.5)) || m.type == PASSIVE){
+				for(let m of s.modules){
+					if(Array.isArray(m.aux) && m.aux.length && m.aux[0] &&
+						(m.aux[1] > 3/TIME[m.type] || ((Date.now()/1000)%1 < 0.5)) || m.type == PASSIVE){
 
-					if(m.type == ALPHA) drawEffect(ALPHA);
+						if(m.type == ALPHA) drawEffect(ALPHA);
 
-					if(m.type == DELTA) drawEffect(DELTA, m.aux[2]);
+						if(m.type == DELTA) drawEffect(DELTA, m.aux[2]);
 
-					if(m.type == PASSIVE && (m.use || s.type != BS || s.team == TEAM))
-						drawEffect(PASSIVE, m.aux[0]);
+						if(m.type == PASSIVE && (m.use || s.type != BS || s.team == TEAM))
+							drawEffect(PASSIVE, m.aux[0]);
 
-					if(m.type == OMEGA) drawEffect(OMEGA);
+						if(m.type == OMEGA) drawEffect(OMEGA);
 
-					if(m.type == MIRROR) drawEffect(MIRROR, m.aux[0]);
+						if(m.type == MIRROR) drawEffect(MIRROR, m.aux[0]);
 
-					if(m.type == ALLY) drawEffect(ALLY, m.aux[0]);
+						if(m.type == ALLY) drawEffect(ALLY, m.aux[0]);
+					}
+
+					if(m.type == PULSE) drawEffect(PULSE, m.state);
 				}
 
 				pop();
@@ -1358,8 +1362,8 @@ function stagingUI(){
 	}else if(chooseModule == 0){
 		let p = true;
 
-		for(let i=0; i<5; ++i){
-			if(mouseIn(width/2-100+i*50, height/2+150, 20, 20)){
+		for(let i=0; i<6; ++i){
+			if(mouseIn(width/2-125+i*50, height/2+150, 20, 20)){
 				modules[0] = modules[0] == LASER+i ? null : LASER+i;
 				localStorage.setItem("modules", JSON.stringify(modules));
 				p = false;
