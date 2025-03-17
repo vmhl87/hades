@@ -1101,7 +1101,7 @@ class Game{
 
 			for(let s of this.ships) if(!s.emp)
 				for(let m of s.modules)
-					if(IS_WEAPON(m.type) && (m.type != PULSE || m.state == 1)
+					if(IS_WEAPON(m.type) && (m.type != PULSE || m.state == 1) &&
 						(m.type != CANNON || m.state == 1)){
 						const D = DAMAGE[m.type] != null ? DAMAGE[m.type] :
 							(LASER_DAMAGE[m.type] != null ? LASER_DAMAGE[m.type][
