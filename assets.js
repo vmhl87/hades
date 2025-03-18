@@ -1575,7 +1575,7 @@ function drawEffect(T, S=null){
 		noStroke();
 		fill(100, 255, 150, 50*min(1, S*2.5));
 		circle(0, 0, RANGE[DISRUPT]*2*min(1, (1-S)*20/3));
-		stroke(100, 255, 150, 100*min(1, (1-S)*80/3)); noFill(); strokeWeight(2/sqrt(camera.z));
+		stroke(100, 255, 150, 100*min(min(1, S*5), (1-S)*80/3)); noFill(); strokeWeight(2/sqrt(camera.z));
 		for(let j=0; j<3; ++j){
 			let a = (1-Math.pow(noise(floor(Date.now()/100), j), 2))*
 					(2*(RANGE[DISRUPT]+20)*min(1, (1-S)*20/3)-40)+40,
