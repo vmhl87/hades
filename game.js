@@ -24,9 +24,9 @@ const ALPHA = ++ct, DELTA = ++ct, OMEGA = ++ct, PASSIVE = ++ct, MIRROR = ++ct, A
 
 // MODULE TYPES
 
-const EMP = ++ct, DUEL = ++ct, FORT = ++ct, TP = ++ct, AMP = ++ct, LEAP = ++ct, BARRIER = ++ct, STRIKE = ++ct, RIPPLE = ++ct, DISRUPT = ++ct;
+const EMP = ++ct, DUEL = ++ct, FORT = ++ct, TP = ++ct, AMP = ++ct, LEAP = ++ct, BARRIER = ++ct, STRIKE = ++ct, BOND = ++ct, DISRUPT = ++ct;
 
-/* UNOBTAIN */ const SUSPEND = ++ct, VENG = ++ct, APOCALYPSE = ++ct;
+/* UNOBTAIN */ const SUSPEND = ++ct, VENG = ++ct, RIPPLE = ++ct, APOCALYPSE = ++ct;
 
 const Const = require("./constants.js");
 
@@ -94,6 +94,8 @@ class Ship{
 		this.suspend = 1;
 		this.sectorDmg = ([STRIKEP, ROCKETP, STRIKEP, BOMBERP]).includes(type) ? 0 : 150;
 
+		this.bond = [0, null];
+
 		for(let m of this.modules){
 			if(IS_WEAPON(m.type)){
 				m.aux = [];
@@ -122,8 +124,11 @@ class Ship{
 			if([LASER, LASER2, COL, CANNON, PULSE].includes(m.type))
 				m.state = 0;
 
-			else if(m.type == WARP)
+			if(m.type == WARP)
 				m.color = [200, 100, 50];
+
+			if(m.type == BOND)
+				m.aux = { offset: [0, 0], uid: null };
 		}
 
 		if(type == BS && Number.isInteger(team[0]) && team[0] < 0){
@@ -137,15 +142,15 @@ class Ship{
 	}
 
 	waitMoveTo(pos, i){
-		this.wait = [...pos, 1, i];
+		if(this.bond[0] == 0) this.wait = [...pos, 1, i];
 	}
 
 	moveTo(pos, i){
-		this.move.push([...pos, i]);
+		if(this.bond[0] == 0) this.move.push([...pos, i]);
 	}
 
 	confirmMove(){
-		if(this.wait){
+		if(this.wait && this.bond[0] == 0){
 			this.move.push([this.wait[0], this.wait[1], this.wait[3]]);
 			this.wait = null;
 		}
@@ -177,6 +182,7 @@ class Ship{
 			imp: this.imp,
 			ally: this.ally == null ? 0 : 1,
 			arts: Array.from(this.arts),
+			bond: this.bond,
 		};
 	}
 	
@@ -249,7 +255,7 @@ class Ship{
 	}
 
 	travel(){
-		if([TURRET, PHASE].includes(this.type)){
+		if([TURRET, PHASE, BOMB].includes(this.type)){
 			this.move = [];
 			this.wait = null;
 			this.dock = null;
@@ -390,6 +396,7 @@ class Game{
 			this.ships[s].move = [];
 			this.ships[s].wait = null;
 			this.ships[s].tp = [...dat.loc, dat.dock];
+			this.ships[s].bond = [0, null];
 		}
 
 		if(T == LEAP){
@@ -416,6 +423,7 @@ class Game{
 			this.ships[s].move = [];
 			this.ships[s].wait = null;
 			this.ships[s].tp = [R[I][0], R[I][1]+10, R[I][2]];
+			this.ships[s].bond = [0, null];
 		}
 
 		if(T == EMP){
@@ -464,6 +472,29 @@ class Game{
 
 				if(x.team[0] == CERB && x.move.length > 1)
 					x.move = x.move.slice(0, 1);
+
+				this.ships[s].bond = [0, null];
+				x.bond = [0, null];
+			}
+		}
+
+		if(T == BOND){
+			for(let x of this.ships) if(x.uid == dat.loc){
+				if(this.ships[s].bond[0] != 0 && this.ships[s].bond[1] == x.uid){
+					this.ships[s].bond = [0, null];
+					m.aux = { offset: [0, 0], uid: null };
+
+				}else{
+					x.move = [];
+					x.tp = null;
+					x.wait = null;
+					x.dock = null;
+					x.bond = [1, this.ships[s].uid];
+					this.ships[s].modules[dat.i].aux = {
+						offset: [x.pos[0]-this.ships[s].pos[0], x.pos[1]-this.ships[s].pos[1]],
+						uid: dat.loc,
+					};
+				}
 			}
 		}
 	}
@@ -636,7 +667,7 @@ class Game{
 			}
 
 			if(T == DELTA){
-				if(1+S > 10/EFFECT_TIME[T] || (s.modules[i].aux[2] && s.move.length == 0))
+				if(1+S > 10/EFFECT_TIME[T] || (s.modules[i].aux[2] && s.move.length == 0 && s.bond[0] == 0))
 					s.modules[i].aux[2] = 0;
 
 				if(s.modules[i].aux[2] == 1 && s.imp == 0)
@@ -760,14 +791,44 @@ class Game{
 			s.emp = Math.max(0, s.emp - 1/(TPS*EFFECT_TIME[EMP]*s.empVuln));
 			s.fort = Math.max(0, s.fort - 1/(TPS*EFFECT_TIME[FORT]));
 			s.imp = Math.max(0, s.imp - 1/(TPS*EFFECT_TIME[DISRUPT]*s.disruptVuln));
+			s.bond[0] = Math.max(0, s.bond[0] - 1/(TPS*EFFECT_TIME[BOND]));
+			if(s.bond[0] == 0) s.bond[1] = null;
 		}
 
 		let locked = new Set();
 
 		for(let s of this.ships) for(let m of s.modules)
+			if(m.type == BOND && m.aux.uid != null)
+				locked.add(m.aux.uid);
+
+		for(let s of this.ships){
+			if(locked.has(s.uid) && s.bond[0] == 0)
+				locked.delete(s.uid);
+
+			if(!locked.has(s.uid)) s.bond[0] = 0;
+		}
+
+		{
+			let M = new Map();
+			for(let i=0; i<this.ships.length; ++i)
+				M.set(this.ships[i].uid, i);
+
+			for(let s of this.ships) for(let m of s.modules)
+				if(m.type == BOND && m.aux.uid != null){
+					if(!M.has(m.aux.uid) || !locked.has(m.aux.uid))
+						m.aux = { offset: [0, 0], uid: null };
+
+					else{
+						this.ships[M.get(m.aux.uid)].pos[0] = s.pos[0]+m.aux.offset[0];
+						this.ships[M.get(m.aux.uid)].pos[1] = s.pos[1]+m.aux.offset[1];
+					}
+				}
+		};
+
+		for(let s of this.ships) for(let m of s.modules)
 			if(m.type == BARRIER && m.state < 0)
 				for(let x of this.ships) if(x.team[0] != s.team[0] && x.type != STRIKEP)
-					if(_dist(x.pos, s.pos) < RANGE[BARRIER])
+					if(_dist(x.pos, s.pos) < RANGE[BARRIER] && (s.bond[0] == 0 || x.uid != s.bond[1]))
 						locked.add(x.uid);
 		
 		// cerberus + lone BS AI

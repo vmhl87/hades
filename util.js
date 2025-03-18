@@ -113,27 +113,17 @@ let timeframes = [0, 0];
 class Ship{
 	constructor(dat){
 		this.type = dat.type;
-		this.hp = dat.hp;
-		this.mhp = dat.mhp;
 		this.team = dat.team;
 		this.user = dat.user;
 		this.name = dat.name;
 		this.modules = dat.modules;
 		this.pos = dat.pos;
-		this.move = dat.move;
-		this.wait = dat.wait;
-		this.tp = dat.tp;
 		this.vpos = [...this.pos];
 		this.vvpos = [...this.pos];
 		this.rot = PI;
 		this.uid = dat.uid;
-		this.dock = dat.dock;
-		this.expire = dat.expire;
-		this.emp = dat.emp;
-		this.fort = dat.fort;
-		this.imp = dat.imp;
-		this.ally = dat.ally;
-		this.arts = dat.arts;
+
+		this.decode(dat);
 
 		if(this.move.length)
 			this.rot = atan2(this.move[0][1]-this.pos[1], this.move[0][0]-this.pos[0]);
@@ -157,6 +147,7 @@ class Ship{
 		this.imp = dat.imp;
 		this.ally = dat.ally;
 		this.arts = dat.arts;
+		this.bond = dat.bond;
 	}
 
 	travel(){
@@ -288,14 +279,14 @@ function selectedPos(pos){
 	const F = MOBILE ? 2 : 1;
 
 	if(selectMove == null || selectMove[0] != "module" ||
-	(shipID != null && ships[shipID].modules[selectMove[1].i].type != RIPPLE))
+	(shipID != null && !([RIPPLE, BOND].includes(ships[shipID].modules[selectMove[1].i].type))))
 		for(let i=0; i<rocks.length; ++i){
 			const d = _dist(screenPos(rocks[i]), pos);
 			if(d < 50/F) opt.push([d, ["rock", i]]);
 		}
 
 	if(selectMove == null || (selectMove[0] == "module" &&
-	shipID != null && ships[shipID].modules[selectMove[1].i].type == RIPPLE))
+	shipID != null && [RIPPLE, BOND].includes(ships[shipID].modules[selectMove[1].i].type)))
 		for(let i=0; i<ships.length; ++i){
 			const d = _dist(screenPos(ships[i].vpos), pos);
 			if(d < 50/F){

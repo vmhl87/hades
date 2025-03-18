@@ -48,7 +48,7 @@ let showGuide = false, guideUI = {};
 	guideUI.leap = ct++;
 	guideUI.barrier = ct++;
 	guideUI.strike = ct++;
-	guideUI.ripple = ct++;
+	guideUI.bond = ct++;
 	guideUI.disrupt = ct++;
 
 	guideUI.decoy = ct++;
@@ -56,6 +56,7 @@ let showGuide = false, guideUI = {};
 	guideUI.turret = ct++;
 	guideUI.phase = ct++;
 	guideUI.warp = ct++;
+	guideUI.bomb = ct++;
 
 	guideUI.tree = new Array(ct);
 
@@ -85,7 +86,7 @@ let showGuide = false, guideUI = {};
 	for(let x=guideUI.emp; x<=guideUI.disrupt; ++x)
 		subpage(guideUI.module, x);
 
-	for(let x=guideUI.decoy; x<=guideUI.warp; ++x)
+	for(let x=guideUI.decoy; x<=guideUI.bomb; ++x)
 		subpage(guideUI.drone, x);
 
 	function info(page){
@@ -163,8 +164,8 @@ let showGuide = false, guideUI = {};
 	info(guideUI.barrier).push("Barrier");
 	info(guideUI.strike).push(["module", STRIKE]);
 	info(guideUI.strike).push("Strike");
-	info(guideUI.ripple).push(["module", RIPPLE]);
-	info(guideUI.ripple).push("Ripple");
+	info(guideUI.bond).push(["module", BOND]);
+	info(guideUI.bond).push("Bond");
 	info(guideUI.disrupt).push(["module", DISRUPT]);
 	info(guideUI.disrupt).push("Disrupt");
 
@@ -178,6 +179,8 @@ let showGuide = false, guideUI = {};
 	info(guideUI.phase).push("Phase Drone");
 	info(guideUI.warp).push(["module", WARP]);
 	info(guideUI.warp).push("Warp Drones");
+	info(guideUI.bomb).push(["module", BOMB]);
+	info(guideUI.bomb).push("Remote Bomb");
 
 	guideUI.now = guideUI.start;
 	guideUI.time = Date.now();
@@ -704,6 +707,83 @@ function drawGuide(){
 			_text(INFO[DART] + "\n\n" + STATS[DART], width/2-120, Y+150, 240, 1000);
 			pop();
 
+		}else if(P == guideUI.pulse){
+			push();
+			textAlign(CENTER, CENTER); textSize(18);
+			fill(200 + sin(Date.now()/300)*55); noStroke();
+			text("PREVIEW UNDER\nCONSTRUCTION", width/2, Y+40);
+			pop();
+
+			push(); textAlign(LEFT, TOP);
+			_text(INFO[PULSE] + "\n\n" + STATS[PULSE], width/2-120, Y+150, 240, 1000);
+			pop();
+
+		}else if(P == guideUI.alpha){
+			push();
+			textAlign(CENTER, CENTER); textSize(18);
+			fill(200 + sin(Date.now()/300)*55); noStroke();
+			text("PREVIEW UNDER\nCONSTRUCTION", width/2, Y+40);
+			pop();
+
+			push(); textAlign(LEFT, TOP);
+			_text(INFO[ALPHA] + "\n\n" + STATS[ALPHA], width/2-120, Y+150, 240, 1000);
+			pop();
+
+		}else if(P == guideUI.delta){
+			push();
+			textAlign(CENTER, CENTER); textSize(18);
+			fill(200 + sin(Date.now()/300)*55); noStroke();
+			text("PREVIEW UNDER\nCONSTRUCTION", width/2, Y+40);
+			pop();
+
+			push(); textAlign(LEFT, TOP);
+			_text(INFO[DELTA] + "\n\n" + STATS[DELTA], width/2-120, Y+150, 240, 1000);
+			pop();
+
+		}else if(P == guideUI.omega){
+			push();
+			textAlign(CENTER, CENTER); textSize(18);
+			fill(200 + sin(Date.now()/300)*55); noStroke();
+			text("PREVIEW UNDER\nCONSTRUCTION", width/2, Y+40);
+			pop();
+
+			push(); textAlign(LEFT, TOP);
+			_text(INFO[OMEGA] + "\n\n" + STATS[OMEGA], width/2-120, Y+150, 240, 1000);
+			pop();
+
+		}else if(P == guideUI.passive){
+			push();
+			textAlign(CENTER, CENTER); textSize(18);
+			fill(200 + sin(Date.now()/300)*55); noStroke();
+			text("PREVIEW UNDER\nCONSTRUCTION", width/2, Y+40);
+			pop();
+
+			push(); textAlign(LEFT, TOP);
+			_text(INFO[PASSIVE] + "\n\n" + STATS[PASSIVE], width/2-120, Y+150, 240, 1000);
+			pop();
+
+		}else if(P == guideUI.mirror){
+			push();
+			textAlign(CENTER, CENTER); textSize(18);
+			fill(200 + sin(Date.now()/300)*55); noStroke();
+			text("PREVIEW UNDER\nCONSTRUCTION", width/2, Y+40);
+			pop();
+
+			push(); textAlign(LEFT, TOP);
+			_text(INFO[MIRROR] + "\n\n" + STATS[MIRROR], width/2-120, Y+150, 240, 1000);
+			pop();
+
+		}else if(P == guideUI.ally){
+			push();
+			textAlign(CENTER, CENTER); textSize(18);
+			fill(200 + sin(Date.now()/300)*55); noStroke();
+			text("PREVIEW UNDER\nCONSTRUCTION", width/2, Y+40);
+			pop();
+
+			push(); textAlign(LEFT, TOP);
+			_text(INFO[ALLY] + "\n\n" + STATS[ALLY], width/2-120, Y+150, 240, 1000);
+			pop();
+
 		}else if(P == guideUI.emp){
 			const T = 9;
 			const O = (((Date.now()-guideUI.time)/1000) % (T+2)) - 1;
@@ -840,7 +920,7 @@ function drawGuide(){
 			_text(INFO[STRIKE] + "\n\n" + STATS[STRIKE], width/2-120, Y+150, 240, 1000);
 			pop();
 
-		}else if(P == guideUI.ripple){
+		}else if(P == guideUI.bond){
 			push();
 			textAlign(CENTER, CENTER); textSize(18);
 			fill(200 + sin(Date.now()/300)*55); noStroke();
@@ -848,7 +928,7 @@ function drawGuide(){
 			pop();
 
 			push(); textAlign(LEFT, TOP);
-			_text(INFO[RIPPLE] + "\n\n" + STATS[RIPPLE], width/2-120, Y+150, 240, 1000);
+			_text(INFO[BOND] + "\n\n" + STATS[BOND], width/2-120, Y+150, 240, 1000);
 			pop();
 
 		}else if(P == guideUI.disrupt){
@@ -915,6 +995,17 @@ function drawGuide(){
 
 			push(); textAlign(LEFT, TOP);
 			_text(INFO[WARP] + "\n\n" + STATS[WARP], width/2-120, Y+150, 240, 1000);
+			pop();
+
+		}else if(P == guideUI.bomb){
+			push();
+			textAlign(CENTER, CENTER); textSize(18);
+			fill(200 + sin(Date.now()/300)*55); noStroke();
+			text("PREVIEW UNDER\nCONSTRUCTION", width/2, Y+40);
+			pop();
+
+			push(); textAlign(LEFT, TOP);
+			_text(INFO[BOMB] + "\n\n" + STATS[BOMB], width/2-120, Y+150, 240, 1000);
 			pop();
 
 		}else{

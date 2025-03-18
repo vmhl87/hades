@@ -1236,6 +1236,17 @@ function drawModule(T){
 		arc(-6*sin(PI*2/3), -6*cos(PI*2/3), 18, 18, PI*4/3-PI*0.4, PI*4/3+PI*0.6);
 	}
 
+	if(T == BOND){
+		stroke(50, 150, 50); fill(50, 150, 50);
+		line(-9, 9, 6, -6);
+		strokeWeight(1.5);
+		line(-1, -3, -7, 3);
+		line(1, 3, 7, -3);
+		strokeWeight(2);
+		circle(-9, 9, 6); noFill();
+		circle(9, -9, 6);
+	}
+
 	if(T == DISRUPT){
 		stroke(50, 150, 50); noFill();
 		arc(0, 0, 25, 25, -PI*0.3, PI*0.3);

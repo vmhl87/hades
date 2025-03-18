@@ -24,9 +24,9 @@ const ALPHA = ++ct, DELTA = ++ct, OMEGA = ++ct, PASSIVE = ++ct, MIRROR = ++ct, A
 
 // MODULE TYPES
 
-const EMP = ++ct, DUEL = ++ct, FORT = ++ct, TP = ++ct, AMP = ++ct, LEAP = ++ct, BARRIER = ++ct, STRIKE = ++ct, RIPPLE = ++ct, DISRUPT = ++ct;
+const EMP = ++ct, DUEL = ++ct, FORT = ++ct, TP = ++ct, AMP = ++ct, LEAP = ++ct, BARRIER = ++ct, STRIKE = ++ct, BOND = ++ct, DISRUPT = ++ct;
 
-/* UNOBTAIN */ const SUSPEND = ++ct, VENG = ++ct, APOCALYPSE = ++ct;
+/* UNOBTAIN */ const SUSPEND = ++ct, VENG = ++ct, RIPPLE = ++ct, APOCALYPSE = ++ct;
 
 const NULL = 2.71, DEV = 1.618;
 
@@ -188,6 +188,7 @@ RANGE[REPAIR] = 200;
 RANGE[ROCKET] = 250;
 RANGE[TURRET] = 130;
 RANGE[WARP] = 400;
+RANGE[BOND] = 110;
 RANGE[BOMB] = 60;
 
 RANGE[RIPPLE] = 300;
@@ -211,6 +212,7 @@ ACTIVATED[LEAP] = true;
 ACTIVATED[BARRIER] = true;
 ACTIVATED[STRIKE] = true;
 ACTIVATED[RIPPLE] = true;
+ACTIVATED[BOND] = true;
 ACTIVATED[DISRUPT] = true;
 ACTIVATED[SUSPEND] = true;
 
@@ -263,6 +265,9 @@ RECHARGE_TIME[STRIKE] = 45;
 EFFECT_TIME[RIPPLE] = 0;
 RECHARGE_TIME[RIPPLE] = 60;
 
+EFFECT_TIME[BOND] = 10;
+RECHARGE_TIME[BOND] = 90;
+
 EFFECT_TIME[VENG] = 10;
 RECHARGE_TIME[VENG] = 120;
 
@@ -305,13 +310,10 @@ RECHARGE_TIME[OMEGA] = 60;
 EFFECT_TIME[MIRROR] = 45;
 RECHARGE_TIME[MIRROR] = 60;
 
-EFFECT_TIME[MIRROR] = 45;
-RECHARGE_TIME[MIRROR] = 60;
-
 EFFECT_TIME[ALLY] = 45;
 RECHARGE_TIME[ALLY] = 60;
 
-const LOCMOD = [DECOY, REPAIR, ROCKET, TP, STRIKE, RIPPLE, WARP];
+const LOCMOD = [DECOY, REPAIR, ROCKET, TP, STRIKE, RIPPLE, BOND, WARP];
 
 const CERB = 3.14;
 
@@ -350,6 +352,7 @@ INFO[LEAP] = "After a short delay, the Battleship applies massive blast damage t
 INFO[BARRIER] = "Prevents enemy ships, drones, and most rockets within range from moving. Enemy ships which teleport into or out of the field take damage. Teleportation caused by LEAP is affected as well. Half of the incurred damage is applied normally, and the other half applies directly to the hull regardless of shields.";
 INFO[STRIKE] = "Launches a fast rocket that deals high damage to enemy vessels within range. Can pass through Barrier. A small amount of damage is applied if the rocket is destroyed before reaching its destination.";
 INFO[RIPPLE] = "Instantaneously swaps the Battleship with an allied drone, rocket, or Cerberus ship within range.";
+INFO[BOND] = "Binds to a target ship, holding it stationary relative to the owner Battleship. Can push Barrier. Bonded ships can only break the link with a module that causes Teleport.";
 INFO[DISRUPT] = "Nullifies all enemy shields within range for a short time.";
 
 INFO[SUSPEND] = "Projects a suspension field around nearby enemies that slows their movement and decreases their weapon damage.";
@@ -400,9 +403,10 @@ STATS[TP] = `Delay: 3s\nRange: 400m`;
 STATS[AMP] = `Multiplier: 300%\nRange: 100m`;
 STATS[LEAP] = `Damage: 4000, Delay: 6s\nRange: 65m`;
 STATS[BARRIER] = `Effect time: 10s\nRange: 100m`;
-STATS[STRIKE] = `Damage: 3000, HP: 180\nRange: Unlimited`;
-STATS[RIPPLE] = `Range: 300m`;
-STATS[DISRUPT] = `Effect time: 6s\nRange: 70m`;
+STATS[STRIKE] = `Damage: ${DAMAGE[STRIKEP]}, HP: ${HP[STRIKEP]}\nRange: Unlimited`;
+STATS[RIPPLE] = `Range: ${RANGE[RIPPLE]}m`;
+STATS[DISRUPT] = `Effect time: ${EFFECT_TIME[DISRUPT]}s\nRange: ${RANGE[DISRUPT]}m`;
+STATS[BOND] = `Effect time: ${EFFECT_TIME[BOND]}s\nRange: ${RANGE[BOND]}m`;
 
 STATS[SUSPEND] = `Effect time: 30s, Reduction: 30%\nRange: 150m`;
 
@@ -453,6 +457,7 @@ MODULE_NAME[BARRIER] = "BARRIER";
 MODULE_NAME[STRIKE] = "STRIKE";
 MODULE_NAME[RIPPLE] = "SWAP";
 MODULE_NAME[DISRUPT] = "DISRUPT";
+MODULE_NAME[BOND] = "BOND";
 
 MODULE_NAME[SUSPEND] = "SUSPEND";
 

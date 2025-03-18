@@ -506,6 +506,10 @@ function main(){
 			REV.set(ships[i].uid, i);
 		}
 
+		function SH(uid){
+			return REV.has(uid) ? ships[REV.get(uid)] : null;
+		}
+
 		push(); fill(200, 50, 50, 20); stroke(255, 50, 50); strokeWeight(1.5*camera.z);
 
 		for(let s of ships){
@@ -727,6 +731,40 @@ function main(){
 		const NOW = snapshot ? age : age + (Date.now()-last)*TPS/1000/speed;
 
 		for(let i of bsID){
+			for(let m of ships[i].modules){
+				if(m.type == BOND && m.aux.uid != null){
+					if(REV.has(m.aux.uid)){
+						push();
+						stroke(100, 255, 100, 100); strokeWeight(sqrt(camera.z));
+						noFill();
+						beginShape();
+						for(let j=0; j<=6; ++j){
+							const P = _lerp(screenPos(ships[i].vpos), screenPos(SH(m.aux.uid).vpos), j/6);
+							vertex(
+								P[0]+(noise(23+j*10, round(Date.now()/100))-0.5)*sqrt(camera.z)*20,
+								P[1]+(noise(96+j*10, round(Date.now()/100))-0.5)*sqrt(camera.z)*20
+							);
+						}
+						endShape();
+						stroke(200, 200, 50, 150+sin(Date.now()/500)*50); strokeWeight(2*sqrt(camera.z));
+						line(...screenPos(ships[i].vpos), ...screenPos(SH(m.aux.uid).vpos));
+						stroke(100, 255, 100, 100); strokeWeight(sqrt(camera.z));
+						beginShape();
+						for(let j=0; j<=6; ++j){
+							const P = _lerp(screenPos(ships[i].vpos), screenPos(SH(m.aux.uid).vpos), j/6);
+							vertex(
+								P[0]+(noise(34+j*10, floor(Date.now()/100))-0.5)*sqrt(camera.z)*20,
+								P[1]+(noise(94+j*10, floor(Date.now()/100))-0.5)*sqrt(camera.z)*20
+							);
+						}
+						endShape();
+						pop();
+					}
+				}
+			}
+		}
+
+		for(let i of bsID){
 			const s = ships[i];
 			if(s.imp == 0){
 				push(); translate(width/2+(s.vpos[0]-camera.x)*camera.z, height/2+(s.vpos[1]-camera.y)*camera.z);
@@ -831,10 +869,6 @@ function main(){
 
 		{
 			const S = sqrt(camera.z);
-
-			function SH(uid){
-				return REV.has(uid) ? ships[REV.get(uid)] : null;
-			}
 
 			push();
 			for(let s of ships) if(!s.emp){
@@ -1651,6 +1685,14 @@ function click(){
 			for(let s of ships) if(s.uid == select[1])
 				if((_dist(ships[shipID].vpos, s.vpos) < RANGE[RIPPLE] || CENT)
 					&& (ships[shipID].user == s.user || s.team == CERB || CENT)){
+					socket.emit("activateModule", {gameID: gameID, shipID: selectMove[1].s,
+						i: selectMove[1].i, loc: select[1]});
+					selectMove = null;
+				}
+
+		}else if(shipID != null && ships[shipID].modules[selectMove[1].i].type == BOND && select != null && select[1] != selectMove[1].s){
+			for(let s of ships) if(s.uid == select[1])
+				if(_dist(ships[shipID].vpos, s.vpos) < RANGE[BOND] || CENT){
 					socket.emit("activateModule", {gameID: gameID, shipID: selectMove[1].s,
 						i: selectMove[1].i, loc: select[1]});
 					selectMove = null;
