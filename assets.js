@@ -764,6 +764,7 @@ function drawShip3(s){
 		emp: s.emp || 0,
 		ally: s.ally || 0,
 		hp: s.hp || HP[s.type],
+		mhp: s.mhp || HP[s.type],
 		modules: s.modules || [],
 		rot: s.rot || 0,
 		move: s.move || [],
@@ -777,7 +778,7 @@ function drawShip2(s){
 	if(dragMove != null && dragMove[2] == s.uid && !s.move.length)
 		rotate(atan2(dragMove[1]-screenPos(s.vpos)[1], dragMove[0]-screenPos(s.vpos)[0]));
 	else rotate(s.rot);
-	let T = s.T != null ? S.T : (s.user == ID ? 0 : (s.team == TEAM ? 3 : (Number.isInteger(s.team) ? 2 : 1)));
+	let T = s.T != null ? s.T : (s.user == ID ? 0 : (s.team == TEAM ? 3 : (Number.isInteger(s.team) ? 2 : 1)));
 	drawShip(s.type, T, s.move.length && !s.emp ? 1 : 0);
 	pop();
 	if(s.imp){

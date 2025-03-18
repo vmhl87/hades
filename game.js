@@ -482,7 +482,8 @@ class Game{
 			for(let x of this.ships) if(x.uid == dat.loc){
 				if(this.ships[s].bond[0] != 0 && this.ships[s].bond[1] == x.uid){
 					this.ships[s].bond = [0, null];
-					m.aux = { offset: [0, 0], uid: null };
+					for(let m of x.modules) if(m.type == BOND && m.aux.uid == this.ships[s].uid)
+						m.aux = { offset: [0, 0], uid: null };
 
 				}else{
 					x.move = [];
