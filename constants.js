@@ -265,7 +265,7 @@ RECHARGE_TIME[STRIKE] = 45;
 EFFECT_TIME[RIPPLE] = 0;
 RECHARGE_TIME[RIPPLE] = 60;
 
-EFFECT_TIME[BOND] = 10;
+EFFECT_TIME[BOND] = 5;
 RECHARGE_TIME[BOND] = 90;
 
 EFFECT_TIME[VENG] = 10;
@@ -397,30 +397,30 @@ STATS[MIRROR] = `HP: ${STRENGTH[MIRROR]}, Multiplier: 300%\nRange: ${RANGE[MIRRO
 STATS[ALLY] = `HP: ${STRENGTH[ALLY]}\nRange: ${RANGE[ALLY]}m`;
 
 STATS[EMP] = `Effect time: ${EFFECT_TIME[EMP]}s\nRange: ${RANGE[EMP]}m`;
-STATS[DUEL] = `Multiplier: 150%`;
-STATS[FORT] = `Effect time: 12s, Reduction: 40%`;
-STATS[TP] = `Delay: 3s\nRange: 400m`;
-STATS[AMP] = `Multiplier: 300%\nRange: 100m`;
-STATS[LEAP] = `Damage: 4000, Delay: 6s\nRange: 65m`;
-STATS[BARRIER] = `Effect time: 10s\nRange: 100m`;
+STATS[DUEL] = `Multiplier: ${Math.round(DAMAGE[DUEL]*100)}%`;
+STATS[FORT] = `Effect time: ${EFFECT_TIME[FORT]}s, Reduction: ${Math.round(100*(1-DAMAGE[FORT]))}%`;
+STATS[TP] = `Delay: ${EFFECT_TIME[TP]}s\nRange: ${RANGE[TP]}m`;
+STATS[AMP] = `Multiplier: ${Math.round(DAMAGE[AMP]*100)}%\nRange: ${RANGE[AMP]}m`;
+STATS[LEAP] = `Damage: ${DAMAGE[LEAP]}, Delay: ${EFFECT_TIME[LEAP]}s\nRange: ${RANGE[LEAP]}m`;
+STATS[BARRIER] = `Effect time: ${EFFECT_TIME[BARRIER]}s\nRange: ${RANGE[BARRIER]}m`;
 STATS[STRIKE] = `Damage: ${DAMAGE[STRIKEP]}, HP: ${HP[STRIKEP]}\nRange: Unlimited`;
 STATS[RIPPLE] = `Range: ${RANGE[RIPPLE]}m`;
 STATS[DISRUPT] = `Effect time: ${EFFECT_TIME[DISRUPT]}s\nRange: ${RANGE[DISRUPT]}m`;
 STATS[BOND] = `Effect time: ${EFFECT_TIME[BOND]}s\nRange: ${RANGE[BOND]}m`;
 
-STATS[SUSPEND] = `Effect time: 30s, Reduction: 30%\nRange: 150m`;
+STATS[SUSPEND] = `Effect time: ${EFFECT_TIME[SUSPEND]}s, Reduction: 30%\nRange: ${RANGE[SUSPEND]}m`;
 
-STATS[VENG] = `Damage: 7000, Delay: 10s\nRange: 160m`;
+STATS[VENG] = `Damage: ${DAMAGE[VENG]}, Delay: ${EFFECT_TIME[VENG]}s\nRange: ${RANGE[VENG]}m`;
 
 STATS[APOCALYPSE] = `Delay: 40s`;
 
-STATS[DECOY] = `HP: 1000, Deploy range: 250m\nLifetime: 40s`;
-STATS[REPAIR] = `HP: 1000, Heal amount: 500-2000\nDeploy range: 200m, Lifetime: 40s`;
-STATS[ROCKET] = `HP: 600, Deploy range: 250m\nLifetime: 100s, Damage: 1000`;
-STATS[TURRET] = `HP: 1500, Setup time: 3s\nLifetime: 120s, DPS: 200`;
-STATS[PHASE] = `HP: 1000, Range: 150m\nLifetime: 30s`;
-STATS[WARP] = `HP: 900, Delay: 3s, DPS: 200\nDeploy range: 400m, Lifetime: 40s`;
-STATS[BOMB] = `HP: ${HP[BOMB]}, Damage: ${DAMAGE[PULSE]}\nDelay: 8s, Lifetime: 120s`;
+STATS[DECOY] = `HP: ${HP[DECOY]}, Deploy range: ${RANGE[DECOY]}m\nLifetime: ${EXPIRE_TIME[DECOY]}s`;
+STATS[REPAIR] = `HP: ${HP[REPAIR]}, Heal amount: 500-2000\nDeploy range: ${RANGE[REPAIR]}m, Lifetime: ${EXPIRE_TIME[REPAIR]}s`;
+STATS[ROCKET] = `HP: ${HP[ROCKET]}, Deploy range: ${RANGE[ROCKET]}m\nLifetime: ${EXPIRE_TIME[ROCKET]}s, Damage: ${DAMAGE[ROCKETP]}`;
+STATS[TURRET] = `HP: ${HP[TURRET]}, Setup time: ${EFFECT_TIME[TURRET]}s\nLifetime: ${EXPIRE_TIME[TURRET]}s, DPS: ${DAMAGE[TURRETD]}`;
+STATS[PHASE] = `HP: ${HP[PHASE]}, Range: ${RANGE[SUSPEND]}m\nLifetime: ${EXPIRE_TIME[PHASE]}s`;
+STATS[WARP] = `HP: ${HP[WARP]}, Delay: ${EFFECT_TIME[WARP]}s, DPS: 200\nDeploy range: ${RANGE[WARP]}m, Lifetime: ${EXPIRE_TIME[WARP]}s`;
+STATS[BOMB] = `HP: ${HP[BOMB]}, Damage: ${DAMAGE[PULSE]}, \nDelay: 6s, Lifetime: ${EXPIRE_TIME[BOMB]}s`;
 
 let MODULE_NAME = new Array(ct);
 

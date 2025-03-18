@@ -373,7 +373,7 @@ class Game{
 				this.ships[s].pos[1]+10*Math.sin(R)
 			]);
 			this.ships[this.ships.length-1].modules[0].color = [200, 50, 100];
-			this.ships[this.ships.length-1].modules[0].delay = 8;
+			this.ships[this.ships.length-1].modules[0].delay = 6;
 		}
 
 		if(T == WARP){
