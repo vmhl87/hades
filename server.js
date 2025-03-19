@@ -122,7 +122,7 @@ function startGame(Q, mode){
 	}else if(mode == "2TEAM"){
 		let S = new Set();
 
-		while(S.size < n/2)
+		while(S.size < Q.length/2)
 			S.add(Math.floor(Math.random()*Q.length));
 
 		for(let i=0; i<Q.length; ++i)
