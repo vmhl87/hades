@@ -619,7 +619,7 @@ function touchEnded(){
 }
 
 function windowResized(){
-	//resizeCanvas(windowWidth, windowHeight);
+	resizeCanvas(windowWidth, windowHeight);
 }
 
 function saveState(){
@@ -631,8 +631,14 @@ function saveState(){
 function loadState(STATE){
 	const S = JSON.parse(STATE);
 
+	camera = {x: 0, y: 0, z: 1};
+
 	ships = [];
-	for(let x of S.ships) ships.push(new Ship(x));
+	for(let x of S.ships){
+		ships.push(new Ship(x));
+		if(x.user == S.ID)
+			camera = {x: x.pos[0], y: x.pos[1], z: 1};
+	}
 
 	rocks = S.rocks;
 
