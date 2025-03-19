@@ -2,6 +2,8 @@ const socket = io();
 
 const MODES = ["FFA", "2TEAM", "CO-OP", "SOLO"];
 
+const CAN_ENTER_ALLMOD = false;
+
 function start(){
 	socket.emit("enqueue", modules, user, MODES[mode]);
 }
@@ -65,8 +67,64 @@ function setupLogin(){
 	});
 }
 
+function setupSpectate(){
+	const gameid = document.getElementById("gameID");
+	const submit = document.getElementById("submit");
+	const cancelButton = document.getElementById("cancel2");
+
+	function disable(){
+		submit.disabled = true;
+		submit.style.backgroundColor = "#606060";
+		submit.style.color = "#A0A0A0";
+		submit.style.cursor = "not-allowed";
+		submit.textContent = "INVALID ID";
+	}
+
+	function enable(){
+		submit.disabled = false;
+		submit.style.backgroundColor = "#808080";
+		submit.style.color = "white";
+		submit.style.cursor = "pointer";
+		submit.textContent = "SPECTATE";
+	}
+
+	gameid.addEventListener("input", () => {
+		gameid.value = gameid.value.replace(/[^\d]/g, "");
+		disable();
+		socket.emit("checkGameID", parseInt(gameid.value));
+	});
+
+	socket.on("validGameID", x => {
+		if(x.toString() == gameid.value){
+			enable();
+		}
+	});
+
+	gameid.addEventListener("keypress", event => {
+		if(event.key == "Enter"){
+			if(submit.disabled) return;
+			socket.emit("spectate", parseInt(gameid.value));
+			gameid.value = "";
+			document.getElementById("spectate-overlay").style.display = "none";
+		}
+	});
+
+	submit.addEventListener("click", () => {
+		if(submit.disabled) return;
+		socket.emit("spectate", parseInt(gameid.value));
+		gameid.value = "";
+		document.getElementById("spectate-overlay").style.display = "none";
+	});
+
+	cancelButton.addEventListener("click", () => {
+		gameid.value = "";
+		document.getElementById("spectate-overlay").style.display = "none";
+	});
+}
+
 function mouseIn(x, y, w, h){
 	if(document.getElementById("login-overlay").style.display != "none") return false;
+	if(document.getElementById("spectate-overlay").style.display != "none") return false;
 
 	if(MOBILE){
 		for(const [k, v] of posTouches)
@@ -317,6 +375,7 @@ let dragMove = null;
 
 function mousePressed(){
 	if(document.getElementById("login-overlay").style.display != "none") return;
+	if(document.getElementById("spectate-overlay").style.display != "none") return;
 
 	if(!MOBILE){
 		moved = false;
@@ -348,7 +407,7 @@ function mobileClick(P){
 					modules = JSON.parse(localStorage.getItem("modules"));
 				SECDISP = [100, []];
 				for(let i=0; i<3; ++i) SECDISP[1].push([...lastMouse[i][1]]);
-			}else{
+			}else if(CAN_ENTER_ALLMOD){
 				ALLMODULE = true;
 				modules = [null, null, null, null, null];
 				SECDISP = [100, []];
@@ -363,6 +422,7 @@ function mobileClick(P){
 
 function mouseReleased(){
 	if(document.getElementById("login-overlay").style.display != "none") return;
+	if(document.getElementById("spectate-overlay").style.display != "none") return;
 
 	if(MOBILE) return;
 
@@ -392,7 +452,7 @@ function mouseReleased(){
 					modules = JSON.parse(localStorage.getItem("modules"));
 				SECDISP = [100, []];
 				for(let i=0; i<3; ++i) SECDISP[1].push([...lastMouse[i][1]]);
-			}else{
+			}else if(CAN_ENTER_ALLMOD){
 				ALLMODULE = true;
 				modules = [null, null, null, null, null];
 				SECDISP = [100, []];

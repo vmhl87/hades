@@ -42,6 +42,7 @@ function setup(){
 	}
 
 	setupLogin();
+	setupSpectate();
 
 	/*
 	for(let element of document.getElementsByClassName("p5Canvas"))
@@ -246,6 +247,37 @@ function main(){
 				textAlign(LEFT, CENTER); textSize(18);
 				fill(50, 200, 200, 80); noStroke();
 				text("SAVED BUILDS", 60, height-32);
+			}
+			pop();
+		};
+
+		{
+			push(); translate(width-30, height-30);
+			const H = mouseIn(width-30, height-30, 30, 30);
+			stroke(50, 200, 200, H ? 80 : 60); strokeWeight(3);
+			noFill();
+			if(H) scale(1.1);
+			beginShape();
+			vertex(-12, 0);
+			vertex(-3, 7);
+			vertex(3, 7);
+			vertex(12, 0);
+			vertex(3, -7);
+			vertex(-3, -7);
+			endShape(CLOSE);
+			fill(50, 200, 200, H ? 80 : 60); noStroke();
+			beginShape();
+			vertex(-3, 0);
+			vertex(0, -5);
+			vertex(3, 0);
+			vertex(0, 5);
+			endShape(CLOSE);
+			pop();
+			push();
+			if(H){
+				textAlign(RIGHT, CENTER); textSize(18);
+				fill(50, 200, 200, 80); noStroke();
+				text("SPECTATE GAME", width-60, height-32);
 			}
 			pop();
 		};
@@ -1313,6 +1345,37 @@ function main(){
 			}
 		};
 
+		{
+			push(); translate(30, height-30);
+			const H = mouseIn(30, height-30, 30, 30);
+			stroke(50, 200, 200, H ? 80 : 60); strokeWeight(3);
+			noFill();
+			if(H) scale(1.1);
+			beginShape();
+			vertex(-12, 0);
+			vertex(-3, 7);
+			vertex(3, 7);
+			vertex(12, 0);
+			vertex(3, -7);
+			vertex(-3, -7);
+			endShape(CLOSE);
+			fill(50, 200, 200, H ? 80 : 60); noStroke();
+			beginShape();
+			vertex(-3, 0);
+			vertex(0, -5);
+			vertex(3, 0);
+			vertex(0, 5);
+			endShape(CLOSE);
+			pop();
+			push();
+			if(H){
+				textAlign(LEFT, CENTER); textSize(18);
+				fill(50, 200, 200, 80); noStroke();
+				text("GAME ID: " + gameID.toString(), 60, height-32);
+			}
+			pop();
+		};
+
 		if(artifacts.length){
 			const T = Artifacts.types[artifacts[0][2]];
 			const O = 255*min(1, (artifacts[0][0]-Date.now())*7/5000);
@@ -1424,6 +1487,7 @@ function stagingUI(){
 	}
 
 	if(mouseIn(30, height-30, 30, 30) && !showGuide){
+		/*
 		if(ALLMODULE){
 			const D = parseInt(prompt("game ID"));
 			if(Number.isInteger(D)){
@@ -1432,8 +1496,16 @@ function stagingUI(){
 			}
 
 		}else{
+		*/
 			showBuilds = !showBuilds;
-		}
+			return;
+		//}
+	}
+
+	if(mouseIn(width-30, height-30, 30, 30)){
+		document.getElementById("spectate-overlay").style.display = "block";
+		document.getElementById("gameID").focus();
+		return;
 	}
 
 	if(!searching){

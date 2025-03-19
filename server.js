@@ -365,4 +365,12 @@ io.on("connect", (socket) => {
 	});
 
 	socket.on("echo", e => console.log("echo", ...e));
+
+	socket.on("checkGameID", x => {
+		for(let g of games)
+			if(g.uid == x){
+				socket.emit("validGameID", x);
+				return;
+			}
+	});
 });
