@@ -1232,7 +1232,7 @@ function main(){
 			fill(200, 150, 50, 255*min(1, (e[1]-NOW)/TPS));
 			let mine = null;
 			for(let x of ships) if(x.type == BS && x.user == ID) mine = x.name;
-			text((e[0] == mine ? "YOU WIN" : (MODES[mode] == "2v2" ? "YOU LOSE" : e[0] + " WINS")) + " THE MATCH", width/2, 70);
+			text((e[0] == mine ? "YOU WIN" : (MODES[mode] == "2TEAM" ? "YOU LOSE" : e[0] + " WINS")) + " THE MATCH", width/2, 70);
 			pop();
 		}
 
