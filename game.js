@@ -311,7 +311,7 @@ class Game{
 		this.players = players;
 		this.ships = [];
 		this.rocks = [];
-		this.uid = ++UID;
+		this.uid = (++UID)*1000 + Math.floor(Math.random()*1000);  // entropy
 		this.entities = {blast: [], death: [], heal: [], emp: [], imp: [], sectorDeath: [], eliminate: [], win: [], surrender: []};
 		this.lifetime = TPS*6;
 		this.loneBSTimer = Math.random();

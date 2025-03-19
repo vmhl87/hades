@@ -64,6 +64,10 @@ const COLS = Module.COLS, ROWS = Module.ROWS, TPS = Module.TPS;
 
 let games = [], queue = {"FFA": [], "2TEAM": [], "CO-OP": []}, TIME = 0;
 
+let SERVER_MOVE_PROTECT = true;
+
+console.log(SERVER_LOCK_PASSWD);
+
 function tick(game){
 	if(game) game.update();
 	else{
@@ -222,6 +226,15 @@ io.on("connect", (socket) => {
 	});
 
 	socket.on("enqueue", (modules, user, mode) => {
+		if(SERVER_MOVE_PROTECT){
+			modules = modules.filter(x =>
+				(x >= LASER && x <= PULSE) ||
+				(x >= ALPHA && x <= ALLY) ||
+				(x >= EMP && x <= DISRUPT) ||
+				(x >= DECOY && x <= BOMB)
+			);
+		}
+
 		console.log("enqueued player", mode, socket.id);
 		if(queue[mode].filter(x => x.s.id == socket.id).length == 0){
 			queue[mode].push({s: socket, modules: modules, u: user});
@@ -260,7 +273,7 @@ io.on("connect", (socket) => {
 		for(let g of games){
 			if(g.uid == data.gameID){
 				for(let s of g.ships){
-					if(s.uid == data.shipID){
+					if(s.uid == data.shipID && (s.team[1] == socket.id || !SERVER_MOVE_PROTECT)){
 						if(s.wait) s.cancelMove();
 						if(s.move.length) s.moveTo(data.pos, data.dock);
 						else s.waitMoveTo(data.pos, data.dock);
@@ -274,7 +287,7 @@ io.on("connect", (socket) => {
 		for(let g of games){
 			if(g.uid == data.gameID){
 				for(let s of g.ships){
-					if(s.uid == data.shipID){
+					if(s.uid == data.shipID && (s.team[1] == socket.id || !SERVER_MOVE_PROTECT)){
 						s.confirmMove();
 					}
 				}
@@ -286,7 +299,7 @@ io.on("connect", (socket) => {
 		for(let g of games){
 			if(g.uid == data.gameID){
 				for(let s of g.ships){
-					if(s.uid == data.shipID){
+					if(s.uid == data.shipID && (s.team[1] == socket.id || !SERVER_MOVE_PROTECT)){
 						s.cancelMove();
 					}
 				}
@@ -295,6 +308,8 @@ io.on("connect", (socket) => {
 	});
 
 	socket.on("spawn", data => {
+		if(SERVER_MOVE_PROTECT) return;
+
 		for(let g of games){
 			if(g.uid == data.gameID){
 				g.addShip(...data.arg);
@@ -314,7 +329,7 @@ io.on("connect", (socket) => {
 		for(let g of games){
 			if(g.uid == data.gameID){
 				for(let i=0; i<g.ships.length; ++i){
-					if(g.ships[i].uid == data.shipID){
+					if(g.ships[i].uid == data.shipID && (g.ships[i].team[1] == socket.id || !SERVER_MOVE_PROTECT)){
 						if(data.i != null && data.i < g.ships[i].modules.length &&
 							g.ships[i].modules[data.i].state == 1){
 							g.activateModule(i, data);
@@ -334,6 +349,8 @@ io.on("connect", (socket) => {
 	});
 
 	socket.on("ascend", data => {
+		if(SERVER_MOVE_PROTECT) return;
+
 		for(let g of games){
 			if(g.uid == data.gameID){
 				for(let s of g.ships){
