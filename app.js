@@ -515,7 +515,7 @@ function main(){
 		for(let s of ships){
 			s.travel();
 
-			if(s.type == BOMBER){
+			if(s.type == BOMBER && s.dock != null){
 				const X = floor(rocks[s.dock][0]/300+COLS/2);
 				const Y = floor(rocks[s.dock][1]/300+ROWS/2);
 
