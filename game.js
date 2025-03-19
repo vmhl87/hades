@@ -58,12 +58,18 @@ function IS_WEAPON(T){
 	return (T >= LASER && T <= ROCKETD) || (T >= SENTINEL && T <= COL);
 }
 
-function normalModule(T){
-	return
-		(T >= LASER && T <= PULSE) ||
-		(T >= ALPHA && T <= ALLY) ||
-		(T >= EMP && T <= DISRUPT) ||
-		(T >= DECOY && T <= BOMB);
+function normalModule(M){
+	let W = M.filter(x => x >= LASER && x <= PULSE),
+		S = M.filter(x => x >= ALPHA && x <= ALLY),
+		C = M.filter(x => x >= EMP && x <= DISRUPT),
+		D = M.filter(x => x >= DECOY && x <= BOMB);
+
+	if(W.length > 1) W = W.slice(0, 1);
+	if(S.length > 1) S = S.slice(0, 1);
+	if(C.length > 1) C = C.slice(0, 2);
+	if(D.length > 1) D = D.slice(0, 1);
+
+	return [...W, ...S, ...C, ...D];
 }
 
 let UID = 0;
@@ -1603,4 +1609,4 @@ class Game{
 	}
 }
 
-module.exports = { Ship, Game, COLS, ROWS, TPS };
+module.exports = { Ship, Game, COLS, ROWS, TPS, normalModule };

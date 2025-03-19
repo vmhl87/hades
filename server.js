@@ -226,7 +226,7 @@ io.on("connect", (socket) => {
 
 	socket.on("enqueue", (modules, user, mode) => {
 		if(SERVER_MOVE_PROTECT)
-			modules = modules.filter(normalModule);
+			modules = normalModule(modules);
 
 		console.log("enqueued player", mode, socket.id);
 		if(queue[mode].filter(x => x.s.id == socket.id).length == 0){
