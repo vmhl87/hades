@@ -2,6 +2,8 @@ let font = null;
 
 let modules = [LASER, ALPHA, EMP, DUEL, DECOY];
 
+let savedBuilds = [], showBuilds = false;
+
 function genUser(){
 	return [
 		"GUEST" + Math.floor(Math.random()*1000).toString(),
@@ -35,10 +37,16 @@ function setup(){
 		mode = localStorage.getItem("mode");
 	}
 
+	if(localStorage.getItem("savedBuilds")){
+		savedBuilds = JSON.parse(localStorage.getItem("savedBuilds"));
+	}
+
 	setupLogin();
 
+	/*
 	for(let element of document.getElementsByClassName("p5Canvas"))
 		element.addEventListener("contextmenu", e => e.preventDefault())
+	*/
 }
 
 let ships = [], rocks = [], entities = [],
@@ -215,6 +223,29 @@ function main(){
 				textAlign(LEFT, CENTER); textSize(18);
 				fill(50, 200, 200, 80); noStroke();
 				text("GUIDE", 60, 28);
+			}
+			pop();
+		};
+
+		if(!showBuilds){
+			push(); translate(30, height-30);
+			const H = mouseIn(30, height-30, 30, 30);
+			stroke(50, 200, 200, H ? 80 : 60); strokeWeight(3);
+			noFill();
+			if(H) scale(1.1);
+			rect(-10, -10, 20, 20);
+			line(0, -5, 0, 0);
+			beginShape();
+			vertex(-3, 2);
+			vertex(0, 5);
+			vertex(3, 2);
+			endShape();
+			pop();
+			push();
+			if(H){
+				textAlign(LEFT, CENTER); textSize(18);
+				fill(50, 200, 200, 80); noStroke();
+				text("SAVED BUILDS", 60, height-32);
 			}
 			pop();
 		};
@@ -456,6 +487,44 @@ function main(){
 		}
 
 		if(showGuide) drawGuide();
+
+		if(showBuilds){
+			const H = savedBuilds.length ? savedBuilds.length*50*0.75+10+70 : 38,
+				W = savedBuilds.length ? 235 : 150;
+
+			push();
+			fill(0, 20, 30); stroke(20, 70, 80); strokeWeight(3);
+			rect(15, height-15-H, W, H);
+
+			textAlign(LEFT, TOP); textSize(16); fill(40, 130, 150); noStroke();
+			if(savedBuilds.length) text("SAVED BUILDS", 25, height-5-H);
+			textAlign(LEFT, BOTTOM);
+			const B = font.textBounds("SAVE NEW BUILD", 25, height-25);
+			textAlign(CENTER, CENTER);
+			const C = font.textBounds("SAVE NEW BUILD", B.x+B.w/2, B.y+B.h/2);
+			const D = mouseIn(B.x+B.w/2, B.y+B.h/2, B.w/2+10, B.h/2+10);
+			textSize(D ? 17 : 16);
+			text("SAVE NEW BUILD", B.x+B.w/2, B.y*2-C.y+B.h/2);
+
+			for(let i=0; i<savedBuilds.length; ++i){
+				const H1 = mouseIn(15+25+75, height-15-H+25+i*50*0.75+25, 90, 15),
+					H2 = mouseIn(15+25+250*0.75, height-15-H+25+i*50*0.75+25, 15, 15);
+
+				for(let j=0; j<5; ++j){
+					push(); translate(15+25+j*50*0.75, height-15-H+25+i*50*0.75+25); scale(H1 ? 0.85 : 0.75);
+					drawModule2(savedBuilds[i][j], 1);
+					pop();
+				}
+
+				push(); translate(15+25+250*0.75, height-15-H+25+i*50*0.75+25);
+				stroke(150, 50, 50); strokeWeight(2); scale(H2 ? 1.2 : 1);
+				line(-8, -8, 8, 8);
+				line(-8, 8, 8, -8);
+				pop();
+			}
+
+			pop();
+		}
 
 		if(SECDISP[0]){
 			--SECDISP[0];
@@ -1308,16 +1377,62 @@ function stagingUI(){
 		return;
 	}
 
+	if(showBuilds){
+		const H = savedBuilds.length ? savedBuilds.length*50*0.75+10+70 : 38,
+			W = savedBuilds.length ? 235 : 150;
+
+		if(mouseIn(15+W/2, height-15-H/2, W/2, H/2)){
+			push();
+			textAlign(LEFT, BOTTOM); textSize(16);
+			const B = font.textBounds("SAVE NEW BUILD", 25, height-25);
+			textAlign(CENTER, CENTER);
+			const C = font.textBounds("SAVE NEW BUILD", B.x+B.w/2, B.y+B.h/2);
+			const D = mouseIn(B.x+B.w/2, B.y+B.h/2, B.w/2+10, B.h/2+10);
+			pop();
+
+			if(D){
+				savedBuilds.push([...modules]);
+				localStorage.setItem("savedBuilds", JSON.stringify(savedBuilds));
+				return;
+			}
+
+			for(let i=0; i<savedBuilds.length; ++i){
+				const H1 = mouseIn(15+25+75, height-15-H+25+i*50*0.75+25, 90, 15),
+					H2 = mouseIn(15+25+250*0.75, height-15-H+25+i*50*0.75+25, 15, 15);
+				
+				if(H1){
+					modules = [...savedBuilds[i]];
+					localStorage.setItem("modules", JSON.stringify(modules));
+					return;
+				}
+
+				if(H2){
+					savedBuilds.splice(i, 1);
+					localStorage.setItem("savedBuilds", JSON.stringify(savedBuilds));
+					return;
+				}
+			}
+
+			return;
+
+		}else showBuilds = false;
+	}
+
 	if(mouseIn(30, 30, 30, 30)){
 		showGuide = !showGuide;
 		return;
 	}
 
-	if(mouseIn(30, height-30, 30, 30) && ALLMODULE){
-		const D = parseInt(prompt("game ID"));
-		if(Number.isInteger(D)){
-			socket.emit("spectate", D);
-			return;
+	if(mouseIn(30, height-30, 30, 30) && !showGuide){
+		if(ALLMODULE){
+			const D = parseInt(prompt("game ID"));
+			if(Number.isInteger(D)){
+				socket.emit("spectate", D);
+				return;
+			}
+
+		}else{
+			showBuilds = !showBuilds;
 		}
 	}
 

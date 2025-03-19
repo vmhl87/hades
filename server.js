@@ -222,7 +222,7 @@ io.on("connect", (socket) => {
 	});
 
 	socket.on("enqueue", (modules, user, mode) => {
-		console.log("enqueued player", mode, socket.id, "with", modules);
+		console.log("enqueued player", mode, socket.id);
 		if(queue[mode].filter(x => x.s.id == socket.id).length == 0){
 			queue[mode].push({s: socket, modules: modules, u: user});
 			let m = [];
@@ -252,7 +252,7 @@ io.on("connect", (socket) => {
 	});
 
 	socket.on("solo", (modules, user) => {
-		console.log("solo match started by", socket.id, "with", modules);
+		console.log("solo match started by", socket.id, user[0]);
 		startGame([{s: socket, modules: modules, u: user}], "SOLO");
 	});
 

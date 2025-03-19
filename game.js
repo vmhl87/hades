@@ -94,6 +94,8 @@ class Ship{
 		this.suspend = 1;
 		this.sectorDmg = ([STRIKEP, ROCKETP, STRIKEP, BOMBERP]).includes(type) ? 0 : 150;
 
+		this.shipName = null;
+
 		this.bond = [0, null];
 
 		for(let m of this.modules){
@@ -183,6 +185,7 @@ class Ship{
 			ally: this.ally == null ? 0 : 1,
 			arts: Array.from(this.arts),
 			bond: this.bond,
+			shipName: this.shipName,
 		};
 	}
 	

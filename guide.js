@@ -188,9 +188,7 @@ let showGuide = false, guideUI = {};
 
 function drawGuide(){
 	push();
-	fill(0, 20, 30); noStroke();
-	rect(width/2-150, height/2-min(height-120, 500)/2, 300, min(height-120, 500));
-	stroke(20, 70, 80); strokeWeight(3);
+	fill(0, 20, 30); stroke(20, 70, 80); strokeWeight(3);
 	rect(width/2-150, height/2-min(height-120, 500)/2, 300, min(height-120, 500));
 	pop();
 
