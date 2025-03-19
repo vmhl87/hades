@@ -548,9 +548,11 @@ class Game{
 							s._hurt(DAMAGE[BARRIER]/2, x.team[1]);
 						}
 
-				s.pos = s.tp.slice(0, 2);
-				s.dock = s.tp[2];
-				s.tp = null;
+				if(s.tp != null){
+					s.pos = s.tp.slice(0, 2);
+					s.dock = s.tp[2];
+					s.tp = null;
+				}
 
 				for(let x of this.ships) if(x.team[0] != s.team[0])
 					for(let m of x.modules) if(m.type == BARRIER && m.state < 0)
@@ -574,9 +576,12 @@ class Game{
 						}
 
 				this.explode([...s.pos], RANGE[LEAP], 9, [200, 100, 50]);
-				s.pos = s.tp.slice(0, 2);
-				s.dock = s.tp[2];
-				s.tp = null;
+
+				if(s.tp != null){
+					s.pos = s.tp.slice(0, 2);
+					s.dock = s.tp[2];
+					s.tp = null;
+				}
 
 				for(let x of this.ships) if(x.team[0] != s.team[0])
 					for(let m of x.modules) if(m.type == BARRIER && m.state < 0)
