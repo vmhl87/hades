@@ -228,7 +228,7 @@ function main(){
 			pop();
 		};
 
-		if(!showBuilds){
+		if(!showBuilds && !searching){
 			push(); translate(30, height-30);
 			const H = mouseIn(30, height-30, 30, 30);
 			stroke(50, 200, 200, H ? 80 : 60); strokeWeight(3);
@@ -251,7 +251,7 @@ function main(){
 			pop();
 		};
 
-		{
+		if(!searching){
 			push(); translate(width-30, height-30);
 			const H = mouseIn(width-30, height-30, 30, 30);
 			stroke(50, 200, 200, H ? 80 : 60); strokeWeight(3);
