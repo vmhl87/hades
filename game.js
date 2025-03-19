@@ -619,19 +619,21 @@ class Game{
 					for(let i=0; i<this.sectors.length; ++i) if(this.sectors[i].includes(s.dock))
 						P = i;
 
-					const X = P%COLS, Y = Math.floor(P/COLS);
+					if(P != null){
+						const X = P%COLS, Y = Math.floor(P/COLS);
 
-					let count = 0;
+						let count = 0;
 
-					for(let x of this.ships) if(x.team[0] != s.team[0]){
-						if(Math.abs(300*X-150*COLS+150 - x.pos[0]) < 300 && Math.abs(300*Y-150*ROWS+150 - x.pos[1]) < 300){
-							this.addShip(BOMBERP, s.team, [], [...s.pos], [[...x.pos, null]]);
-							s.modules[i].state = 0;
-							++count;
+						for(let x of this.ships) if(x.team[0] != s.team[0]){
+							if(Math.abs(300*X-150*COLS+150 - x.pos[0]) < 300 && Math.abs(300*Y-150*ROWS+150 - x.pos[1]) < 300){
+								this.addShip(BOMBERP, s.team, [], [...s.pos], [[...x.pos, null]]);
+								s.modules[i].state = 0;
+								++count;
+							}
 						}
-					}
 
-					if(count) s.modules[i].use = true;
+						if(count) s.modules[i].use = true;
+					}
 				}
 			}
 
@@ -871,7 +873,7 @@ class Game{
 				if(this.dead[Math.floor((s.pos[0]+150*COLS)/300)+Math.floor((s.pos[1]+150*ROWS)/300)*COLS] == 2)
 					s.hurt(s.sectorDmg/TPS);
 
-				if([SENTINEL, GUARD, COL].includes(s.type)){
+				if([SENTINEL, GUARD, COL].includes(s.type) && s.team[0] == CERB){
 					if(s.pos[1] > -150*ROWS*2){
 						if(s.wait == null && s.move.length == 0){
 							if(occupied[s.ai[1]].length) s.ai[0] += 1/(TPS*([3, 1, 0, 2])[s.type-SENTINEL]);
