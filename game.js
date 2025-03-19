@@ -58,6 +58,14 @@ function IS_WEAPON(T){
 	return (T >= LASER && T <= ROCKETD) || (T >= SENTINEL && T <= COL);
 }
 
+function normalModule(T){
+	return
+		(T >= LASER && T <= PULSE) ||
+		(T >= ALPHA && T <= ALLY) ||
+		(T >= EMP && T <= DISRUPT) ||
+		(T >= DECOY && T <= BOMB);
+}
+
 let UID = 0;
 
 class Ship{

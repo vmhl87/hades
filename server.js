@@ -58,7 +58,7 @@ app.get('/Ubuntu-Regular.ttf', (x, res) => {
 
 const Module = require("./game.js");
 
-const Ship = Module.Ship, Game = Module.Game;
+const Ship = Module.Ship, Game = Module.Game, normalModule = Module.normalModule;
 
 const COLS = Module.COLS, ROWS = Module.ROWS, TPS = Module.TPS;
 
@@ -225,14 +225,8 @@ io.on("connect", (socket) => {
 	});
 
 	socket.on("enqueue", (modules, user, mode) => {
-		if(SERVER_MOVE_PROTECT){
-			modules = modules.filter(x =>
-				(x >= LASER && x <= PULSE) ||
-				(x >= ALPHA && x <= ALLY) ||
-				(x >= EMP && x <= DISRUPT) ||
-				(x >= DECOY && x <= BOMB)
-			);
-		}
+		if(SERVER_MOVE_PROTECT)
+			modules = modules.filter(normalModule);
 
 		console.log("enqueued player", mode, socket.id);
 		if(queue[mode].filter(x => x.s.id == socket.id).length == 0){
