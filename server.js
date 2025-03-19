@@ -223,11 +223,13 @@ io.on("connect", (socket) => {
 
 	socket.on("enqueue", (modules, user, mode) => {
 		console.log("enqueued player", mode, socket.id, "with", modules);
-		queue[mode].push({s: socket, modules: modules, u: user});
-		let m = [];
-		for(let q of queue[mode]) m.push(q.u[0]);
-		console.log(" =>", mode, m);
-		io.emit("queueSize", mode, queue[mode].length);
+		if(queue[mode].filter(x => x.s.id == socket.id).length == 0){
+			queue[mode].push({s: socket, modules: modules, u: user});
+			let m = [];
+			for(let q of queue[mode]) m.push(q.u[0]);
+			console.log(" =>", mode, m);
+			io.emit("queueSize", mode, queue[mode].length);
+		}
 	});
 
 	socket.on("dequeue", () => {
