@@ -65,8 +65,7 @@ const COLS = Module.COLS, ROWS = Module.ROWS, TPS = Module.TPS;
 let games = [], queue = {"FFA": [], "2TEAM": [], "CO-OP": []}, TIME = 0;
 
 let SERVER_MOVE_PROTECT = true;
-
-console.log(SERVER_LOCK_PASSWD);
+const SERVER_LOCK_PASSWD = "DEFAULTPASSWORD" || process.env.SERVER_LOCK_PASSWD;
 
 function tick(game){
 	if(game) game.update();
@@ -361,6 +360,14 @@ io.on("connect", (socket) => {
 				}
 			}
 		}
+	});
+
+	socket.on("unlock", p => {
+		if(p == SERVER_LOCK_PASSWD) SERVER_MOVE_PROTECT = false;
+	});
+
+	socket.on("lock", p => {
+		if(p == SERVER_LOCK_PASSWD) SERVER_MOVE_PROTECT = true;
 	});
 
 	socket.on("echo", e => console.log("echo", ...e));
