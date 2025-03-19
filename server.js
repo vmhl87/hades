@@ -128,7 +128,7 @@ function startGame(Q, mode){
 		for(let i=0; i<Q.length; ++i)
 			B[i] = S.has(i) ? "T0" : "T1";
 
-	}else if(mode == "TEAM"){
+	}else if(mode == "2TEAM"){
 		for(let i=0; i<Q.length; ++i) B[i] = "T0";
 
 	}else if(mode == "SOLO"){
