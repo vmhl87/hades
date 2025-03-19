@@ -119,7 +119,7 @@ function startGame(Q, mode){
 		for(let i=0; i<Q.length; ++i)
 			B[i] = 'T'+i.toString();
 
-	}else if(mode == "2v2"){
+	}else if(mode == "2TEAM"){
 		let S = new Set();
 
 		while(S.size < n/2)
@@ -128,7 +128,7 @@ function startGame(Q, mode){
 		for(let i=0; i<Q.length; ++i)
 			B[i] = S.has(i) ? "T0" : "T1";
 
-	}else if(mode == "2TEAM"){
+	}else if(mode == "CO-OP"){
 		for(let i=0; i<Q.length; ++i) B[i] = "T0";
 
 	}else if(mode == "SOLO"){
