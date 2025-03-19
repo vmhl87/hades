@@ -418,7 +418,7 @@ function echo(...x){
 	socket.emit("echo", x);
 }
 
-let scrollVel = [0, 0];
+let scrollVel = [0, 0], funkyDelay = 0;
 
 function draw(){
 	timeframes[1] = timeframes[0];
@@ -426,7 +426,7 @@ function draw(){
 
 	if(windowWidth != width || windowHeight != height) resizeCanvas(windowWidth, windowHeight);
 
-	if(touches.length && !MOBILE){
+	if(touches.length && !MOBILE && Date.now()-funkyDelay > 2000){
 		MOBILE = true;
 		frameRate(30);
 	}

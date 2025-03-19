@@ -1709,6 +1709,8 @@ function click(){
 
 function keyReleased(){
 	MOBILE = false;
+	funkyDelay = Date.now();
+	frameRate(60);
 
 	if(!staging && connected){
 		if(key == 'w'){
