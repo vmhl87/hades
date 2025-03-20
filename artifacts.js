@@ -32,7 +32,7 @@ let Artifacts = {
 		"+20% Speed, -25% EMP Resist",
 		"At the heart of every Cerberus ship's reactor is an ion cell, a mysterious device the size of a water bottle that releases an enormous amount of energy by generating polarized magnetic fields which mysteriously deteriorate a few days after the cell is harvested. Although useful for significantly boosting the Battleship engine’s performance for a little while, the properties of the Ion Cell make it especially susceptible to EMP disruption.",
 		(x, g) => { x.speed *= 1.2; x.empVuln *= 1.25; },
-		["ORB", [50, 255, 255], [255, 255, 0], [150, 100, 255]],
+		["Y", [50, 255, 255], [255, 255, 0], [150, 100, 255]],
 	]);
 
 	s([
@@ -71,7 +71,7 @@ let Artifacts = {
 		"-50% Sector Damage",
 		"",
 		(x, g) => { x.sectorDmg *= 0.5; },
-		["DIAMOND", [0, 255, 0], [0, 200, 200], [0, 120, 0]],
+		["ORB", [0, 255, 0], [0, 200, 200], [0, 120, 0]],
 	]);
 
 	s([

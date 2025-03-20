@@ -1039,8 +1039,6 @@ function drawGuide(){
 					found = true;
 
 					push(); translate(width/2, Y+20);
-					//noFill(); stroke(200, 150, 50, 100);
-					//rect(width/2-40, Y-60+40, 80, 80);
 					drawArtifact(x[4], 100);
 					pop();
 
@@ -1049,7 +1047,7 @@ function drawGuide(){
 					pop();
 
 					push(); textAlign(LEFT, TOP); textSize(16);
-					_text(x[2], width/2-120, Y+130, 240, 1000);
+					_text(x[2], width/2-120, Y+140, 240, 1000);
 					pop();
 				}
 
