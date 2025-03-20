@@ -196,9 +196,11 @@ class Ship{
 		if(!Number.isNaN(dat.pos[0]) && !Number.isNaN(dat.pos[1]))
 			this.pos = dat.pos;
 		this.move = dat.move;
-		if(this.team != ID) this.wait = dat.wait;
+
+		if(this.user != ID) this.wait = dat.wait;
 		else if(this.wait != null && dat.wait != null)
 			this.wait[2] = dat.wait[2];
+
 		this.tp = dat.tp;
 		this.dock = dat.dock;
 		this.expire = dat.expire;
