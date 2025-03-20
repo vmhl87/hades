@@ -84,14 +84,15 @@ let Artifacts = {
 };
 
 function drawArtifact(T, O){
-	stroke(200, O/2); strokeWeight(3); noFill();
+	stroke(200, O/3); strokeWeight(2); noFill();
 	rect(-40, -40, 80, 80);
+	strokeWeight(3);
 
 	if(T[0] == "Y"){
 		for(let i=0; i<3; ++i){
 			stroke(...T[1], O);
-			const A = [sin(i*PI*2/3)*5, cos(i*PI*2/3)*5];
-			const B = [sin(i*PI*2/3)*35, cos(i*PI*2/3)*35];
+			const A = [sin(i*PI*2/3)*5, cos(i*PI*2/3)*5-5];
+			const B = [sin(i*PI*2/3)*35, cos(i*PI*2/3)*35-5];
 
 			const S = ((Date.now()/2000)%1)*5 - (2-(i+2)%3)*0.3-1;
 
@@ -103,10 +104,10 @@ function drawArtifact(T, O){
 			const X = S > 0 && S < 1 ? 0.5-cos(S*PI*2)/2 : 0;
 
 			stroke(...T[2], O);
-			arc(0, 0, 30+X*10, 30+X*10, (-i+1)*PI*2/3+PI/2+PI/8, (-i+2)*PI*2/3+PI/2-PI/8);
+			arc(0, -5, 30+X*10, 30+X*10, (-i+1)*PI*2/3+PI/2+PI/8, (-i+2)*PI*2/3+PI/2-PI/8);
 
 			stroke(...T[3], O);
-			arc(0, 0, 50+X*5, 50+X*5, (-i+1)*PI*2/3+PI/2+PI/6, (-i+2)*PI*2/3+PI/2-PI/6);
+			arc(0, -5, 50+X*5, 50+X*5, (-i+1)*PI*2/3+PI/2+PI/6, (-i+2)*PI*2/3+PI/2-PI/6);
 		}
 	}
 

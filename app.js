@@ -1387,8 +1387,8 @@ function main(){
 			textAlign(RIGHT, TOP); textSize(17);
 			text("ARTIFACT RECOVERED", width/2 + 140, 37);
 
-			push(); translate(width/2-150+40, 80);
-			drawArtifact(T[4], O);
+			push(); translate(width/2-150+50, 80);
+			drawArtifact(T[4], O*100/255);
 			pop();
 
 			fill(200, O); noStroke(); textSize(15);
