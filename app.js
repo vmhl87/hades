@@ -1256,8 +1256,7 @@ function main(){
 
 						if(H){
 							if(MOBILE || mouseIsPressed){
-								//const A = ships[shipID].arts;
-								const A = [0, 5, 3, 2];
+								const A = ships[shipID].arts;
 
 								let W = 0, H = A.length*50-10;
 
