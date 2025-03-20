@@ -94,7 +94,7 @@ function drawArtifact(T, O){
 			const A = [sin(i*PI*2/3)*5, cos(i*PI*2/3)*5-5];
 			const B = [sin(i*PI*2/3)*35, cos(i*PI*2/3)*35-5];
 
-			const S = ((Date.now()/2000)%1)*5 - (2-(i+2)%3)*0.3-1;
+			const S = ((Date.now()/1750)%1)*5 - (2-(i+2)%3)*0.3-1;
 
 			const C = min(1, max(0, S-0.2)), D = min(1, max(0, S+0.2));
 
@@ -112,9 +112,9 @@ function drawArtifact(T, O){
 	}
 
 	if(T[0] == "DIAMOND"){
-		const A = ((Date.now()/1500)%1)*3 - 0.5;
-		const B = ((Date.now()/1500)%1)*3 - 1.5;
-		const S = ((Date.now()/1500+0.5)%1)*3 - 1;
+		const A = ((Date.now()/1750)%1)*3 - 0.5;
+		const B = ((Date.now()/1750)%1)*3 - 1.5;
+		const S = ((Date.now()/1750+0.5)%1)*3 - 1;
 
 		stroke(...T[1], O);
 		push(); rotate(PI/2*max(0, min(1, (S-0.5)*0.6+0.5)));
