@@ -315,7 +315,20 @@ window.addEventListener('wheel', function(e) {
 
 document.addEventListener("dblclick", function(e) {
 	e.preventDefault();
+
 }, { passive: false });
+
+document.addEventListener("touchstart", function(e) {
+	e.preventDefault();
+});
+
+document.addEventListener("touchend", function(e) {
+	e.preventDefault();
+});
+
+document.addEventListener("touchmove", function(e) {
+	e.preventDefault();
+});
 
 function _dist(a, b){
 	return sqrt((a[0]-b[0])*(a[0]-b[0]) + (a[1]-b[1])*(a[1]-b[1]));

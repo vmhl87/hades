@@ -9,7 +9,7 @@ canvas {
 	top: 0px;
 }
 
-* {
+canvas {
 	-webkit-tap-highlight-color: transparent;
 	-webkit-touch-callout: none;
 	touch-action: manipulation;
