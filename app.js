@@ -809,6 +809,8 @@ function main(){
 				pop();
 			}
 
+			s.target = null;
+
 			if(dragMove != null && dragMove[2] == s.uid){
 				push();
 				strokeWeight(4*sqrt(camera.z)); noFill();
@@ -817,6 +819,9 @@ function main(){
 					line(...screenPos(s.move[s.move.length-1].slice(0, 2)), dragMove[0], dragMove[1]);
 				else line(...screenPos(s.pos), dragMove[0], dragMove[1]);
 				pop();
+
+				if(!s.move.length)
+					s.target = atan2(dragMove[1]-screenPos(s.vpos)[1], dragMove[0]-screenPos(s.vpos)[0]);
 			}
 
 			if(s.tp){

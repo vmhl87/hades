@@ -775,9 +775,7 @@ function drawShip3(s){
 function drawShip2(s){
 	push(); scale(sqrt(camera.z));
 	push();
-	if(dragMove != null && dragMove[2] == s.uid && !s.move.length)
-		rotate(atan2(dragMove[1]-screenPos(s.vpos)[1], dragMove[0]-screenPos(s.vpos)[0]));
-	else rotate(s.rot);
+	rotate(s.rot);
 	let T = s.T != null ? s.T : (s.user == ID ? 0 : (s.team == TEAM ? 3 : (Number.isInteger(s.team) ? 2 : 1)));
 	push(); if(s.entangled && s.hit && s.move.length && !s.emp) translate(random()*2-1, random()*2-1);
 	drawShip(s.type, T, s.move.length && !s.emp ? 1 : 0);
@@ -834,10 +832,14 @@ function drawShip2(s){
 
 		fill(200, 150, 50);
 		rect(-15, -25, ceil(30*exp), 3);
+	}
 
-		fill(50, 150, 150);
+	if(s.type == BOMBER && s.modules.length && s.modules[0].type == BOMBER){
+		fill(100, 80); noStroke();
+		rect(-15, hp == max ? -20 : -25, 30, 3);
 
-		stroke(50, 150, 150); noFill();
+		fill(s.modules[0].state == 1 ? 175 : 125, 50, 50);
+		rect(-15, hp == max ? -20 : -25, ceil(30*s.modules[0].state), 3);
 	}
 
 	pop();

@@ -181,6 +181,8 @@ class Ship{
 		this.rot = PI;
 		this.uid = dat.uid;
 
+		this.target = null;  // for drag moving
+
 		this.decode(dat);
 
 		if(this.move.length)
@@ -226,6 +228,8 @@ class Ship{
 
 		if(this.move.length) this.wait = null;
 
+		if(this.target != null) target = this.target;
+
 		let diff = target - this.rot;
 		if(diff > PI) diff -= PI*2;
 		if(diff < -PI) diff += PI*2;
@@ -236,15 +240,12 @@ class Ship{
 		if(this.rot > PI*2) this.rot -= PI*2;
 		if(this.rot < -PI*2) this.rot += PI*2;
 
-		/*
-		this.vpos[0] = lerp(this.vpos[0], this.pos[0], T);
-		this.vpos[1] = lerp(this.vpos[1], this.pos[1], T);
-		*/
-
 		const F = last+500, OLD = timeframes[1], NEW = timeframes[0];
 
-		this.vvpos[0] = lerp(this.vvpos[0], this.pos[0], (NEW-OLD)/(F-OLD));
-		this.vvpos[1] = lerp(this.vvpos[1], this.pos[1], (NEW-OLD)/(F-OLD));
+		if(F != OLD){  // I think this was what caused corner glitch
+			this.vvpos[0] = lerp(this.vvpos[0], this.pos[0], (NEW-OLD)/(F-OLD));
+			this.vvpos[1] = lerp(this.vvpos[1], this.pos[1], (NEW-OLD)/(F-OLD));
+		}
 
 		this.vpos[0] = lerp(this.vpos[0], this.vvpos[0], T*5);
 		this.vpos[1] = lerp(this.vpos[1], this.vvpos[1], T*5);
