@@ -319,14 +319,20 @@ document.addEventListener("dblclick", function(e) {
 }, { passive: false });
 
 document.addEventListener("touchstart", function(e) {
+	if(document.getElementById("login-overlay").style.display != "none") return;
+	if(document.getElementById("spectate-overlay").style.display != "none") return;
 	e.preventDefault();
 });
 
 document.addEventListener("touchend", function(e) {
+	if(document.getElementById("login-overlay").style.display != "none") return;
+	if(document.getElementById("spectate-overlay").style.display != "none") return;
 	e.preventDefault();
 });
 
 document.addEventListener("touchmove", function(e) {
+	if(document.getElementById("login-overlay").style.display != "none") return;
+	if(document.getElementById("spectate-overlay").style.display != "none") return;
 	e.preventDefault();
 });
 
