@@ -107,7 +107,13 @@ class Ship{
 
 		this.dmgBoost = 1;
 		this.empVuln = 1;
+		this.cerbVuln = 1;
 		this.disruptVuln = 1;
+		this.moveVuln = 1;
+
+		this.entangled = false;
+		this.hit = false;
+
 		this.suspend = 1;
 		this.sectorDmg = ([STRIKEP, ROCKETP, STRIKEP, BOMBERP]).includes(type) ? 0 : 150;
 
@@ -202,11 +208,18 @@ class Ship{
 			ally: this.ally == null ? 0 : 1,
 			arts: Array.from(this.arts),
 			bond: this.bond,
-			shipName: this.shipName,
+			entangled: this.entangled,
+			hit: this.hit,
 		};
 	}
 	
 	hurt(x, src = null){
+		this.hit = true;
+
+		if(src == CERB) x *= this.cerbVuln;
+
+		if(this.move.length && this.emp == 0) x *= this.moveVuln;
+
 		if(this.type == BS && this.ai != null)
 			this.ai[1] = true;
 
@@ -248,9 +261,9 @@ class Ship{
 	}
 
 	_hurt(x, src = null){
-		this.hp = Math.max(0, this.hp-x);
+		this.hit = true;
 
-		//if(this.hp == 0 && src != null) this.kill = src;
+		this.hp = Math.max(0, this.hp-x);
 
 		if(src != null){
 			if(!this._kill.has(src)) this._kill.set(src, 0);
@@ -1291,7 +1304,7 @@ class Game{
 					for(let x of this.ships)
 						if(x.team[0] != s.team[0])
 							if(_dist(x.pos, s.pos) < RANGE[BOMBERP])
-								x.hurt(DAMAGE[BOMBERP]);
+								x.hurt(DAMAGE[BOMBERP], s.team[1]);
 				}
 
 			}
@@ -1319,7 +1332,7 @@ class Game{
 				for(let x of this.ships)
 					if(x.team[0] != s.team[0])
 						if(_dist(x.pos, s.pos) < 40)
-							x.hurt(500);
+							x.hurt(500, s.team[1]);
 			}
 		}
 
@@ -1544,6 +1557,8 @@ class Game{
 			this.entities[k] = this.entities[k].filter(x => x[x.length-1] >= this.age);
 
 		for(let p of this.players) p.emit("state", {s: q, entities: this.entities, dead: this.dead, age: this.age, speed: this.speed});
+
+		for(let s of this.ships) s.hit = false;
 
 		++this.age;
 	}

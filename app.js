@@ -146,7 +146,7 @@ socket.on("state", data => {
 
 socket.on("artifact", (shipID, type) => {
 	if(!staging && connected)
-		artifacts.push([Date.now()+10000, shipID, type]);
+		artifacts.push([Date.now()+20000, shipID, type]);
 });
 
 socket.on("end", () => {
@@ -1387,7 +1387,9 @@ function main(){
 			textAlign(RIGHT, TOP); textSize(17);
 			text("ARTIFACT RECOVERED", width/2 + 140, 37);
 
-			noFill(); stroke(200, 150, 50, 100/255*O); rect(width/2-150 + 10, 40, 80, 80);
+			push(); translate(width/2-150+40, 80);
+			drawArtifact(T[4], O);
+			pop();
 
 			fill(200, O); noStroke(); textSize(15);
 			text(T[0], width/2+140, 60);
@@ -1418,7 +1420,7 @@ function main(){
 
 		while(artifacts.length && artifacts[0][0] < Date.now()){
 			artifacts = artifacts.slice(1);
-			if(artifacts.length) artifacts[0][0] = Date.now()+10000;
+			if(artifacts.length) artifacts[0][0] = Date.now()+20000;
 		}
 
 	}else{

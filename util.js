@@ -206,6 +206,8 @@ class Ship{
 		this.ally = dat.ally;
 		this.arts = dat.arts;
 		this.bond = dat.bond;
+		this.entangled = dat.entangled;
+		this.hit = dat.hit;
 	}
 
 	travel(){

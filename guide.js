@@ -8,15 +8,14 @@ let showGuide = false, guideUI = {};
 	guideUI.credits = ct++;
 	guideUI.gameplay = ct++;
 	guideUI.ship = ct++;
-	guideUI.weapon = ct++;
-	guideUI.shield = ct++;
-	guideUI.module = ct++;
-	guideUI.drone = ct++;
+	guideUI.modules = ct++;
+	guideUI.artifacts = ct++;
 
 	guideUI.intro = ct++;
 	guideUI.movement = ct++;
-	guideUI.combat = ct++;
-	guideUI.modules = ct++;
+	guideUI.weaponsGuide = ct++;
+	guideUI.modulesGuide = ct++;
+	guideUI.artifactsGuide = ct++;
 	guideUI.keyboardShortcuts = ct++;
 
 	guideUI.battleship = ct++;
@@ -25,6 +24,11 @@ let showGuide = false, guideUI = {};
 	guideUI.interceptor = ct++;
 	guideUI.colossus = ct++;
 	guideUI.bomber = ct++;
+
+	guideUI.weapon = ct++;
+	guideUI.shield = ct++;
+	guideUI.combat = ct++;
+	guideUI.drone = ct++;
 
 	guideUI.laser = ct++;
 	guideUI.cannon = ct++;
@@ -58,6 +62,9 @@ let showGuide = false, guideUI = {};
 	guideUI.warp = ct++;
 	guideUI.bomb = ct++;
 
+	for(let x of Artifacts.types)
+		guideUI["_artifact_"+x[0]] = ct++;
+
 	guideUI.tree = new Array(ct);
 
 	for(let i=0; i<guideUI.tree.length; ++i)
@@ -68,7 +75,7 @@ let showGuide = false, guideUI = {};
 		guideUI.tree[child].par = node;
 	}
 
-	for(let x=guideUI.credits; x<=guideUI.drone; ++x)
+	for(let x=guideUI.credits; x<=guideUI.artifacts; ++x)
 		subpage(guideUI.start, x);
 
 	for(let x=guideUI.intro; x<=guideUI.keyboardShortcuts; ++x)
@@ -77,6 +84,9 @@ let showGuide = false, guideUI = {};
 	for(let x=guideUI.battleship; x<=guideUI.bomber; ++x)
 		subpage(guideUI.ship, x);
 
+	for(let x=guideUI.weapon; x<=guideUI.drone; ++x)
+		subpage(guideUI.modules, x);
+
 	for(let x=guideUI.laser; x<=guideUI.pulse; ++x)
 		subpage(guideUI.weapon, x);
 
@@ -84,10 +94,13 @@ let showGuide = false, guideUI = {};
 		subpage(guideUI.shield, x);
 
 	for(let x=guideUI.emp; x<=guideUI.disrupt; ++x)
-		subpage(guideUI.module, x);
+		subpage(guideUI.combat, x);
 
 	for(let x=guideUI.decoy; x<=guideUI.bomb; ++x)
 		subpage(guideUI.drone, x);
+
+	for(let x of Artifacts.types)
+		subpage(guideUI.artifacts, guideUI["_artifact_"+x[0]]);
 
 	function info(page){
 		return guideUI.tree[page].info;
@@ -98,15 +111,14 @@ let showGuide = false, guideUI = {};
 	info(guideUI.credits).push("Credits");
 	info(guideUI.gameplay).push("Gameplay");
 	info(guideUI.ship).push("Ships");
-	info(guideUI.weapon).push("Weapons");
-	info(guideUI.shield).push("Shields");
-	info(guideUI.module).push("Modules");
-	info(guideUI.drone).push("Drones");
+	info(guideUI.modules).push("Modules");
+	info(guideUI.artifacts).push("Artifacts");
 
 	info(guideUI.intro).push("Introduction");
 	info(guideUI.movement).push("Movement");
-	info(guideUI.combat).push("Combat");
-	info(guideUI.modules).push("Modules");
+	info(guideUI.weaponsGuide).push("Weapons");
+	info(guideUI.modulesGuide).push("Modules");
+	info(guideUI.artifactsGuide).push("Artifacts");
 	info(guideUI.keyboardShortcuts).push("Keyboard Shortcuts");
 
 	info(guideUI.battleship).push(["ship", BS]);
@@ -121,6 +133,11 @@ let showGuide = false, guideUI = {};
 	info(guideUI.colossus).push("Cerberus Colossus");
 	info(guideUI.bomber).push(["ship", BOMBER]);
 	info(guideUI.bomber).push("Cerberus Bomber");
+
+	info(guideUI.weapon).push("Weapon");
+	info(guideUI.shield).push("Shield");
+	info(guideUI.combat).push("Combat");
+	info(guideUI.drone).push("Drone");
 
 	info(guideUI.laser).push(["module", LASER]);
 	info(guideUI.laser).push("Laser");
@@ -181,6 +198,9 @@ let showGuide = false, guideUI = {};
 	info(guideUI.warp).push("Warp Drones");
 	info(guideUI.bomb).push(["module", BOMB]);
 	info(guideUI.bomb).push("Remote Bomb");
+
+	for(let x of Artifacts.types)
+		info(guideUI["_artifact_"+x[0]]).push(x[0]);
 
 	guideUI.now = guideUI.start;
 	guideUI.time = Date.now();
@@ -307,14 +327,19 @@ function drawGuide(){
 			_text(BODY.movement, width/2-120, Y, 240, 1000);
 			pop();
 
-		}else if(P == guideUI.combat){
+		}else if(P == guideUI.weaponsGuide){
 			push(); textAlign(LEFT, TOP);
-			_text(BODY.combat, width/2-120, Y, 240, 1000);
+			_text(BODY.weapons, width/2-120, Y, 240, 1000);
 			pop();
 
-		}else if(P == guideUI.modules){
+		}else if(P == guideUI.modulesGuide){
 			push(); textAlign(LEFT, TOP);
 			_text(BODY.modules, width/2-120, Y, 240, 1000);
+			pop();
+
+		}else if(P == guideUI.artifactsGuide){
+			push(); textAlign(LEFT, TOP);
+			_text(BODY.artifacts, width/2-120, Y, 240, 1000);
 			pop();
 
 		}else if(P == guideUI.keyboardShortcuts){
@@ -1007,9 +1032,32 @@ function drawGuide(){
 			pop();
 
 		}else{
-			push(); textAlign(LEFT, TOP);
-			_text("This page is under construction.", width/2-120, Y, 240, 1000);
-			pop();
+			let found = false;
+
+			for(let x of Artifacts.types)
+				if(P == guideUI["_artifact_"+x[0]]){
+					found = true;
+
+					push(); translate(width/2, Y+20);
+					//noFill(); stroke(200, 150, 50, 100);
+					//rect(width/2-40, Y-60+40, 80, 80);
+					drawArtifact(x[4], 100);
+					pop();
+
+					push(); textAlign(CENTER, TOP); textSize(17);
+					text(x[1], width/2, Y+90);
+					pop();
+
+					push(); textAlign(LEFT, TOP); textSize(16);
+					_text(x[2], width/2-120, Y+130, 240, 1000);
+					pop();
+				}
+
+			if(!found){
+				push(); textAlign(LEFT, TOP);
+				_text("This page is under construction.", width/2-120, Y, 240, 1000);
+				pop();
+			}
 		}
 	}
 }
@@ -1063,8 +1111,9 @@ const BODY = {
 
 	intro: "In this space combat game, players pilot battleships in a 2-d arena. Battleships equip weapons, shields, modules, and drones in combat against various player- and computer-controlled enemies.\n\nPlayers may compete in multiplayer arenas, or play solo.",
 	movement: "Ships in Hades' Star cannot move arbitrarily. Players may only direct their Battleship and drones to move towards locations of asteroids, and once a ship has started moving, it cannot be cancelled.\n\nIn order to move, select your Battleship by clicking on it, and either press the arrow in the control dialog or drag your ship to the desired location. The ship then begins a 10-second countdown before departing, allowing you to cancel the movement. If you wish to depart immediately, press the arrow again (it should now turn into a check mark).",
-	combat: "Weapons auto-target and auto-activate without the need for player input. Each Weapon has a specific range, and begins firing on enemy ships that come within its range, up to its maximum number of targets.\n\nA Weapon will not stop firing upon an enemy ship until it is out of range, or a module such as Decoy Drone has been used to forcibly switch targeting.\n\nSelecting any Ship will display a circle representing its attack radius (or blast radius in the case of rockets) as well as any radii of nearby enemies.",
+	weapons: "Weapons auto-target and auto-activate without the need for player input. Each Weapon has a specific range, and begins firing on enemy ships that come within its range, up to its maximum number of targets.\n\nA Weapon will not stop firing upon an enemy ship until it is out of range, or a module such as Decoy Drone has been used to forcibly switch targeting.\n\nSelecting any Ship will display a circle representing its attack radius (or blast radius in the case of rockets) as well as any radii of nearby enemies.",
 	modules: "Many shields, modules, and drones must be manually activated. To trigger them, select the owner Ship, and click on the relevant icon in the control dialog. Once activated, the module will take some time to recharge before it can be used again.\n\nSome modules, such as Teleport, require the player to select a destination upon activation.\n\nThe modules of enemy Battleships are not visible until they have been used. In the case of automatically activated modules, such as Weapons, they reveal once the Ship has begun firing upon an enemy.",
+	artifacts: "Cerberus ships have a chance to drop Artifacts when killed. These artifacts provide small passive bonuses, such as increased movement speed or damage.\n\nEach Battleship can equip at most four Artifacts. Drop rates linearly decrease the more Artifacts you have collected.",
 	keyboardShortcuts: "W - select your Battleship\n\nE - select movement destination\n\nX - cancel movement\n\nA/S/D/F/G - activate slot 1/2/3/4/5",
 
 	battleship: "Battleships are powerful combat vessels which may equip one Weapon, one Shield, two Modules, and one Drone. With a 7k health pool, they can absorb significant damage.\n\nIn addition to player controlled Battleships, several computer controlled Lone Battleships may jump into the arena at various points throughout the round. Some Lone Battleships equip an unobtainable VENGEANCE module. Lone Battleships are identified by their pale salmon color.",

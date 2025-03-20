@@ -779,7 +779,9 @@ function drawShip2(s){
 		rotate(atan2(dragMove[1]-screenPos(s.vpos)[1], dragMove[0]-screenPos(s.vpos)[0]));
 	else rotate(s.rot);
 	let T = s.T != null ? s.T : (s.user == ID ? 0 : (s.team == TEAM ? 3 : (Number.isInteger(s.team) ? 2 : 1)));
+	push(); if(s.entangled && s.hit && s.move.length && !s.emp) translate(random()*2-1, random()*2-1);
 	drawShip(s.type, T, s.move.length && !s.emp ? 1 : 0);
+	pop();
 	pop();
 	if(s.imp){
 		stroke(50, 200, 50); noFill(); strokeWeight(2);
