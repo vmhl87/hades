@@ -1062,7 +1062,7 @@ function main(){
 		if(focus){
 			if(selectMove){
 				push();
-				fill(0, 20, 30); stroke(50, 200, 200, 50); strokeWeight(3);
+				fill(0, 20, 30); stroke(20, 70, 80); strokeWeight(3);
 				rect(width/2-150, height-60, 300, 40);
 				pop();
 
@@ -1083,7 +1083,7 @@ function main(){
 			}else{
 				if(focus[0] == "rock"){
 					push();
-					fill(0, 20, 30); stroke(50, 200, 200, 50); strokeWeight(3);
+					fill(0, 20, 30); stroke(20, 70, 80); strokeWeight(3);
 					rect(width/2-55, height-60, 110, 40);
 					pop();
 
@@ -1095,7 +1095,7 @@ function main(){
 					const hp = ships[shipID].hp, max = ships[shipID].mhp;
 
 					push();
-					fill(0, 20, 30); stroke(50, 200, 200, 50); strokeWeight(3);
+					fill(0, 20, 30); stroke(20, 70, 80); strokeWeight(3);
 					rect(width/2-150, height-120, 300, 100);
 					pop();
 
