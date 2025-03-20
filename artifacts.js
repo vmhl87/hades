@@ -60,7 +60,7 @@ let Artifacts = {
 
 	s([
 		"Entanglement Drive",
-		"-15% Damage while moving",
+		"+15% Resistance while moving",
 		"",
 		(x, g) => { x.moveVuln *= 0.85; x.entangled = true; },
 		["Y", [255, 150, 100], [255, 255, 200], [80, 120, 200]],
