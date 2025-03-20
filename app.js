@@ -1091,7 +1091,7 @@ function main(){
 					fill(200); text("ASTEROID", width/2, height-50);
 					pop();
 
-				}else if(focus[0] == "ship"){
+				}else if(focus[0] == "ship" && shipID != null){
 					const hp = ships[shipID].hp, max = ships[shipID].mhp;
 
 					push();
@@ -1850,7 +1850,7 @@ function click(){
 			}
 
 		}else if(select && select[0] == "rock"){
-			if(selectMove[0] == "ship"){
+			if(selectMove[0] == "ship" && shipID != null){
 				if(ships[shipID].move.length || ships[shipID].dock == null || ships[shipID].dock != select[1]){
 					socket.emit("move", {
 						gameID: gameID, shipID: selectMove[1],
