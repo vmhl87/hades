@@ -313,6 +313,10 @@ window.addEventListener('wheel', function(e) {
 
 }, {passive: false})
 
+document.addEventListener("dblclick", function(e) {
+	e.preventDefault();
+}, { passive: false });
+
 function _dist(a, b){
 	return sqrt((a[0]-b[0])*(a[0]-b[0]) + (a[1]-b[1])*(a[1]-b[1]));
 }
