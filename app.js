@@ -1238,6 +1238,59 @@ function main(){
 					line(-10, -10, 10, 10);
 					line(-10, 10, 10, -10);
 					pop();
+
+					if(ships[shipID].arts.length){
+						push(); translate(width/2+15, height-50); scale(1, 1.3);
+						fill(200, 150, 50); stroke(200, 150, 50); strokeWeight(3);
+						beginShape();
+						vertex(0.5, -3);
+						vertex(2, -1);
+						vertex(0, 0);
+						vertex(-0.5, 3);
+						vertex(-2, 1);
+						vertex(0, 0);
+						endShape(CLOSE);
+						pop();
+
+						const H = mouseIn(width/2+15, height-50, 15, 15);
+
+						if(H){
+							if(MOBILE || mouseIsPressed){
+								//const A = ships[shipID].arts;
+								const A = [0, 5, 3, 2];
+
+								let W = 0, H = A.length*50-10;
+
+								push(); textSize(16);
+								for(let x of A) W = Math.max(W, textWidth(Artifacts.types[x][0]));
+								W += 60; const P = 10; W += P*2; H += P*2;
+								fill(0, 20, 30); stroke(20, 70, 80); strokeWeight(2);
+								rect(width/2+15-W/2, height-80-H, W, H);
+
+								for(let i=0; i<A.length; ++i){
+									push(); translate(width/2+15-W/2+20+P, height-80-H+20+50*i+P);
+									push(); scale(0.5);
+									drawArtifact(Artifacts.types[A[i]][4], 200);
+									pop();
+									fill(200); noStroke();
+									textAlign(LEFT, CENTER);
+									text(Artifacts.types[A[i]][0], 30, -2);
+									pop();
+								}
+								pop();
+
+							}else{
+								push();
+								textAlign(CENTER, BOTTOM); textSize(16);
+								const B = font.textBounds("ARTIFACTS", 0, 0);
+								fill(0, 20, 30); stroke(20, 70, 80); strokeWeight(2);
+								rect(width/2+15-B.w/2-10, height-80-B.h-12, B.w+20, B.h+20);
+								fill(40, 130, 150); noStroke();
+								text("ARTIFACTS", width/2+15, height-80);
+								pop();
+							}
+						}
+					};
 				}
 			}
 		}
