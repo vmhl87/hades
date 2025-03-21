@@ -216,7 +216,7 @@ class Ship{
 	hurt(x, src = null){
 		this.hit = true;
 
-		if(src == CERB) x *= this.cerbVuln;
+		if(typeof src == "string" && src.startsWith(CERB.toString())) x *= this.cerbVuln;
 
 		if(this.move.length && this.emp == 0) x *= this.moveVuln;
 
