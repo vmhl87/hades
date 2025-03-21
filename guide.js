@@ -1105,7 +1105,7 @@ function controlGuide(){
 }
 
 const BODY = {
-	credits: "First and foremost, this is a fanmade clone of the original Hades' Star video game.\n\nMany of the ships and modules were modeled after their Hades' Star counterparts, both in visual design and function.\n\nAll of the code on this game is original and available here:  github.com/vmhl87/hades",
+	credits: "This is a fanmade clone of the original Hades' Star. Many of the ships and modules in this game are modeled after their Hades' Star counterparts, both in visual design and function.\n\nAll of the code on this game is original and available here:  github.com/vmhl87/hades",
 
 	intro: "In this space combat game, players pilot battleships in a 2-d arena. Battleships equip weapons, shields, modules, and drones in combat against various player- and computer-controlled enemies.\n\nPlayers may compete in multiplayer arenas, or play solo.",
 	movement: "Ships in Hades' Star cannot move arbitrarily. Players may only direct their Battleship and drones to move towards locations of asteroids, and once a ship has started moving, it cannot be cancelled.\n\nIn order to move, select your Battleship by clicking on it, and either press the arrow in the control dialog or drag your ship to the desired location. The ship then begins a 10-second countdown before departing, allowing you to cancel the movement. If you wish to depart immediately, press the arrow again (it should now turn into a check mark).",
