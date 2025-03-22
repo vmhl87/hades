@@ -553,8 +553,10 @@ function draw(){
 		camera.x += scrollVel[0]/camera.z;
 		camera.y += scrollVel[1]/camera.z;
 
-		scrollVel[0] *= 0.8;
-		scrollVel[1] *= 0.8;
+		const V = 1 - (0.2 * 60/frameRate());
+
+		scrollVel[0] *= V;
+		scrollVel[1] *= V;
 	}
 
 	if(MOBILE) updateTouch();
