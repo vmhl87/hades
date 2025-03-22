@@ -41,6 +41,10 @@ function setup(){
 		savedBuilds = JSON.parse(localStorage.getItem("savedBuilds"));
 	}
 
+	if(localStorage.getItem("performance")){
+		frameRate(parseInt(localStorage.getItem("performance")));
+	}
+
 	setupLogin();
 	setupSpectate();
 
@@ -1956,7 +1960,6 @@ function click(){
 function keyReleased(){
 	MOBILE = false;
 	funkyDelay = Date.now();
-	frameRate(60);
 
 	if(!staging && connected){
 		if(key == 'w'){

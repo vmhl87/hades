@@ -236,7 +236,7 @@ class Ship{
 		if(diff > PI) diff -= PI*2;
 		if(diff < -PI) diff += PI*2;
 
-		let T = (MOBILE ? 0.1 : 0.05) / speed;
+		const T = 3 / speed / frameRate();
 
 		this.rot += diff * T * 2;
 		if(this.rot > PI*2) this.rot -= PI*2;
@@ -514,10 +514,8 @@ function draw(){
 
 	if(windowWidth != width || windowHeight != height) resizeCanvas(windowWidth, windowHeight);
 
-	if(touches.length && !MOBILE && Date.now()-funkyDelay > 2000){
+	if(touches.length && !MOBILE && Date.now()-funkyDelay > 2000)
 		MOBILE = true;
-		// frameRate(30);
-	}
 
 	if(!staging){
 		if(!MOBILE && mouseIsPressed && !(abs(startMouseX-30) < 30 && abs(startMouseY-30) < 30)){
@@ -648,8 +646,10 @@ function updateTouch(){
 
 			const old = [camera.x, camera.y];
 
-			camera.x = offset[2][0] + (offset[3][0]-P[0])/camera.z;
-			camera.y = offset[2][1] + (offset[3][1]-P[1])/camera.z;
+			const orig = [offset[2][0] + (offset[3][0]-width/2)/offset[0], offset[2][1] + (offset[3][1]-height/2)/offset[0]];
+
+			camera.x = orig[0] - (P[0]-width/2)/camera.z;
+			camera.y = orig[1] - (P[1]-height/2)/camera.z;
 
 			scrollVel = [(camera.x-old[0])*camera.z, (camera.y-old[1])*camera.z];
 
@@ -742,4 +742,15 @@ function loadState(STATE){
 	staging = 0;
 	connected = 1;
 	snapshot = 1;
+}
+
+function perf(x = null){
+	if(x == null){
+		frameRate(60);
+		localStorage.deleteItem("performance");
+
+	}else{
+		frameRate(x);
+		localStorage.setItem("performance", x.toString());
+	}
 }
