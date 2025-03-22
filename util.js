@@ -553,7 +553,7 @@ function draw(){
 		camera.x += scrollVel[0]/camera.z;
 		camera.y += scrollVel[1]/camera.z;
 
-		const V = 1 - (0.2 * 60/frameRate());
+		const V = 1 - (0.1 * 60/frameRate());
 
 		scrollVel[0] *= V;
 		scrollVel[1] *= V;
