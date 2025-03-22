@@ -516,7 +516,7 @@ function draw(){
 
 	if(touches.length && !MOBILE && Date.now()-funkyDelay > 2000){
 		MOBILE = true;
-		frameRate(30);
+		// frameRate(30);
 	}
 
 	if(!staging){

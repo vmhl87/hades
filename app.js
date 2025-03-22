@@ -1102,7 +1102,7 @@ function main(){
 					let N = focus[0] == "rock" ? "ASTEROID" : NAME[ships[shipID].type];
 
 					if(ships[shipID].name != null) N += " [" + ships[shipID].name + "]";
-					else if(ships[shipID].type == BS) N = "LONE BATTLESHIP";
+					else if(ships[shipID].type == BS) N = "ROGUE BATTLESHIP";
 
 					push(); textAlign(LEFT, TOP); textSize(18);
 					fill(200); noStroke(); text(N, width/2-150 + 10, height-120 + 10);
