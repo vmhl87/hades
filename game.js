@@ -1519,7 +1519,7 @@ class Game{
 				}
 
 				if(s.hp <= 0 && s.kill != null && [SENTINEL, GUARD, INT, COL, BOMBER, BS].includes(s.type)){
-					if(s.type != BS || Number.isInteger(s.team[0])){
+					if(s.type != BS || Number.isInteger(s.team[0]))
 						for(let x of this.ships)
 							if(x.team[1] == s.kill && x.type == BS && !Number.isInteger(s.kill)){
 								if(s.type == BS) x.heal(ROGUE_BS_HEAL_AMT);
