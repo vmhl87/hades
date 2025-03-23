@@ -816,16 +816,26 @@ function main(){
 			s.target = null;
 
 			if(dragMove != null && dragMove[2] == s.uid){
-				push();
-				strokeWeight(4*sqrt(camera.z)); noFill();
-				stroke(200, 100, 100, 50);
-				if(s.move.length)
-					line(...screenPos(s.move[s.move.length-1].slice(0, 2)), dragMove[0], dragMove[1]);
-				else line(...screenPos(s.pos), dragMove[0], dragMove[1]);
-				pop();
+				const S = selectedPos(dragMove);
 
-				if(!s.move.length)
-					s.target = atan2(dragMove[1]-screenPos(s.vpos)[1], dragMove[0]-screenPos(s.vpos)[0]);
+				if(S != null && S[0] == "rock"){
+					const P = screenPos(rocks[S[1]]);
+
+					push();
+					strokeWeight(4*sqrt(camera.z)); noFill();
+					stroke(200, 100, 100, 50);
+					if(s.move.length)
+						line(...screenPos(s.move[s.move.length-1].slice(0, 2)), ...P);
+					else line(...screenPos(s.pos), ...P);
+					pop();
+
+					if(!s.move.length)
+						s.target = atan2(P[1]-screenPos(s.vpos)[1], P[0]-screenPos(s.vpos)[0]);
+
+				}else{
+					if(!s.move.length)
+						s.target = atan2(dragMove[1]-screenPos(s.vpos)[1], dragMove[0]-screenPos(s.vpos)[0]);
+				}
 			}
 
 			if(s.tp){
