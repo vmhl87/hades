@@ -1,4 +1,4 @@
-const COLS = 5, ROWS = 5, TPS = 4, SECTOR_COLLAPSE_TIME = 40, MAX_ARTS = 3;
+const COLS = 5, ROWS = 5, TPS = 4, SECTOR_COLLAPSE_TIME = 40, MAX_ARTS = 4, ROGUE_BS_HEAL_AMT = 1000;
 
 let ct = 0;
 
@@ -1518,16 +1518,18 @@ class Game{
 
 				}
 
-				if(s.hp <= 0 && s.kill != null && [SENTINEL, GUARD, INT, COL, BOMBER].includes(s.type)){
-					for(let x of this.ships)
-						if(x.team[1] == s.kill && x.type == BS && !Number.isInteger(s.kill)){
-							if(Math.random() > ([0.8, 0.5, 0.4, 0, 0])[s.type-SENTINEL] && Math.random() > x.arts.size/MAX_ARTS){
-								const I = Math.floor(Math.random()*Artifacts.types.length);
-								if(!x.arts.has(I)) for(let y of this.players) if(y.id == x.team[1]){
-									y.emit("artifact", x.uid, I);
+				if(s.hp <= 0 && s.kill != null && [SENTINEL, GUARD, INT, COL, BOMBER, BS].includes(s.type)){
+					if(s.type != BS || Number.isInteger(s.team[0])){
+						for(let x of this.ships)
+							if(x.team[1] == s.kill && x.type == BS && !Number.isInteger(s.kill)){
+								if(s.type == BS) x.heal(ROGUE_BS_HEAL_AMT);
+								else if(Math.random() > ([0.8, 0.5, 0.4, 0, 0])[s.type-SENTINEL] && Math.random() > x.arts.size/(MAX_ARTS-1)){
+									const I = Math.floor(Math.random()*Artifacts.types.length);
+									if(!x.arts.has(I)) for(let y of this.players) if(y.id == x.team[1]){
+										y.emit("artifact", x.uid, I);
+									}
 								}
-							}
-					}
+						}
 				}
 
 				if(s.ally != null && s.ally[0] != null && s.ally[0].hp <= 0) s.ally = null;
