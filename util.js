@@ -322,19 +322,19 @@ document.addEventListener("touchstart", function(e) {
 	if(document.getElementById("login-overlay").style.display != "none") return;
 	if(document.getElementById("spectate-overlay").style.display != "none") return;
 	e.preventDefault();
-});
+}, { passive: false });
 
 document.addEventListener("touchend", function(e) {
 	if(document.getElementById("login-overlay").style.display != "none") return;
 	if(document.getElementById("spectate-overlay").style.display != "none") return;
 	e.preventDefault();
-});
+}, { passive: false });
 
 document.addEventListener("touchmove", function(e) {
 	if(document.getElementById("login-overlay").style.display != "none") return;
 	if(document.getElementById("spectate-overlay").style.display != "none") return;
 	e.preventDefault();
-});
+}, { passive: false });
 
 function _dist(a, b){
 	return sqrt((a[0]-b[0])*(a[0]-b[0]) + (a[1]-b[1])*(a[1]-b[1]));
@@ -362,7 +362,7 @@ function selected(){
 function selectedPos(pos){
 	let opt = [];
 
-	const F = MOBILE ? 2 : 1;
+	const F = MOBILE ? 1 : 1;
 
 	if(selectMove == null || selectMove[0] != "module" ||
 	(shipID != null && !([RIPPLE, BOND].includes(ships[shipID].modules[selectMove[1].i].type))))
@@ -646,19 +646,20 @@ function updateTouch(){
 
 			const P = [(touches[0].x+touches[1].x)/2, (touches[0].y+touches[1].y)/2];
 
-			const old = [camera.x, camera.y];
-
 			const orig = [offset[2][0] + (offset[3][0]-width/2)/offset[0], offset[2][1] + (offset[3][1]-height/2)/offset[0]];
 
 			camera.x = orig[0] - (P[0]-width/2)/camera.z;
 			camera.y = orig[1] - (P[1]-height/2)/camera.z;
 
-			scrollVel = [(camera.x-old[0])*camera.z, (camera.y-old[1])*camera.z];
+			scrollVel = [offset[4][0]-P[0], offset[4][1]-P[1]];
+
+			offset[4] = [P[0], P[1]];
 
 		}else{
 			lockID = touches[0].id+touches[1].id;
 			offset = [camera.z, _dist([touches[0].x, touches[0].y], [touches[1].x, touches[1].y]),
-				[camera.x, camera.y], [(touches[0].x+touches[1].x)/2, (touches[0].y+touches[1].y)/2]
+				[camera.x, camera.y], [(touches[0].x+touches[1].x)/2, (touches[0].y+touches[1].y)/2],
+				[(touches[0].x+touches[1].x)/2, (touches[0].y+touches[1].y)/2]
 			];
 		}
 	}

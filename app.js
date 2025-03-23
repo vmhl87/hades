@@ -1,4 +1,4 @@
-let font = null;
+let font = null, SHOW_TOUCH_REGIONS = false;
 
 let modules = [LASER, ALPHA, EMP, DUEL, DECOY];
 
@@ -1084,6 +1084,12 @@ function main(){
 				text("CANCEL", width/2+77+65/2, height-42);
 				pop();
 
+				if(SHOW_TOUCH_REGIONS){
+					push(); stroke(255, 150, 50);
+					rect(width/2+77+65/2-60, height-42-30, 120, 60);
+					pop();
+				}
+
 			}else{
 				if(focus[0] == "rock"){
 					push();
@@ -1193,6 +1199,13 @@ function main(){
 					let canMove = ships[shipID].user == ID && !snapshot &&
 						(ships[shipID].type == BS || CENT) && ships[shipID].tp == null && ships[shipID].bond[0] == 0,
 						canStop = ships[shipID].wait;
+
+					if(SHOW_TOUCH_REGIONS){
+						push(); stroke(255, 150, 50); noFill();
+						rect(width/2-117-10-30, height-50-30, 60, 60);
+						rect(width/2-70+10-30, height-50-30, 60, 60);
+						pop();
+					}
 
 					push(); strokeWeight(2);
 					if(canStop){
@@ -1888,11 +1901,11 @@ function click(){
 				(CENT || ships[shipID].type == BS) && ships[shipID].tp == null && ships[shipID].bond[0] == 0,
 				canStop = canMove && ships[shipID].wait;
 			if(canMove && (ships[shipID].move.length > 1 || canStop) &&
-				mouseIn(width/2-70, height-50, 20, 20)){
+				mouseIn(width/2-70+10, height-50, 30, 30)){
 				socket.emit("cancelMove", {gameID: gameID, shipID: focus[1]});
 				ships[shipID].wait = null;
 			}
-			if(canMove && mouseIn(width/2-117, height-50, 20, 20)){
+			if(canMove && mouseIn(width/2-117-10, height-50, 30, 30)){
 				if(canStop) socket.emit("confirmMove", {gameID: gameID, shipID: focus[1]});
 				else selectMove = ["ship", focus[1]];
 			}
@@ -1900,11 +1913,12 @@ function click(){
 
 	}else if(focus && selectMove != null){
 
-		if(mouseIn(width/2, height-40, 150, 20)){
-			if(mouseIn(width/2+77+65/2, height-42, 40, 20)){
-				selectMove = null;
-			}
+		if(mouseIn(width/2+77+65/2, height-42, 60, 30)){
+			selectMove = null;
+			return;
+		}
 
+		if(mouseIn(width/2, height-40, 150, 20)){
 		}else if(select && select[0] == "rock"){
 			if(selectMove[0] == "ship" && shipID != null){
 				if(ships[shipID].move.length || ships[shipID].dock == null || ships[shipID].dock != select[1]){
