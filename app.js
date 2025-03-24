@@ -819,7 +819,7 @@ function main(){
 				const S = selectedPos(dragMove);
 
 				if(S != null && S[0] == "rock"){
-					const P = screenPos(rocks[S[1]]);
+					const P = screenPos(rocks[S[1]][0], rocks[S[1]][1]+10);
 
 					push();
 					strokeWeight(4*sqrt(camera.z)); noFill();
