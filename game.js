@@ -1524,7 +1524,7 @@ class Game{
 						for(let x of this.ships)
 							if(x.team[1] == s.kill && x.type == BS && !Number.isInteger(s.kill)){
 								if(s.type == BS) x.heal(ROGUE_BS_HEAL_AMT);
-								else if(Math.random() > ([0.8, 0.5, 0.4, 0, 0])[s.type-SENTINEL] && Math.random() > x.arts.size/MAX_ARTS)){
+								else if(Math.random() > ([0.8, 0.5, 0.4, 0, 0])[s.type-SENTINEL] && Math.random() > x.arts.size/MAX_ARTS){
 									const I = Math.floor(Math.random()*Artifacts.types.length);
 									if(!x.seenArts.has(I)) for(let y of this.players) if(y.id == x.team[1]){
 										x.seenArts.add(I);
