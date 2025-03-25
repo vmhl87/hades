@@ -359,7 +359,7 @@ function main(){
 			drawModule(modules[3]);
 			pop();
 
-			fill(255, 150, 0, searching ? 60 :
+			fill(...(modules[4] >= EMP ? [100, 255, 100] : [255, 150, 0]), searching ? 60 :
 				(mouseIn(width/2+100, height/2+50, 20, 20) || chooseModule == 4 ? 80 : 60));
 			rect(width/2 + 80, height/2 - 20 + 50, 40, 40);
 			push(); translate(width/2+100, height/2 + 50);
@@ -428,7 +428,7 @@ function main(){
 			if(chooseModule == 2 || chooseModule == 3){
 				for(let i=0; i<5; ++i){
 					fill(100, 255, 100,
-						modules[5-chooseModule] == EMP+i ? 60 :
+						[modules[5-chooseModule], modules[4]].includes(EMP+i) ? 60 :
 						(mouseIn(width/2-100+i*50, height/2+125, 20, 20) ? 80 : 60)
 					);
 					rect(width/2-120+i*50, height/2+105, 40, 40);
@@ -436,12 +436,12 @@ function main(){
 					drawModule(EMP+i);
 					pop();
 					fill(0, 100);
-					if(modules[5-chooseModule] == EMP+i) rect(width/2-120+i*50, height/2+105, 40, 40);
+					if([modules[5-chooseModule], modules[4]].includes(EMP+i)) rect(width/2-120+i*50, height/2+105, 40, 40);
 				}
 
 				for(let i=0; i<5; ++i){
 					fill(100, 255, 100,
-						modules[5-chooseModule] == EMP+5+i ? 60 :
+						[modules[5-chooseModule], modules[4]].includes(EMP+5+i) ? 60 :
 						(mouseIn(width/2-100+i*50, height/2+175, 20, 20) ? 80 : 60)
 					);
 					rect(width/2-120+i*50, height/2+155, 40, 40);
@@ -449,17 +449,43 @@ function main(){
 					drawModule(EMP+5+i);
 					pop();
 					fill(0, 100);
-					if(modules[5-chooseModule] == EMP+5+i) rect(width/2-120+i*50, height/2+155, 40, 40);
+					if([modules[5-chooseModule], modules[4]].includes(EMP+5+i)) rect(width/2-120+i*50, height/2+155, 40, 40);
 				}
 			}
 
 			if(chooseModule == 4){
 				for(let i=0; i<6; ++i){
-					fill(255, 100, 0, mouseIn(width/2-125+i*50, height/2+150, 20, 20) ? 80 : 60);
-					rect(width/2-145+i*50, height/2+130, 40, 40);
-					push(); translate(width/2-125+i*50, height/2+150);
+					fill(255, 100, 0, mouseIn(width/2-125+i*50, height/2+125, 20, 20) ? 80 : 60);
+					rect(width/2-145+i*50, height/2+105, 40, 40);
+					push(); translate(width/2-125+i*50, height/2+125);
 					drawModule(DECOY+i);
 					pop();
+				}
+
+				for(let i=0; i<5; ++i){
+					fill(100, 255, 100,
+						[modules[2], modules[3]].includes(EMP+i) ? 60 :
+						(mouseIn(width/2-100+i*50, height/2+175, 20, 20) ? 80 : 60)
+					);
+					rect(width/2-120+i*50, height/2+155, 40, 40);
+					push(); translate(width/2-100+i*50, height/2+175);
+					drawModule(EMP+i);
+					pop();
+					fill(0, 100);
+					if([modules[2], modules[3]].includes(EMP+i)) rect(width/2-120+i*50, height/2+155, 40, 40);
+				}
+
+				for(let i=0; i<5; ++i){
+					fill(100, 255, 100,
+						[modules[2], modules[3]].includes(EMP+5+i) ? 60 :
+						(mouseIn(width/2-100+i*50, height/2+225, 20, 20) ? 80 : 60)
+					);
+					rect(width/2-120+i*50, height/2+205, 40, 40);
+					push(); translate(width/2-100+i*50, height/2+225);
+					drawModule(EMP+5+i);
+					pop();
+					fill(0, 100);
+					if([modules[2], modules[3]].includes(EMP+5+i)) rect(width/2-120+i*50, height/2+205, 40, 40);
 				}
 			}
 
@@ -1701,7 +1727,7 @@ function stagingUI(){
 
 		for(let i=0; i<5; ++i){
 			if(mouseIn(width/2-100+i*50, height/2+125, 20, 20) &&
-				modules[5-chooseModule] != EMP+i){
+				![modules[5-chooseModule], modules[4]].includes(EMP+i)){
 				modules[chooseModule] = modules[chooseModule] == EMP+i ? null : EMP+i;
 				localStorage.setItem("modules", JSON.stringify(modules));
 				p = false;
@@ -1710,7 +1736,7 @@ function stagingUI(){
 
 		for(let i=0; i<5; ++i){
 			if(mouseIn(width/2-100+i*50, height/2+175, 20, 20) &&
-				modules[5-chooseModule] != EMP+5+i){
+				![modules[5-chooseModule], modules[4]].includes(EMP+5+i)){
 				modules[chooseModule] = modules[chooseModule] == EMP+5+i ? null : EMP+5+i;
 				localStorage.setItem("modules", JSON.stringify(modules));
 				p = false;
@@ -1723,8 +1749,26 @@ function stagingUI(){
 		let p = true;
 
 		for(let i=0; i<6; ++i){
-			if(mouseIn(width/2-125+i*50, height/2+150, 20, 20)){
+			if(mouseIn(width/2-125+i*50, height/2+125, 20, 20)){
 				modules[4] = modules[4] == DECOY+i ? null : DECOY+i;
+				localStorage.setItem("modules", JSON.stringify(modules));
+				p = false;
+			}
+		}
+
+		for(let i=0; i<5; ++i){
+			if(mouseIn(width/2-100+i*50, height/2+175, 20, 20) &&
+				![modules[2], modules[3]].includes(EMP+i)){
+				modules[chooseModule] = modules[chooseModule] == EMP+i ? null : EMP+i;
+				localStorage.setItem("modules", JSON.stringify(modules));
+				p = false;
+			}
+		}
+
+		for(let i=0; i<5; ++i){
+			if(mouseIn(width/2-100+i*50, height/2+225, 20, 20) &&
+				![modules[2], modules[3]].includes(EMP+5+i)){
+				modules[chooseModule] = modules[chooseModule] == EMP+5+i ? null : EMP+5+i;
 				localStorage.setItem("modules", JSON.stringify(modules));
 				p = false;
 			}
