@@ -104,6 +104,7 @@ class Ship{
 		this.kill = null;
 		this._kill = new Map();
 		this.arts = new Set();
+		this.seenArts = new Set();
 
 		this.dmgBoost = 1;
 		this.empVuln = 1;
@@ -1525,7 +1526,8 @@ class Game{
 								if(s.type == BS) x.heal(ROGUE_BS_HEAL_AMT);
 								else if(Math.random() > ([0.8, 0.5, 0.4, 0, 0])[s.type-SENTINEL] && Math.random() > x.arts.size/(MAX_ARTS-1)){
 									const I = Math.floor(Math.random()*Artifacts.types.length);
-									if(!x.arts.has(I)) for(let y of this.players) if(y.id == x.team[1]){
+									if(!x.seenArts.has(I)) for(let y of this.players) if(y.id == x.team[1]){
+										x.seenArts.add(I);
 										y.emit("artifact", x.uid, I);
 									}
 								}
