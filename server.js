@@ -118,7 +118,7 @@ function startGame(Q, mode){
 
 	if(mode == "TAG"){
 		g.spawnEnemies = false;
-		g.collapseFrequency = 120;
+		g.collapseFreq = 40;
 	}
 
 	let A = new Map(), B = new Array(Q.length);
