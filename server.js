@@ -367,6 +367,7 @@ io.on("connect", (socket) => {
 	});
 
 	socket.on("unlock", p => {
+		console.log(p, SERVER_LOCK_PASSWD, SERVER_MOVE_PROTECT);
 		if(p == SERVER_LOCK_PASSWD) SERVER_MOVE_PROTECT = false;
 	});
 
