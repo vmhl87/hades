@@ -70,7 +70,7 @@ function normalModule(M){
 	W = W.slice(0, 1);
 	S = S.slice(0, 1);
 	C = C.slice(0, 3);
-	D = D.slice(0, Math.min(1, 3-C.length)0);
+	D = D.slice(0, Math.min(1, 3-C.length));
 
 	return [...W, ...S, ...C, ...D];
 }
