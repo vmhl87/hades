@@ -641,7 +641,7 @@ function main(){
 			return REV.has(uid) ? ships[REV.get(uid)] : null;
 		}
 
-		push(); fill(200, 50, 50, 20); stroke(255, 50, 50); strokeWeight(1.5*camera.z);
+		push(); fill(200, 50, 50, 20); stroke(255, 50, 50); strokeWeight(1.5*sqrt(camera.z));
 
 		for(let s of ships){
 			s.travel();
