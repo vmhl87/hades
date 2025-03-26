@@ -289,18 +289,26 @@ function main(){
 		{
 			let pick = null;
 
-			for(let i=0; i<5; ++i) if(mouseIn(width/2-100+50*i, height/2+50, 26, 20))
-				pick = i;
+			if(MODES[mode] == "TAG"){
+				if(mouseIn(width/2-25, height/2+50, 26, 20)) pick = 1.5;
+				if(mouseIn(width/2+25, height/2+50, 26, 20)) pick = 2.5;
+
+			}else{
+				for(let i=0; i<5; ++i) if(mouseIn(width/2-100+50*i, height/2+50, 26, 20))
+					pick = i;
+			}
 
 			if(chooseModule != -1) pick = chooseModule < 0 ? chooseModule+10 : chooseModule;
 
 			if(pick != null && (!MOBILE || !ALLMODULE) && !showGuide){
-				const I = INFO[modules[pick]];
+				const M = MODES[mode] == "TAG" ? ([STRIKE, EMP])[pick-1.5] : modules[pick];
+
+				const I = INFO[M];
 
 				if(I != null){
 					push(); textSize(14);
-					const W = MODULE_NAME[modules[pick]]+"\n\n"+
-						wrap(I, 220)+"\n\n"+STATS[modules[pick]];
+					const W = MODULE_NAME[M]+"\n\n"+
+						wrap(I, 220)+"\n\n"+STATS[M];
 					const H = font.textBounds(W, 0, 0).h;
 					const P = width/2-100+50*pick;
 
@@ -329,6 +337,21 @@ function main(){
 				drawModule2(modules[i], mouseIn(width/2-100+i*50, height/2+50, 20, 20) ? 1 : 0);
 				pop();
 			}
+
+		}else if(MODES[mode] == "TAG"){
+			fill(100, 255, 100, searching ? 60 :
+				(mouseIn(width/2-25, height/2+50, 20, 20) ? 80 : 60));
+			rect(width/2 - 45, height/2 - 20 + 50, 40, 40);
+			push(); translate(width/2-25, height/2 + 50);
+			drawModule(STRIKE);
+			pop();
+
+			fill(100, 255, 100, searching ? 60 :
+				(mouseIn(width/2+25, height/2+50, 20, 20) ? 80 : 60));
+			rect(width/2 + 5, height/2 - 20 + 50, 40, 40);
+			push(); translate(width/2+25, height/2 + 50);
+			drawModule(EMP);
+			pop();
 
 		}else{
 			fill(255, 50, 50, searching ? 60 :
@@ -369,8 +392,15 @@ function main(){
 
 		if(searching){
 			fill(0, 100);
-			for(let i=0; i<5; ++i)
-				rect(width/2-120+i*50, height/2+30, 40, 40);
+
+			if(MODES[mode] == "TAG"){
+				rect(width/2-45, height/2+30, 40, 40);
+				rect(width/2+5, height/2+30, 40, 40);
+
+			}else{
+				for(let i=0; i<5; ++i)
+					rect(width/2-120+i*50, height/2+30, 40, 40);
+			}
 		}
 
 		if(chooseModule == -1){
@@ -1815,7 +1845,7 @@ function stagingUI(){
 		if(MOBILE) chooseModule = -1;
 	}
 
-	if(!searching){
+	if(!searching && MODES[mode] != "TAG"){
 		if(ALLMODULE){
 			for(let i=0; i<5; ++i)
 				if(mouseIn(width/2-100+i*50, height/2+50, 20, 20)){

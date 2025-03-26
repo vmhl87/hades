@@ -62,7 +62,7 @@ const Ship = Module.Ship, Game = Module.Game, normalModule = Module.normalModule
 
 const COLS = Module.COLS, ROWS = Module.ROWS, TPS = Module.TPS;
 
-let games = [], queue = {"FFA": [], "2TEAM": [], "CO-OP": []}, TIME = 0;
+let games = [], queue = {"FFA": [], "2TEAM": [], "CO-OP": [], "TAG": []}, TIME = 0;
 
 let SERVER_MOVE_PROTECT = true;
 const SERVER_LOCK_PASSWD = "DEFAULTPASSWORD" || process.env.SERVER_LOCK_PASSWD;
@@ -116,9 +116,14 @@ function startGame(Q, mode){
 	const g = new Game(Q.map(x => x.s));
 	const p = spawnBS(Q.length);
 
+	if(mode == "TAG"){
+		g.spawnEnemies = false;
+		g.collapseFrequency = 120;
+	}
+
 	let A = new Map(), B = new Array(Q.length);
 
-	if(mode == "FFA"){
+	if(["FFA", "TAG"].includes(mode)){
 		for(let i=0; i<Q.length; ++i)
 			B[i] = 'T'+i.toString();
 
@@ -161,6 +166,11 @@ function startGame(Q, mode){
 
 		g.addShip(1, [B[i], Q[i].s.id, N], Q[i].modules,
 			[300*(p[i][0]-COLS/2+0.5), 300*(p[i][1]-ROWS/2+0.5)]);
+
+		if(mode == "TAG"){
+			g.ships[g.ships.length-1].mhp = 9000;
+			g.ships[g.ships.length-1].hp = 9000;
+		}
 	}
 
 	g.start();

@@ -1,11 +1,11 @@
 const socket = io();
 
-const MODES = ["FFA", "2TEAM", "CO-OP", "SOLO"];
+const MODES = ["FFA", "2TEAM", "CO-OP", "SOLO", "TAG"];
 
 const CAN_ENTER_ALLMOD = false;
 
 function start(){
-	socket.emit("enqueue", modules, user, MODES[mode]);
+	socket.emit("enqueue", MODES[mode] == "TAG" ? [STRIKE, EMP] : modules, user, MODES[mode]);
 }
 
 function cancel(){

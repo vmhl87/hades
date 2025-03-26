@@ -354,6 +354,9 @@ class Game{
 
 		this.age = 0;
 		this.speed = 1;
+
+		this.spawnEnemies = true;
+		this.collapseFreq = null;
 	}
 
 	addShip(type, team, modules, pos, move = []){
@@ -1376,7 +1379,7 @@ class Game{
 
 		let COLLAPSING = this.dead.filter(x => x != 0 && x != 2).length != 0;
 
-		{
+		if(this.spawnEnemies){
 			// spawn cerberus
 
 			let S = [];
@@ -1489,7 +1492,8 @@ class Game{
 			}
 		};
 
-		if(this.ships.filter(x => x.hp == 0 && x.type == COL && x.kill != null).length){
+		if(this.ships.filter(x => x.hp == 0 && x.type == COL && x.kill != null).length ||
+			(this.collapseFreq != null && (this.age+1)%this.collapseFreq == 0)){
 			//const REM = Math.min(this.aliveCount, Math.max(3, Math.ceil(this.aliveCount*0.2)));
 			const REM = 5; // let's keep this simple
 
