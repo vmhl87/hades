@@ -168,8 +168,8 @@ function startGame(Q, mode){
 			[300*(p[i][0]-COLS/2+0.5), 300*(p[i][1]-ROWS/2+0.5)]);
 
 		if(mode == "TAG"){
-			g.ships[g.ships.length-1].mhp = 9000;
-			g.ships[g.ships.length-1].hp = 9000;
+			g.ships[g.ships.length-1].mhp = 3000;
+			g.ships[g.ships.length-1].hp = 3000;
 		}
 	}
 
