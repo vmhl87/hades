@@ -4,6 +4,8 @@ const MODES = ["FFA", "2TEAM", "CO-OP", "SOLO", "TAG"];
 
 const CAN_ENTER_ALLMOD = false;
 
+let setFrameRate = 60;
+
 function start(){
 	socket.emit("enqueue", MODES[mode] == "TAG" ? [STRIKE, EMP] : modules, user, MODES[mode]);
 }
@@ -236,7 +238,7 @@ class Ship{
 		if(diff > PI) diff -= PI*2;
 		if(diff < -PI) diff += PI*2;
 
-		const T = 3 / speed / frameRate();
+		const T = 3 / speed / setFrameRate;
 
 		this.rot += diff * T * 2;
 		if(this.rot > PI*2) this.rot -= PI*2;

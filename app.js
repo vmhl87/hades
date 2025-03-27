@@ -42,7 +42,8 @@ function setup(){
 	}
 
 	if(localStorage.getItem("performance")){
-		frameRate(parseInt(localStorage.getItem("performance")));
+		setFrameRate = parseInt(localStorage.getItem("performance"));
+		frameRate(setFrameRate);
 	}
 
 	setupLogin();
