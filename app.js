@@ -485,7 +485,7 @@ function main(){
 
 			if(chooseModule == 4){
 				for(let i=0; i<6; ++i){
-					fill(255, 100, 0, mouseIn(width/2-125+i*50, height/2+125, 20, 20) ? 80 : 60);
+					fill(255, 150, 0, mouseIn(width/2-125+i*50, height/2+125, 20, 20) ? 80 : 60);
 					rect(width/2-145+i*50, height/2+105, 40, 40);
 					push(); translate(width/2-125+i*50, height/2+125);
 					drawModule(DECOY+i);
@@ -567,7 +567,7 @@ function main(){
 				}
 
 				for(let i=0; i<6; ++i){
-					fill(255, 100, 0, mouseIn(width/2-125+i*50, height/2+325, 20, 20) ? 80 : 60);
+					fill(255, 150, 0, mouseIn(width/2-125+i*50, height/2+325, 20, 20) ? 80 : 60);
 					rect(width/2-145+i*50, height/2+305, 40, 40);
 					push(); translate(width/2-125+i*50, height/2+325);
 					drawModule(DECOY+i);

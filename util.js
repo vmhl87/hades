@@ -242,7 +242,7 @@ class Ship{
 		if(this.rot > PI*2) this.rot -= PI*2;
 		if(this.rot < -PI*2) this.rot += PI*2;
 
-		const F = last+500, OLD = timeframes[1], NEW = timeframes[0];
+		const F = last+250, OLD = timeframes[1], NEW = timeframes[0];
 
 		if(F != OLD){  // I think this was what caused corner glitch
 			this.vvpos[0] = lerp(this.vvpos[0], this.pos[0], (NEW-OLD)/(F-OLD));
