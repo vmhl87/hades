@@ -253,6 +253,9 @@ class Ship{
 
 		this.vpos[0] = lerp(this.vpos[0], this.vvpos[0], T*5);
 		this.vpos[1] = lerp(this.vpos[1], this.vvpos[1], T*5);
+
+		this.vvpos = [...this.pos];
+		this.vpos = [...this.pos];
 	}
 }
 
