@@ -144,7 +144,7 @@ socket.on("state", data => {
 	entities = data.entities;
 
 	speed = data.speed;
-	last = Date.now();
+	last = data.datetime;
 	age = data.age;
 });
 

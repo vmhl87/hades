@@ -800,8 +800,8 @@ class Game{
 			let b = count[a[0]] > count[a[1]] ? a[1] : a[0];
 			++count[b];
 			this.rocks.push([
-				Math.round(Math.random()*300) + 300*(b%COLS) - 300*COLS/2,
-				Math.round(Math.random()*300) + 300*Math.floor(b/COLS) - 300*ROWS/2
+				Math.round(Math.random()*280) + 300*(b%COLS) - 300*COLS/2,
+				Math.round(Math.random()*280) + 300*Math.floor(b/COLS) - 300*ROWS/2
 			]);
 			this.sectors[b].push(i);
 		}
@@ -1564,7 +1564,7 @@ class Game{
 		for(let k of Object.keys(this.entities))
 			this.entities[k] = this.entities[k].filter(x => x[x.length-1] >= this.age);
 
-		for(let p of this.players) p.emit("state", {s: q, entities: this.entities, dead: this.dead, age: this.age, speed: this.speed});
+		for(let p of this.players) p.emit("state", {s: q, entities: this.entities, dead: this.dead, age: this.age, speed: this.speed, datetime: Date.now()});
 
 		for(let s of this.ships) s.hit = false;
 
