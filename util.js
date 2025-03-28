@@ -717,7 +717,7 @@ function windowResized(){
 
 function saveState(){
 	return JSON.stringify({
-		ships, rocks, entities, ROWS, COLS, ID, age
+		ships, rocks, entities, ROWS, COLS, TEAM, ID, age
 	});
 }
 
@@ -739,6 +739,7 @@ function loadState(STATE){
 
 	ROWS = S.ROWS;
 	COLS = S.COLS;
+	TEAM = S.TEAM;
 	ID = S.ID;
 	age = S.age;
 
