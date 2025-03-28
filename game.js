@@ -974,7 +974,7 @@ class Game{
 						}
 					}
 
-				}else if(s.type == INT){
+				}else if(s.type == INT && s.team[0] == CERB){
 					if(s.wait == null && s.move.length == 0)
 						s.ai += 1/(TPS*20);
 
