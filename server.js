@@ -179,7 +179,8 @@ function startGame(Q, mode){
 
 io.on("connect", (socket) => {
 	socket.on("error", e => {
-		throw (e.description || e);
+		// what the heck!!
+		// throw (e.description || e);
 	});
 
 	console.log("connect " + socket.id);
