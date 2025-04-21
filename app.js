@@ -1,3 +1,5 @@
+p5.disableFriendlyErrors = true;
+
 let font = null, SHOW_TOUCH_REGIONS = false;
 
 let modules = [LASER, ALPHA, EMP, DUEL, DECOY];
