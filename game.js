@@ -292,7 +292,6 @@ class Ship{
 		if([TURRET, PHASE, BOMB].includes(this.type)){
 			this.move = [];
 			this.wait = null;
-			this.dock = null;
 			return;
 		}
 
@@ -392,6 +391,8 @@ class Game{
 				this.ships[s].pos[0]+10*Math.cos(R),
 				this.ships[s].pos[1]+10*Math.sin(R)
 			]);
+			if(!this.ships[s].move.length && this.ships[s].tp == null)
+				this.ships[this.ships.length-1].dock = this.ships[s].dock;
 		}
 
 		if(T == PHASE){
@@ -401,6 +402,8 @@ class Game{
 				this.ships[s].pos[1]+10*Math.sin(R)
 			]);
 			this.activateModule(this.ships.length-1, {i: 0});
+			if(!this.ships[s].move.length && this.ships[s].tp == null)
+				this.ships[this.ships.length-1].dock = this.ships[s].dock;
 		}
 
 		if(T == BOMB){
@@ -411,6 +414,8 @@ class Game{
 			]);
 			this.ships[this.ships.length-1].modules[0].color = [200, 50, 100];
 			this.ships[this.ships.length-1].modules[0].delay = 6;
+			if(!this.ships[s].move.length && this.ships[s].tp == null)
+				this.ships[this.ships.length-1].dock = this.ships[s].dock;
 		}
 
 		if(T == WARP){

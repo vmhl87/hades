@@ -303,7 +303,7 @@ function main(){
 
 			if(chooseModule != -1) pick = chooseModule < 0 ? chooseModule+10 : chooseModule;
 
-			if(pick != null && (!MOBILE || !ALLMODULE) && !showGuide){
+			if(pick != null && ((!MOBILE && chooseModule == -1) || !ALLMODULE) && !showGuide){
 				const M = MODES[mode] == "TAG" ? ([STRIKE, EMP])[pick-1.5] : modules[pick];
 
 				const I = INFO[M];
@@ -335,7 +335,7 @@ function main(){
 		}
 
 		if(ALLMODULE){
-			if(!MOBILE || chooseModule == -1) for(let i=0; i<5; ++i){
+			if((!MOBILE && 0) || chooseModule == -1) for(let i=0; i<5; ++i){
 				push(); translate(width/2-100+50*i, height/2+50);
 				drawModule2(modules[i], mouseIn(width/2-100+i*50, height/2+50, 20, 20) ? 1 : 0);
 				pop();
@@ -523,20 +523,34 @@ function main(){
 			}
 
 			if(chooseModule < -1){
-				if(MOBILE){
-					push(); translate(0, -100);
-				}
+				push(); translate(0, MOBILE ? -100 : -50);
 
-				for(let i=0; i<6; ++i){
-					fill(255, 50, 50, mouseIn(width/2-125+i*50, height/2+125, 20, 20) ? 80 : 60);
-					rect(width/2-145+i*50, height/2+105, 40, 40);
-					push(); translate(width/2-125+i*50, height/2+125);
+				for(let i=0; i<5; ++i){
+					fill(255, 50, 50, mouseIn(width/2-100+i*50, height/2+75-50, 20, 20) ? 80 : 60);
+					rect(width/2-120+i*50, height/2+55, 40, 40);
+					push(); translate(width/2-100+i*50, height/2+75);
 					drawModule(LASER+i);
 					pop();
 				}
 
+				for(let i=0; i<3; ++i){
+					fill(255, 50, 50, mouseIn(width/2-75+i*50, height/2+125-50, 20, 20) ? 80 : 60);
+					rect(width/2-95+i*50, height/2+105, 40, 40);
+					push(); translate(width/2-75+i*50, height/2+125);
+					drawModule(LASER+5+i);
+					pop();
+				}
+
+				{
+					fill(255, 50, 50, mouseIn(width/2-75+3*50, height/2+125-50, 20, 20) ? 80 : 60);
+					rect(width/2-95+3*50, height/2+105, 40, 40);
+					push(); translate(width/2-75+3*50, height/2+125);
+					drawModule(BOMBER);
+					pop();
+				};
+
 				for(let i=0; i<6; ++i){
-					fill(0, 255, 255, mouseIn(width/2-125+i*50, height/2+175, 20, 20) ? 80 : 60);
+					fill(0, 255, 255, mouseIn(width/2-125+i*50, height/2+175-50, 20, 20) ? 80 : 60);
 					rect(width/2-145+i*50, height/2+155, 40, 40);
 					push(); translate(width/2-125+i*50, height/2+175);
 					drawModule(ALPHA+i);
@@ -546,7 +560,7 @@ function main(){
 				for(let i=0; i<6; ++i){
 					fill(100, 255, 100,
 						modules[5-chooseModule] == EMP+i ? 60 :
-						(mouseIn(width/2-125+i*50, height/2+225, 20, 20) ? 80 : 60)
+						(mouseIn(width/2-125+i*50, height/2+225-50, 20, 20) ? 80 : 60)
 					);
 					rect(width/2-145+i*50, height/2+205, 40, 40);
 					push(); translate(width/2-125+i*50, height/2+225);
@@ -556,28 +570,28 @@ function main(){
 					if(modules[5-chooseModule] == EMP+i) rect(width/2-125+i*50, height/2+205, 40, 40);
 				}
 
-				for(let i=0; i<6; ++i){
+				for(let i=0; i<7; ++i){
 					fill(100, 255, 100,
 						modules[5-chooseModule] == EMP+6+i ? 60 :
-						(mouseIn(width/2-125+i*50, height/2+275, 20, 20) ? 80 : 60)
+						(mouseIn(width/2-150+i*50, height/2+275-50, 20, 20) ? 80 : 60)
 					);
-					rect(width/2-145+i*50, height/2+255, 40, 40);
-					push(); translate(width/2-125+i*50, height/2+275);
+					rect(width/2-170+i*50, height/2+255, 40, 40);
+					push(); translate(width/2-150+i*50, height/2+275);
 					drawModule(EMP+6+i);
 					pop();
 					fill(0, 100);
-					if(modules[5-chooseModule] == EMP+6+i) rect(width/2-145+i*50, height/2+255, 40, 40);
+					if(modules[5-chooseModule] == EMP+6+i) rect(width/2-170+i*50, height/2+255, 40, 40);
 				}
 
-				for(let i=0; i<6; ++i){
-					fill(255, 150, 0, mouseIn(width/2-125+i*50, height/2+325, 20, 20) ? 80 : 60);
-					rect(width/2-145+i*50, height/2+305, 40, 40);
-					push(); translate(width/2-125+i*50, height/2+325);
+				for(let i=0; i<7; ++i){
+					fill(255, 150, 0, mouseIn(width/2-150+i*50, height/2+325-50, 20, 20) ? 80 : 60);
+					rect(width/2-170+i*50, height/2+305, 40, 40);
+					push(); translate(width/2-150+i*50, height/2+325);
 					drawModule(DECOY+i);
 					pop();
 				}
 
-				if(MOBILE) pop();
+				pop();
 			}
 		}
 
@@ -1674,6 +1688,8 @@ function stagingUI(){
 		}
 	}
 
+	let X = false;
+
 	if(chooseModule == -1){
 		{
 			push();
@@ -1810,14 +1826,24 @@ function stagingUI(){
 		if(!mouseIn(width/2, height/2+50, 150, 20) && p) chooseModule = -1;
 
 	}else if(chooseModule < -1){
-		const OFFSET = MOBILE ? 100 : 0;
+		const OFFSET = MOBILE ? 100 : 50;
 
 		let p = true;
 
-		for(let i=0; i<6; ++i)
-			if(mouseIn(width/2-125+i*50, height/2+125-OFFSET, 20, 20)){
+		for(let i=0; i<5; ++i)
+			if(mouseIn(width/2-100+i*50, height/2+75-OFFSET, 20, 20)){
 				modules[chooseModule+10] = modules[chooseModule+10] == LASER+i ? null : LASER+i;
 				p = false;
+			}
+
+		for(let i=0; i<3; ++i)
+			if(mouseIn(width/2-75+i*50, height/2+125-OFFSET, 20, 20)){
+				modules[chooseModule+10] = modules[chooseModule+10] == LASER+5+i ? null : LASER+5+i;
+				p = false;
+			}
+
+			if(mouseIn(width/2-75+3*50, height/2+125-OFFSET, 20, 20)){
+				modules[chooseModule+10] = modules[chooseModule+10] == BOMBER ? null : BOMBER;
 			}
 
 		for(let i=0; i<6; ++i)
@@ -1832,25 +1858,26 @@ function stagingUI(){
 				p = false;
 			}
 
-		for(let i=0; i<6; ++i)
-			if(mouseIn(width/2-125+i*50, height/2+275-OFFSET, 20, 20)){
+		for(let i=0; i<7; ++i)
+			if(mouseIn(width/2-150+i*50, height/2+275-OFFSET, 20, 20)){
 				modules[chooseModule+10] = modules[chooseModule+10] == EMP+6+i ? null : EMP+6+i;
 				p = false;
 			}
 
-		for(let i=0; i<6; ++i)
-			if(mouseIn(width/2-125+i*50, height/2+325-OFFSET, 20, 20)){
+		for(let i=0; i<7; ++i)
+			if(mouseIn(width/2-150+i*50, height/2+325-OFFSET, 20, 20)){
 				modules[chooseModule+10] = modules[chooseModule+10] == DECOY+i ? null : DECOY+i;
 				p = false;
 			}
 
-		if(!mouseIn(width/2, height/2+50, 150, 20) && p) chooseModule = -1;
-		if(MOBILE) chooseModule = -1;
+		//if(!mouseIn(width/2, height/2+50, 150, 20) && p) chooseModule = -1;
+		//if(MOBILE) chooseModule = -1;
+		X = true;
 	}
 
 	if(!searching && MODES[mode] != "TAG"){
 		if(ALLMODULE){
-			for(let i=0; i<5; ++i)
+			if(chooseModule == -1) for(let i=0; i<5; ++i)
 				if(mouseIn(width/2-100+i*50, height/2+50, 20, 20)){
 					chooseModule = chooseModule == i-10 ? -1 : i-10;
 					return;
@@ -1878,6 +1905,8 @@ function stagingUI(){
 			}
 		}
 	}
+
+	if(X) chooseModule = -1;
 }
 
 function click(){
