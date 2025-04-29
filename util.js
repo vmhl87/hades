@@ -2,7 +2,7 @@ const socket = io();
 
 const MODES = ["FFA", "2TEAM", "CO-OP", "SOLO", "TAG"];
 
-const CAN_ENTER_ALLMOD = false;
+const CAN_ENTER_ALLMOD = true;  // DEFAULT TO FALSE
 
 let setFrameRate = 60;
 

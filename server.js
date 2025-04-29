@@ -64,7 +64,7 @@ const COLS = Module.COLS, ROWS = Module.ROWS, TPS = Module.TPS;
 
 let games = [], queue = {"FFA": [], "2TEAM": [], "CO-OP": [], "TAG": []}, TIME = 0;
 
-let SERVER_MOVE_PROTECT = true;
+let SERVER_MOVE_PROTECT = false;  // DEFAULT TO TRUE
 const SERVER_LOCK_PASSWD = process.env.SERVER_LOCK_PASSWD || "DEFAULTPASSWORD";
 
 function tick(game){
