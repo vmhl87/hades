@@ -523,7 +523,7 @@ function main(){
 			}
 
 			if(chooseModule < -1){
-				push(); translate(0, MOBILE ? -100 : -50);
+				push(); translate(0, MOBILE ? -150 : -50);
 
 				for(let i=0; i<5; ++i){
 					fill(255, 50, 50, mouseIn(width/2-100+i*50, height/2+75-50, 20, 20) ? 80 : 60);
@@ -1826,7 +1826,7 @@ function stagingUI(){
 		if(!mouseIn(width/2, height/2+50, 150, 20) && p) chooseModule = -1;
 
 	}else if(chooseModule < -1){
-		const OFFSET = MOBILE ? 100 : 50;
+		const OFFSET = MOBILE ? 150 : 50;
 
 		let p = true;
 
