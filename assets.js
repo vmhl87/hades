@@ -1436,7 +1436,7 @@ function _moduleColor(T){
 	if(T >= SENTINEL && T <= BOMBER) return [255, 50, 50];
 	if(T >= ALPHA && T <= ALLY) return [0, 255, 255];
 	if(T >= EMP && T <= APOCALYPSE) return [100, 255, 100];
-	if(T >= DECOY && T <= REPAIR) return [255, 150, 0];
+	if(T >= DECOY && T <= BOMB) return [255, 150, 0];
 	return [255];
 }
 
@@ -1460,7 +1460,7 @@ function drawModule2(T, S){
 	if(T >= SENTINEL && T <= BOMBER) fill(255, 50, 50, 60);
 	if(T >= ALPHA && T <= ALLY) fill(0, 255, 255, 60);
 	if(T >= EMP && T <= APOCALYPSE) fill(100, 255, 100, 60);
-	if(T >= DECOY && T <= REPAIR) fill(255, 150, 0, 60);
+	if(T >= DECOY && T <= BOMB) fill(255, 150, 0, 60);
 	*/
 
 	fill(..._moduleColor(T), 60);

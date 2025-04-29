@@ -10,7 +10,7 @@ const DARTP = ++ct, ROCKETP = ++ct, STRIKEP = ++ct, BOMBERP = ++ct;
 
 // DRONE TYPES
 
-const DECOY = ++ct, ROCKET = ++ct, TURRET = ++ct, PHASE = ++ct, WARP = ++ct, BOMB = ++ct, REPAIR = ++ct;
+const DECOY = ++ct, ROCKET = ++ct, TURRET = ++ct, PHASE = ++ct, WARP = ++ct, REPAIR = ++ct, BOMB = ++ct;
 
 // WEAPON TYPES
 

@@ -10,7 +10,7 @@ const DARTP = ++ct, ROCKETP = ++ct, STRIKEP = ++ct, BOMBERP = ++ct;
 
 // DRONE TYPES
 
-const DECOY = ++ct, ROCKET = ++ct, TURRET = ++ct, PHASE = ++ct, WARP = ++ct, BOMB = ++ct, REPAIR = ++ct;
+const DECOY = ++ct, ROCKET = ++ct, TURRET = ++ct, PHASE = ++ct, WARP = ++ct, REPAIR = ++ct, BOMB = ++ct;
 
 // WEAPON TYPES
 
@@ -1357,7 +1357,7 @@ class Game{
 			}
 
 		for(let s of this.ships){
-			if(s.type >= DECOY && s.type <= REPAIR){
+			if(s.type >= DECOY && s.type <= BOMB){
 				s.expire = Math.max(0, s.expire-1/(TPS*EXPIRE_TIME[s.type]));
 			}
 
