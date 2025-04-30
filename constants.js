@@ -24,9 +24,9 @@ const ALPHA = ++ct, DELTA = ++ct, OMEGA = ++ct, PASSIVE = ++ct, MIRROR = ++ct, A
 
 // MODULE TYPES
 
-const EMP = ++ct, DUEL = ++ct, FORT = ++ct, TP = ++ct, AMP = ++ct, LEAP = ++ct, BARRIER = ++ct, STRIKE = ++ct, BOND = ++ct, DISRUPT = ++ct;
+const EMP = ++ct, DUEL = ++ct, FORT = ++ct, TP = ++ct, AMP = ++ct, LEAP = ++ct, BARRIER = ++ct, STRIKE = ++ct, BOND = ++ct, DISRUPT = ++ct, SUSPEND = ++ct, RIPPLE = ++ct;
 
-/* UNOBTAIN */ const SUSPEND = ++ct, VENG = ++ct, RIPPLE = ++ct, APOCALYPSE = ++ct;
+/* UNOBTAIN */ const VENG = ++ct, APOCALYPSE = ++ct;
 
 const NULL = 2.71, DEV = 1.618;
 

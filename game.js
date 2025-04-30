@@ -24,9 +24,9 @@ const ALPHA = ++ct, DELTA = ++ct, OMEGA = ++ct, PASSIVE = ++ct, MIRROR = ++ct, A
 
 // MODULE TYPES
 
-const EMP = ++ct, DUEL = ++ct, FORT = ++ct, TP = ++ct, AMP = ++ct, LEAP = ++ct, BARRIER = ++ct, STRIKE = ++ct, BOND = ++ct, DISRUPT = ++ct;
+const EMP = ++ct, DUEL = ++ct, FORT = ++ct, TP = ++ct, AMP = ++ct, LEAP = ++ct, BARRIER = ++ct, STRIKE = ++ct, BOND = ++ct, DISRUPT = ++ct, SUSPEND = ++ct, RIPPLE = ++ct;
 
-/* UNOBTAIN */ const SUSPEND = ++ct, VENG = ++ct, RIPPLE = ++ct, APOCALYPSE = ++ct;
+/* UNOBTAIN */ const VENG = ++ct, APOCALYPSE = ++ct;
 
 const Const = require("./constants.js");
 
@@ -61,7 +61,7 @@ function IS_WEAPON(T){
 function normalModule(M){
 	let W = M.filter(x => x >= LASER && x <= PULSE),
 		S = M.filter(x => x >= ALPHA && x <= ALLY),
-		C = M.filter(x => x >= EMP && x <= DISRUPT),
+		C = M.filter(x => x >= EMP && x <= RIPPLE),
 		D = M.filter(x => x >= DECOY && x <= BOMB);
 
 	let H = new Set();
