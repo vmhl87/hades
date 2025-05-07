@@ -414,7 +414,7 @@ class Game{
 				this.ships[s].pos[1]+10*Math.sin(R)
 			]);
 			this.ships[this.ships.length-1].modules[0].color = [200, 50, 100];
-			this.ships[this.ships.length-1].modules[0].delay = 6;
+			this.ships[this.ships.length-1].modules[0].delay = 5.5;
 			this.ships[this.ships.length-1].modules[0].dmg = DAMAGE[BOMB];
 			if(!this.ships[s].move.length && this.ships[s].tp == null)
 				this.ships[this.ships.length-1].dock = this.ships[s].dock;
