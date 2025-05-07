@@ -130,6 +130,7 @@ class Ship{
 				if(m.type == PULSE){
 					m.color = [200, 75, 50];
 					m.delay = RECHARGE_TIME[PULSE];
+					m.dmg = DAMAGE[PULSE];
 				}
 
 			}else if(m.type == PASSIVE)
@@ -414,6 +415,7 @@ class Game{
 			]);
 			this.ships[this.ships.length-1].modules[0].color = [200, 50, 100];
 			this.ships[this.ships.length-1].modules[0].delay = 6;
+			this.ships[this.ships.length-1].modules[0].dmg = DAMAGE[BOMB];
 			if(!this.ships[s].move.length && this.ships[s].tp == null)
 				this.ships[this.ships.length-1].dock = this.ships[s].dock;
 		}
