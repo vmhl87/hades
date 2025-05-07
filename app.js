@@ -1262,7 +1262,7 @@ function main(){
 									pop();
 								}
 
-							}else if(ACTIVATED[M.type] || [DART, ROCKETD, BOMBER].includes(M.type)){
+							}else if(ACTIVATED[M.type] || [DART, ROCKETD, BOMBER, VENG].includes(M.type)){
 								const T = M.use || S.type != BS || S.team == TEAM ? M.type : NULL;
 
 								if(T != NULL){

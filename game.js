@@ -1135,7 +1135,7 @@ class Game{
 
 					for(let x of this.ships) if(x.team[0] != s.team[0])
 						if(_dist(x.pos, s.pos) < RANGE[m.type] && (![DART, ROCKETD].includes(m.type)
-							|| [BS, DECOY, REPAIR, ROCKET, TURRET, PHASE, WARP].includes(x.type)))
+							|| [BS, DECOY, REPAIR, ROCKET, TURRET, PHASE, WARP, BOMB].includes(x.type)))
 							if(m.type != ROCKETD || _dist(x.pos, s.pos) > 60){
 								if(x.type == DECOY) decoys.push([_dist(x.pos, s.pos), x.uid]);
 								else targets.push([_dist(x.pos, s.pos), x.uid]);
